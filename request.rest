@@ -1,0 +1,39 @@
+GET  http://localhost:3000/
+
+### signing up a user
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+    "username": "boyyy",
+    "email": "boy@gmail.com",
+    "password": "password1234"
+}
+
+### logging in
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{ 
+   "email": "itguy@gmail.com",
+    "password": "password1234"
+}
+
+### accessing a protected route without a token
+GET http://localhost:3000/auth/me
+Content-Type: application/json
+
+{ 
+    "email": "boy@gmail.com",
+    "password": "password1234"
+}
+
+### accessing a protected route with a token
+GET http://localhost:3000/auth/me
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjhjNDQzOGQ4OThhN2Q1ODYxZDE4MyIsImlhdCI6MTc2NDI3OTU2NSwiZXhwIjoxNzY2ODcxNTY1fQ.FydSJGk9CYAXKsGft1BT74A16coVEVKlk3lAitXeOxE
+
+{ 
+    "email": "itguy@gmail.com",
+    "password": "password1234"
+}
