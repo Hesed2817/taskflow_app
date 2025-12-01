@@ -9,6 +9,9 @@ const dbURI = process.env.MONGODB_URI;
 
 mongoose.connect(dbURI)
     .then(() => {
+        require('./models/User');
+        require('./models/Project');
+        
         app.listen(PORT, () => {
             console.log(`Listening on http://localhost:${PORT}`);
         });
