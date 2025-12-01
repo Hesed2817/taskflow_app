@@ -19,8 +19,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 
-// 
+// routes
 app.use('/auth', require('./routes/auth'));
+app.use('/projects', require('./routes/projects'));
 app.get('/', (request, response)=>{
     response.send("Request received successfully!");
 })

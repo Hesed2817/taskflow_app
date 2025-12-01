@@ -12,15 +12,17 @@ const projectSchema = new mongoose.Schema({
         maxlength: [500, "Project name cannot be more than 500 characters"]
     },
     createdBy: {
-        tpye: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     members: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
     }]
 }, {
     timestamps: true,
     collection: 'projects'
 });
+
+module.exports = mongoose.model('Project', projectSchema);
