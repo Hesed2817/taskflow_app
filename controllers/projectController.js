@@ -23,7 +23,7 @@ const createProject = async function (request, response, next) {
         });
 
         // populate the createdBy field to return user details
-        await project.populate('createdBy', 'name email');
+        await project.populate('createdBy', 'username email');
 
         response.status(201).json({
             success: true,
@@ -49,8 +49,8 @@ const getProjects = async function (request, response, next) {
                 { members: request.user.id }
             ]
         })
-            .populate('createdBy', 'name email')
-            .populate('members', 'name email')
+            .populate('createdBy', 'username email')
+            .populate('members', 'username email')
             .sort({ createdAt: -1 }); // newest first
 
         response.json({
@@ -72,8 +72,8 @@ const getProject = async function (request, response, next) {
 
     try {
         const project = await Project.findById(request.params.id)
-            .populate('createdBy', 'name email')
-            .populate('members', 'name email');
+            .populate('createdBy', 'username email')
+            .populate('members', 'username email');
 
         if (!project) {
             return response.status(404).json({
@@ -135,8 +135,8 @@ const updateProject = async function (request, response, next) {
                 new: true,  // return updated document
                 runValidators: true
             }
-        ).populate('createdBy', 'name email')
-            .populate('members', 'name email')
+        ).populate('createdBy', 'username email')
+            .populate('members', 'username email')
 
         response.json({
             success: true,
