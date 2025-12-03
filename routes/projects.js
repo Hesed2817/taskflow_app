@@ -6,6 +6,7 @@ const { createProject,
     updateProject,
     deleteProject
 } = require('../controllers/projectController');
+const taskRouter = require('./task');
 
 const router = express.Router();
 
@@ -20,5 +21,7 @@ router.route('/:id')
     .get(getProject)
     .put(updateProject)
     .delete(deleteProject);
+
+router.use('/:projectId/tasks', taskRouter);
 
 module.exports = router;
