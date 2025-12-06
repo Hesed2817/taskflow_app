@@ -95,26 +95,7 @@ const loginUser = async function (request, response) {
 
 }
 
-//@route GET /api/auth/me
-
-// to be used for testing
-const getMe = async function (request, response) {
-    try {
-        // get the user data using the authenticated user's creds (request.user._id)
-        const user = await User.findById(request.user._id);
-
-        // send the personalized data
-        response.json({
-            success: true,
-            data: user
-        });
-    } catch (error) {
-        console.error(error);
-    }
-}
-
 module.exports = {
     registerUser,
-    loginUser,
-    getMe
+    loginUser
 };

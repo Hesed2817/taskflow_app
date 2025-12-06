@@ -5,8 +5,8 @@ POST http://localhost:3000/auth/register
 Content-Type: application/json
 
 {
-    "username": "boyyy",
-    "email": "boy@gmail.com",
+    "username": "stroz",
+    "email": "stroz@gmail.com",
     "password": "password1234"
 }
 
@@ -29,7 +29,7 @@ Content-Type: application/json
 }
 
 ### accessing a protected route with a token
-GET http://localhost:3000/projects/693011131181728c0188747b/tasks
+GET http://localhost:3000/users/search?email=@gmail
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjhjNGVlOGQ4OThhN2Q1ODYxZDE4NyIsImlhdCI6MTc2NDc1NTQzNiwiZXhwIjoxNzY3MzQ3NDM2fQ.IPdwKm7-ZoaJ09pCLANl2KHQXJO6KuIp5HesjETtM5s
 
