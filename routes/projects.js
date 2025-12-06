@@ -4,7 +4,10 @@ const { createProject,
     getProjects,
     getProject,
     updateProject,
-    deleteProject
+    deleteProject,
+    addProjectMember,
+    getProjectMembers,
+    removeProjectMember
 } = require('../controllers/projectController');
 const taskRouter = require('./task');
 
@@ -22,6 +25,14 @@ router.route('/:id')
     .put(updateProject)
     .delete(deleteProject);
 
+// routes for project team management
+router.route('/:id/members')
+    .get(getProjectMembers)
+    .post(addProjectMember);
+
+router.delete('/:id/members/:userId', removeProjectMember);
+
+// routes related to tasks
 router.use('/:projectId/tasks', taskRouter);
 
 module.exports = router;
