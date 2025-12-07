@@ -1,3 +1,4 @@
+const Task = require('./Task');
 const mongoose = require('mongoose');
 
 const projectSchema = new mongoose.Schema({
@@ -24,5 +25,18 @@ const projectSchema = new mongoose.Schema({
     timestamps: true,
     collection: 'projects'
 });
+
+projectSchema.pre('deleteOne', { document: true, query: false}, async function (next){
+    try{
+        const projectId = this._id;
+
+        await Task.deleteMany({ project: projectId });
+        console.log('successfully deleted associated tasks');
+
+    } catch (error){
+        console.error('Error cascade deleting tasks', error);
+        next();
+    }
+})
 
 module.exports = mongoose.model('Project', projectSchema);

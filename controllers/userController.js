@@ -2,12 +2,12 @@ const User = require('../models/User');
 
 const searchUsers = async function (request, response, next) {
     try {
-        const { email, name } = request.query;
+        const { email, username } = request.query;
 
-        if (!email && !name) {
+        if (!email && !username) {
             return response.status(400).json({
                 success: false,
-                message: 'Please provide an email or name to search'
+                message: 'Please provide an email or username to search'
             });
         }
 
@@ -17,15 +17,15 @@ const searchUsers = async function (request, response, next) {
             query.email = { $regex: email, $options: 'i' }; // case insensitive search
         }
 
-        if (name) {
-            query.name = { $regex: name, $options: 'i' };
+        if (username) {
+            query.username = { $regex: username, $options: 'i' };
         }
 
         // removing current user from results
         query._id = { $ne: request.user.id };
 
         const users = await User.find(query)
-            .select('_id name email')
+            .select('_id username email')
             .limit(10);
 
         response.json({

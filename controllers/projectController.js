@@ -52,7 +52,7 @@ const addProjectMember = async function (request, response, next) {
             });
         }
 
-        const project = await Project.findById(request.params.id);
+        const project = await Project.findById(request.params.projectId);
 
         if (!project) {
             return response.status(404).json({
@@ -137,7 +137,7 @@ const getProjects = async function (request, response, next) {
 const getProject = async function (request, response, next) {
 
     try {
-        const project = await Project.findById(request.params.id)
+        const project = await Project.findById(request.params.projectId)
             .populate('createdBy', 'username email')
             .populate('members', 'username email');
 
@@ -176,7 +176,7 @@ const getProject = async function (request, response, next) {
 const updateProject = async function (request, response, next) {
 
     try {
-        let project = await Project.findById(request.params.id);
+        let project = await Project.findById(request.params.projectId);
 
         if (!project) {
             return response.status(404).json({
@@ -195,7 +195,7 @@ const updateProject = async function (request, response, next) {
 
         // update project
         project = await Project.findByIdAndUpdate(
-            request.params.id,
+            request.params.projectId,
             request.body,
             {
                 new: true,  // return updated document
@@ -220,7 +220,7 @@ const updateProject = async function (request, response, next) {
 // get project members
 const getProjectMembers = async function (request, response, next){
     try {
-        const project = await Project.findById(request.params.id)
+        const project = await Project.findById(request.params.projectId)
         .populate('createdBy', 'name email')
         .populate('members', 'name email');
 
@@ -257,7 +257,7 @@ const getProjectMembers = async function (request, response, next){
 // removing a member from a project
 const removeProjectMember = async function (request, response, next) {
     try {
-        const project = await Project.findById(request.params.id);
+        const project = await Project.findById(request.params.projectId);
         const { userId } = request.params;
         
         if (!project) {
@@ -268,7 +268,9 @@ const removeProjectMember = async function (request, response, next) {
         }
 
 
-        if (!project.createdBy.equals(request.user.id)) {
+        if (!project.createdBy.equals(request.user.id
+        
+        )) {
             return response.status(403).json({
                 success: false,
                 message: 'Only project creators can remove members'
@@ -311,7 +313,7 @@ const removeProjectMember = async function (request, response, next) {
 const deleteProject = async function (request, response, next) {
 
     try {
-        const project = await Project.findById(request.params.id);
+        const project = await Project.findById(request.params.projectId);
 
         if (!project) {
             return response.status(404).json({
@@ -329,7 +331,7 @@ const deleteProject = async function (request, response, next) {
         }
 
         // delete the project
-        await Project.findByIdAndDelete(request.params.id);
+        await Project.findByIdAndDelete(request.params.projectId);
 
         response.json({
             success: true,

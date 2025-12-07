@@ -9,9 +9,9 @@ const { createProject,
     getProjectMembers,
     removeProjectMember
 } = require('../controllers/projectController');
-const taskRouter = require('./task');
+const taskRouter = require('./tasks');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 // protect all routes related to the projects
 router.use(protect);
@@ -20,17 +20,17 @@ router.route('/')
     .get(getProjects)
     .post(createProject);
 
-router.route('/:id')
+router.route('/:projectId')
     .get(getProject)
     .put(updateProject)
     .delete(deleteProject);
 
 // routes for project team management
-router.route('/:id/members')
+router.route('/:projectId/members')
     .get(getProjectMembers)
     .post(addProjectMember);
 
-router.delete('/:id/members/:userId', removeProjectMember);
+router.delete('/:projectId/members/:userId', removeProjectMember);
 
 // routes related to tasks
 router.use('/:projectId/tasks', taskRouter);
