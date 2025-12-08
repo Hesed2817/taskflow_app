@@ -9,21 +9,6 @@ const registerUser = async function (request, response) {
         // extract the user input from the request body
         const { username, email, password } = request.body;
 
-        // validate the user input
-        if (!username || !email || !password) {
-            return response.status(400).json({
-                success: false,
-                message: 'Please fill all the fields'
-            });
-        }
-
-        if (password.length < 6) {
-            return response.status(400).json({
-                success: false,
-                message: 'Password must be atleast 6 characters'
-            });
-        }
-
         // check if the user is not already registered
         const userExists = await User.findOne({ email });
         if (userExists) {
@@ -57,14 +42,6 @@ const loginUser = async function (request, response) {
     // logic for logging in a user
     try {
         const { email, password } = request.body;
-
-        // validating user input
-        if (!email || !password) {
-            return response.status(400).json({
-                success: false,
-                message: 'Please add an email and password'
-            });
-        }
 
         // check for the user and include the password (since select: false)
         const user = await User.findOne({ email }).select('+password');

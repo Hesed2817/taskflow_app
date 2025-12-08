@@ -9,28 +9,35 @@ const { createProject,
     getProjectMembers,
     removeProjectMember
 } = require('../controllers/projectController');
-const taskRouter = require('./task');
+const {
+    projectValidator,
+    projectIdValidator,
+    memberValidator,    
+    validate
+} = require('../utils/validators');
+const taskRouter = require('./tasks');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 // protect all routes related to the projects
 router.use(protect);
 
 router.route('/')
     .get(getProjects)
-    .post(createProject);
+    .post(projectValidator, validate, createProject);
 
-router.route('/:id')
+router.route('/:projectId')
+    .all(projectIdValidator, validate)
     .get(getProject)
-    .put(updateProject)
+    .put(projectValidator, validate, updateProject)
     .delete(deleteProject);
 
 // routes for project team management
-router.route('/:id/members')
+router.route('/:projectId/members')
     .get(getProjectMembers)
-    .post(addProjectMember);
+    .post(projectIdValidator.concat(memberValidator), validate, addProjectMember);
 
-router.delete('/:id/members/:userId', removeProjectMember);
+router.delete('/:projectId/members/:userId',projectIdValidator.concat(memberValidator), validate, removeProjectMember);
 
 // routes related to tasks
 router.use('/:projectId/tasks', taskRouter);

@@ -20,7 +20,7 @@ Content-Type: application/json
 }
 
 ### accessing a protected route without a token
-GET http://localhost:3000/auth/me
+post http://localhost:3000/auth/login
 Content-Type: application/json
 
 { 
@@ -29,15 +29,17 @@ Content-Type: application/json
 }
 
 ### accessing a protected route with a token
-DELETE http://localhost:3000/projects/692d9c3515603f0c98054988/members/69349ab3cc3d7184c3bbd77d
+post http://localhost:3000/projects/693735a2900253e8fb24c415/tasks/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjhjNDQzOGQ4OThhN2Q1ODYxZDE4MyIsImlhdCI6MTc2NTA1OTY4MCwiZXhwIjoxNzY3NjUxNjgwfQ.HZz4yd1rOgk4z3g0jSa_shKdHciGARFTmCt-PA4wAXc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjhjNGVlOGQ4OThhN2Q1ODYxZDE4NyIsImlhdCI6MTc2NTEzOTQ0MywiZXhwIjoxNzY3NzMxNDQzfQ.9v4rGeKjfSlu-H8kDatXLvsLi6A58hE32hkDdM5arkw
 
-{ 
-    "userId": "69349ab3cc3d7184c3bbd77d"  
+{
+  "title": "Test task",
+  "dueDate": "December 31, 2024"
 }
 
+
 ### Search for a user to add to a project
-GET http://localhost:3000/users/ME
+GET http://localhost:3000/tasks?search=<script>alert('xss')</script>
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjhjNDQzOGQ4OThhN2Q1ODYxZDE4MyIsImlhdCI6MTc2NTA1OTY4MCwiZXhwIjoxNzY3NjUxNjgwfQ.HZz4yd1rOgk4z3g0jSa_shKdHciGARFTmCt-PA4wAXc

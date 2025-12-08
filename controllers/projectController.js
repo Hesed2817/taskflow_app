@@ -7,14 +7,6 @@ const createProject = async function (request, response, next) {
     try {
         const { name, description } = request.body;
 
-        // validation
-        if (!name) {
-            return response.status(400).json({
-                success: false,
-                message: "Please add a project name"
-            });
-        }
-
         // create project
         const project = await Project.create({
             name,
@@ -44,22 +36,7 @@ const addProjectMember = async function (request, response, next) {
 
     try {
         const { userId } = request.body;
-
-        if (!userId) {
-            return response.status(400).json({
-                success: false,
-                message: 'Please provide a user ID'
-            });
-        }
-
-        const project = await Project.findById(request.params.id);
-
-        if (!project) {
-            return response.status(404).json({
-                success: false,
-                message: 'Project not found'
-            });
-        }
+        const project = await Project.findById(request.params.projectId);
 
         // checking if user is the project's creator
         if (!project.createdBy.equals(request.user.id)) {
@@ -70,6 +47,7 @@ const addProjectMember = async function (request, response, next) {
         }
 
         const userToAdd = await User.findById(userId);
+
         if (!userToAdd) {
             return response.status(404).json({
                 success: false,
@@ -137,16 +115,9 @@ const getProjects = async function (request, response, next) {
 const getProject = async function (request, response, next) {
 
     try {
-        const project = await Project.findById(request.params.id)
+        const project = await Project.findById(request.params.projectId)
             .populate('createdBy', 'username email')
             .populate('members', 'username email');
-
-        if (!project) {
-            return response.status(404).json({
-                success: false,
-                message: "Project not found"
-            });
-        }
 
         // check if user has access to this project
         const hasAccess = project.createdBy._id.equals(request.user.id) ||
@@ -176,14 +147,7 @@ const getProject = async function (request, response, next) {
 const updateProject = async function (request, response, next) {
 
     try {
-        let project = await Project.findById(request.params.id);
-
-        if (!project) {
-            return response.status(404).json({
-                success: false,
-                message: "Project not found"
-            });
-        }
+        let project = await Project.findById(request.params.projectId);
 
         // check if user is the project creator
         if (!project.createdBy.equals(request.user.id)) {
@@ -195,7 +159,7 @@ const updateProject = async function (request, response, next) {
 
         // update project
         project = await Project.findByIdAndUpdate(
-            request.params.id,
+            request.params.projectId,
             request.body,
             {
                 new: true,  // return updated document
@@ -220,16 +184,9 @@ const updateProject = async function (request, response, next) {
 // get project members
 const getProjectMembers = async function (request, response, next){
     try {
-        const project = await Project.findById(request.params.id)
+        const project = await Project.findById(request.params.projectId)
         .populate('createdBy', 'name email')
         .populate('members', 'name email');
-
-        if (!project) {
-            return response.status(404).json({
-                success: false,
-                message: 'Project not found'
-            });
-        }
 
         // check if user has access to this project
         const hasAccess = project.createdBy._id.equals(request.user.id) ||
@@ -257,18 +214,12 @@ const getProjectMembers = async function (request, response, next){
 // removing a member from a project
 const removeProjectMember = async function (request, response, next) {
     try {
-        const project = await Project.findById(request.params.id);
+        const project = await Project.findById(request.params.projectId);
         const { userId } = request.params;
         
-        if (!project) {
-            return response.status(404).json({
-                success: false,
-                message: 'Project not found'
-            });
-        }
-
-
-        if (!project.createdBy.equals(request.user.id)) {
+        if (!project.createdBy.equals(request.user.id
+        
+        )) {
             return response.status(403).json({
                 success: false,
                 message: 'Only project creators can remove members'
@@ -311,14 +262,7 @@ const removeProjectMember = async function (request, response, next) {
 const deleteProject = async function (request, response, next) {
 
     try {
-        const project = await Project.findById(request.params.id);
-
-        if (!project) {
-            return response.status(404).json({
-                success: false,
-                message: "Project not found"
-            });
-        }
+        const project = await Project.findById(request.params.projectId);
 
         // check if user is the project creator
         if (!project.createdBy.equals(request.user.id)) {
@@ -329,7 +273,7 @@ const deleteProject = async function (request, response, next) {
         }
 
         // delete the project
-        await Project.findByIdAndDelete(request.params.id);
+        await Project.findByIdAndDelete(request.params.projectId);
 
         response.json({
             success: true,
