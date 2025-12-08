@@ -5,13 +5,6 @@ const getProjectTasks = async function (request, response, next) {
     try {
         const project = await Project.findById(request.params.projectId);
 
-        if (!project) {
-            return response.status(404).json({
-                success: false,
-                message: 'Project not found'
-            });
-        }
-
         // check access
         const hasAccess = project.createdBy.equals(request.user.id) || project.members.some(memberId => memberId.equals(request.user.id));
 
@@ -42,23 +35,7 @@ const getProjectTasks = async function (request, response, next) {
 const createTask = async function (request, response, next) {
     try {
         const { title, description, assignedTo, dueDate, status, priority } = request.body;
-
-        if (!title) {
-            return response.status(400).json({
-                success: false,
-                message: 'Please add a task title'
-            });
-        }
-
         const project = await Project.findById(request.params.projectId);
-
-        if (!project) {
-            return response.status(404).json({
-                success: false,
-                message: 'Project not found'
-            });
-        }
-
         const hasAccess = project.createdBy.equals(request.user.id) || project.members.some(memberId => memberId.equals(request.user.id));
 
         if (!hasAccess) {
@@ -112,13 +89,6 @@ const getTask = async function (request, response, next) {
             .populate('assignedTo', 'username email')
             .populate('createdBy', 'username email');
 
-        if (!task) {
-            return response.status(404).json({
-                success: false,
-                message: 'Task not found'
-            });
-        }
-
         const project = await Project.findById(task.project);
         const hasAccess = project.createdBy.equals(request.user.id) || project.members.some(memberId => memberId.equals(request.user.id));
 
@@ -143,14 +113,6 @@ const getTask = async function (request, response, next) {
 const updateTask = async function (request, response, next) {
     try {
         let task = await Task.findById(request.params.taskId);
-
-        if (!task) {
-            return response.status(404).json({
-                success: false,
-                message: 'Task not found'
-            });
-        }
-
         const project = await Project.findById(task.project);
         const hasAccess = project.createdBy.equals(request.user.id) || project.members.some(memberId => memberId.equals(request.user.id));
 
@@ -184,63 +146,122 @@ const updateTask = async function (request, response, next) {
     }
 }
 
-const filterTasks = async function (request, response, next){
+const filterTasks = async function (request, response, next) {
     try {
-        const { title, status, priority, project, assignedTo } = request.query;
+        const { title, status, priority, project, assignedTo, search } = request.query;
 
-        let query = {};
-
-        if (title) query.title = title;
-        if (status) query.status = status;
-        if (priority) query.priority = priority;
-        if (project) query.project = project;
-        if (assignedTo) query.assignedTo = assignedTo;
-        
         // getting user's accessible projects first
         const userProjects = await Project.find({
             $or: [
-                {createdBy: request.user.id},
-                {members: request.user.id}
+                { createdBy: request.user.id },
+                { members: request.user.id }
             ]
         }).select('_id');
 
         const projectIds = userProjects.map(project => project._id);
 
-        // only show tasks from accessible projects
-        query.project = { $in: projectIds };
+        // if user has no projects, return empty
+        if (projectIds.length === 0) {
+            return response.json({
+                success: true,
+                count: 0,
+                data: []
+            });
+        }
+
+        let query = { project: { $in: projectIds } };
+
+        if (status && ['todo', 'in-progress', 'done'].includes(status)) {
+            query.status = status;
+        }
+
+        if (priority && ['low', 'medium', 'high'].includes(priority)) {
+            query.priority = priority;
+        }
+
+        if (project && mongoose.Types.ObjectId.isValid(project)) {
+            if (projectIds.some(pid => pid.equals(project))) {
+                query.project = project;
+            }
+        }
+
+        if (assignedTo && mongoose.Types.ObjectId.isValid(assignedTo)) {
+            query.assignedTo = assignedTo;
+        }
+
+        if (search && typeof search === 'string') {
+            const safeSearch = search.trim().substring(0, 100);
+            query.title = { $regex: safeSearch, $options: 'i' };
+        }
 
         const tasks = await Task.find(query)
             .populate('project', 'name')
             .populate('assignedTo', 'name email')
             .populate('createdBy', 'name email')
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .limit(100);
 
         response.json({
             success: true,
             count: tasks.length,
             data: tasks
         });
-        
-    } catch (error){
+
+    } catch (error) {
         console.error(error);
         next();
     }
 }
 
+// const filterTasks = async function (request, response, next){
+//     try {
+//         const { title, status, priority, project, assignedTo } = request.query;
+
+//         let query = {};
+
+//         if (title) query.title = title;
+//         if (status) query.status = status;
+//         if (priority) query.priority = priority;
+//         if (project) query.project = project;
+//         if (assignedTo) query.assignedTo = assignedTo;
+
+//         // getting user's accessible projects first
+//         const userProjects = await Project.find({
+//             $or: [
+//                 {createdBy: request.user.id},
+//                 {members: request.user.id}
+//             ]
+//         }).select('_id');
+
+//         const projectIds = userProjects.map(project => project._id);
+
+//         // only show tasks from accessible projects
+//         query.project = { $in: projectIds };
+
+//         const tasks = await Task.find(query)
+//             .populate('project', 'name')
+//             .populate('assignedTo', 'name email')
+//             .populate('createdBy', 'name email')
+//             .sort({ createdAt: -1 });
+
+//         response.json({
+//             success: true,
+//             count: tasks.length,
+//             data: tasks
+//         });
+
+//     } catch (error){
+//         console.error(error);
+//         next();
+//     }
+// }
+
 const deleteTask = async function (request, response, next) {
     try {
         const task = await Task.findById(request.params.taskId);
-
-        if (!task) {
-            return response.status(404).json({
-                success: false,
-                message: 'Task not found'
-            });
-        }
-
         const project = await Project.findById(task.project);
 
-        // Only projecct creator or task creator can delete
+        // Only project creator or task creator can delete
         const canDelete = project.createdBy.equals(request.user.id) || task.createdBy.equals(request.user.id);
 
         if (!canDelete) {

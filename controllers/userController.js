@@ -2,14 +2,7 @@ const User = require('../models/User');
 
 const searchUsers = async function (request, response, next) {
     try {
-        const { email, username } = request.query;
-
-        if (!email && !username) {
-            return response.status(400).json({
-                success: false,
-                message: 'Please provide an email or username to search'
-            });
-        }
+        const { email, username } = request.query;        
 
         let query = {};
 
