@@ -144,7 +144,7 @@ SESSION_SECRET=your_session_secret
 ### **Task Filtering**
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/my-tasks` | Get all user's tasks (filterable) |
+| GET | `/api/tasks` | Get all user's tasks (filterable) |
 | GET | `/api/projects/:id/tasks?status=todo` | Filter project tasks |
 
 ### **Users**
