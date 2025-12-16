@@ -12,27 +12,50 @@ const registerUser = async function (request, response) {
         // check if the user is not already registered
         const userExists = await User.findOne({ email });
         if (userExists) {
-            return response.status(400).json({
-                success: false,
-                message: 'User already exists with this email'
-            });
+            if (request.headers['content-type']?.includes('application/json')) {
+                return response.status(400).json({
+                    success: false,
+                    message: 'User already exists with this email'
+                });
+            } else {
+                return response.redirect('/register?error=User already exists with this email');
+            }
+
         }
 
         // create a new user
         const user = await User.create({ username, email, password });
 
+        // create session for the new user
+        request.session.user = {
+            id: user._id,
+            username: user.username,
+            email: user.email
+        };
+
         // generate a token
         const token = generateToken(user._id);
 
-        response.status(201).json({
-            success: true,
-            data: {
-                _id: user.id,
-                username: user.username,
-                email: user.email,
-                token: token
+        // save session
+        request.session.save((error) => {
+            if (error) {
+                return console.error(error);
             }
-        });
+            if (request.headers['content-type']?.includes('application/json')) {
+                response.status(201).json({
+                    success: true,
+                    data: {
+                        _id: user.id,
+                        username: user.username,
+                        email: user.email,
+                        token: token
+                    }
+                });
+            } else {
+                response.redirect('/dashboard');
+            }
+        })
+        
     } catch (error) {
         console.error('Failed to create user:', error);
     }
@@ -51,23 +74,52 @@ const loginUser = async function (request, response) {
             // generate a jwt token
             const token = generateToken(user._id);
 
-            response.json({
-                success: true,
-                data: {
-                    _id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    token: token
+            request.session.user = {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            };
+
+            request.session.save((error) => {
+                if (error) {
+                    return console.error(error);
+                    // return next(error);
+                }
+
+                if (request.headers['content-type']?.includes('application/json')) {
+                    // API call
+                    response.json({
+                        success: true,
+                        data: {
+                            _id: user.id,
+                            username: user.username,
+                            email: user.email,
+                            token: token
+                        }
+                    });
+
+
+                } else {
+                    // Page request 
+                    response.redirect('/dashboard');
                 }
             });
+
+
         } else {
-            response.status(401).json({
-                success: false,
-                message: 'Invalid email or password'
-            });
+            if (request.headers['content-type']?.includes('application/json')) {
+                response.status(401).json({
+                    success: false,
+                    message: 'Invalid email or password'
+                });
+            } else {
+                response.redirect('/login?error=Invalid email or password');
+            }
+
         }
     } catch (error) {
         console.error('Failed to create user:', error);
+        // next(error);
     }
 
 }

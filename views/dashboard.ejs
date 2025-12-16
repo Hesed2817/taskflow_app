@@ -1,0 +1,73 @@
+<%- include('./layouts/main.ejs') -%>
+
+<div>
+    <h1 style="margin-bottom: 1rem;">Welcome, <%= user.username %>!</h1>
+    <p style="color: #666; margin-bottom: 2rem;">Here's an overview of your projects and tasks</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+        <!-- Stats Card -->
+        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h3 style="color: #4f46e5; margin-bottom: 0.5rem;">Projects</h3>
+            <p style="font-size: 2rem; font-weight: bold;"><%= projects.length %></p>
+            <a href="/projects" style="color: #4f46e5; text-decoration: none;">View all →</a>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h3 style="color: #10b981; margin-bottom: 1rem;">Quick Actions</h3>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="/projects/new" style="background: #4f46e5; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;">New Project</a>
+                <a href="/tasks" style="background: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;">View Tasks</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Projects -->
+    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2>Recent Projects</h2>
+            <a href="/projects" style="color: #4f46e5; text-decoration: none;">View All</a>
+        </div>
+        
+        <% if (projects.length > 0) { %>
+            <div style="display: grid; gap: 1rem;">
+                <% projects.forEach(project => { %>
+                    <div style="padding: 1rem; border: 1px solid #e5e7eb; border-radius: 4px;">
+                        <h3 style="margin-bottom: 0.5rem;"><%= project.name %></h3>
+                        <p style="color: #666; margin-bottom: 0.5rem;"><%= project.description || 'No description' %></p>
+                        <a href="/projects/<%= project._id %>" style="color: #4f46e5; text-decoration: none;">View Details →</a>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <p style="color: #666; text-align: center; padding: 2rem;">No projects yet. Create your first project!</p>
+        <% } %>
+    </div>
+    
+    <!-- Recent Tasks -->
+    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2>Recent Tasks</h2>
+            <a href="/tasks" style="color: #4f46e5; text-decoration: none;">View All</a>
+        </div>
+        
+        <% if (tasks.length > 0) { %>
+            <div style="display: grid; gap: 1rem;">
+                <% tasks.forEach(task => { %>
+                    <div style="padding: 1rem; border: 1px solid #e5e7eb; border-radius: 4px; border-left: 4px solid #10b981;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <h3 style="margin: 0;"><%= task.title %></h3>
+                            <span style="background: #d1fae5; color: #059669; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.875rem;">
+                                <%= task.status %>
+                            </span>
+                        </div>
+                        <p style="color: #666; margin-bottom: 0.5rem;">Project: <%= task.project.name %></p>
+                        <a href="/tasks/<%= task._id %>" style="color: #4f46e5; text-decoration: none;">View Task →</a>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <p style="color: #666; text-align: center; padding: 2rem;">No tasks yet. Add tasks to your projects!</p>
+        <% } %>
+    </div>
+</div>

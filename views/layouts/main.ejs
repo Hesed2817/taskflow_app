@@ -1,0 +1,63 @@
+<!-- views/layouts/main.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'TaskFlow' %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Basic reset to avoid CSS issues */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; }
+    </style>
+</head>
+<body>
+    <!-- Simple header that only shows when user exists -->
+    <% if (locals.user) { %>
+        <header style="background: #4f46e5; color: white; padding: 1rem;">
+            <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+                <h1>TaskFlow</h1>
+                <div>
+                    <span>Welcome, <%= user.username %>!</span>
+                    <a href="/logout" style="color: white; margin-left: 1rem;">Logout</a>
+                </div>
+            </div>
+        </header>
+    <% } %>
+    
+    <main style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+        <!-- Simple alerts -->
+        <% if (locals.error) { %>
+            <div style="background: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                <%= error %>
+            </div>
+        <% } %>
+        
+        <% if (locals.success) { %>
+            <div style="background: #d1fae5; color: #059669; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                <%= success %>
+            </div>
+        <% } %>                
+    </main>
+    
+    <script src="/js/script.js"></script>
+    <script>
+        // Simple form handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add loading state to forms
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
