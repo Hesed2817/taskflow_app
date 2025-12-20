@@ -7,12 +7,15 @@ const { createProject,
     deleteProject,
     addProjectMember,
     getProjectMembers,
+    transferProjectOwnership,
     removeProjectMember
 } = require('../controllers/projectController');
 const {
     projectValidator,
     projectIdValidator,
-    memberValidator,    
+    memberValidator,
+    memberIdValidator,
+    transferOwnershipValidator, 
     validate
 } = require('../utils/validators');
 const taskRouter = require('./tasks');
@@ -37,7 +40,16 @@ router.route('/:projectId/members')
     .get(getProjectMembers)
     .post(projectIdValidator.concat(memberValidator), validate, addProjectMember);
 
-router.delete('/:projectId/members/:userId',projectIdValidator.concat(memberValidator), validate, removeProjectMember);
+router.post('/:projectId/transfer-ownership', 
+    projectIdValidator,
+    transferOwnershipValidator,
+    validate,
+    transferProjectOwnership
+);
+
+router.delete('/:projectId/members/:userId',
+    projectIdValidator.concat(memberIdValidator), validate, 
+    removeProjectMember);
 
 // routes related to tasks
 router.use('/:projectId/tasks', taskRouter);

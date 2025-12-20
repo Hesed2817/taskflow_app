@@ -4,7 +4,8 @@
     <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
         <h2 style="margin-bottom: 1.5rem; color: #333;">Create Account</h2>
         
-        <form id="registerForm" style="margin-bottom: 1.5rem;">
+        <!-- ✅ Traditional form - no JavaScript needed -->
+        <form action="/api/auth/register" method="POST" style="margin-bottom: 1.5rem;">
             <div style="margin-bottom: 1rem;">
                 <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Username</label>
                 <input 
@@ -53,52 +54,3 @@
         </div>
     </div>
 </div>
-
-<script>
-document.getElementById('registerForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const form = e.target;
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    
-    // Show loading
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
-    submitBtn.disabled = true;
-    
-    try {
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        
-        const response = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (response.redirected){
-            window.location.href = response.url;
-            return;
-        }
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            // Registration successful - redirect to dashboard
-            window.location.href = '/dashboard';
-        } else {
-            // Show error
-            alert(result.message || 'Registration failed');
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }
-    } catch (error) {
-        console.error('Registration error:', error);
-        alert('Network error. Please try again.');
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }
-});
-</script>

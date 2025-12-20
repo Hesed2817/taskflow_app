@@ -4,7 +4,8 @@
     <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
         <h2 style="margin-bottom: 1.5rem; color: #333;">Login to TaskFlow</h2>
         
-        <form id="loginForm" style="margin-bottom: 1.5rem;">
+        <!-- ✅ Traditional form - will set cookies automatically -->
+        <form action="/api/auth/login" method="POST" style="margin-bottom: 1.5rem;">
             <div style="margin-bottom: 1rem;">
                 <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email</label>
                 <input 
@@ -41,47 +42,3 @@
         </div>
     </div>
 </div>
-
-<script>
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const form = e.target;
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    
-    // Show loading
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-    submitBtn.disabled = true;
-    
-    try {
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            // Login successful - redirect to dashboard
-            window.location.href = '/dashboard';
-        } else {
-            // Show error
-            alert(result.message || 'Login failed');
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        alert('Network error. Please try again.');
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }
-});
-</script>

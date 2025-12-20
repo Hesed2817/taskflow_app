@@ -31,7 +31,6 @@ const getProjectTasks = async function (request, response, next) {
         next();
     }
 }
-
 const createTask = async function (request, response, next) {
     try {
         const { title, description, assignedTo, dueDate, status, priority } = request.body;
@@ -80,8 +79,7 @@ const createTask = async function (request, response, next) {
         console.error('Failed to create task:', error);
         next();
     }
-}
-
+} 
 const getTask = async function (request, response, next) {
     try {
         const task = await Task.findById(request.params.taskId)
@@ -112,28 +110,84 @@ const getTask = async function (request, response, next) {
 
 const updateTask = async function (request, response, next) {
     try {
-        let task = await Task.findById(request.params.taskId);
-        const project = await Project.findById(task.project);
-        const hasAccess = project.createdBy.equals(request.user.id) || project.members.some(memberId => memberId.equals(request.user.id));
+        console.log('Update Task - Params:', request.params);
+        console.log('Update Task - Body:', request.body);
+        console.log('Update Task - User ID:', request.user.id);
 
-        if (!hasAccess) {
-            return response.status(403).json({
+        // First find the task
+        let task = await Task.findById(request.params.taskId);
+        
+        if (!task) {
+            return response.status(404).json({
                 success: false,
-                message: 'Not authorized'
+                message: 'Task not found'
             });
         }
 
-        // updating the task
+        // Find the project
+        const project = await Project.findById(task.project);
+        
+        if (!project) {
+            return response.status(404).json({
+                success: false,
+                message: 'Project not found'
+            });
+        }
+
+        // Check access - project owner, task creator, or assigned user can update
+        const isProjectOwner = project.createdBy.equals(request.user.id);
+        const isTaskCreator = task.createdBy.equals(request.user.id);
+        const isAssignedUser = task.assignedTo && task.assignedTo.equals(request.user.id);
+        
+        if (!isProjectOwner && !isTaskCreator && !isAssignedUser) {
+            return response.status(403).json({
+                success: false,
+                message: 'Not authorized to update this task'
+            });
+        }
+
+        // If assigning to someone, verify they're a project member
+        if (request.body.assignedTo && request.body.assignedTo !== '') {
+            const isMember = project.members.some(memberId => 
+                memberId.equals(request.body.assignedTo) || 
+                project.createdBy.equals(request.body.assignedTo)
+            );
+
+            if (!isMember && request.body.assignedTo !== null) {
+                return response.status(400).json({
+                    success: false,
+                    message: 'Can only assign to project members'
+                });
+            }
+        }
+
+        // Prepare update data
+        const updateData = { ...request.body };
+        
+        // Convert empty string to null for assignedTo
+        if (updateData.assignedTo === '') {
+            updateData.assignedTo = null;
+        }
+        
+        // Format dueDate if provided
+        if (updateData.dueDate) {
+            updateData.dueDate = new Date(updateData.dueDate);
+        }
+
+        console.log('Update data:', updateData);
+
+        // Update the task
         task = await Task.findByIdAndUpdate(
             request.params.taskId,
-            request.body,
+            updateData,
             {
                 new: true,
                 runValidators: true
             }
-        ).populate('project', 'name')
-            .populate('assignedTo', 'username email')
-            .populate('createdBy', 'username email');
+        )
+        .populate('project', 'name')
+        .populate('assignedTo', 'username email')
+        .populate('createdBy', 'username email');
 
         response.json({
             success: true,
@@ -141,8 +195,29 @@ const updateTask = async function (request, response, next) {
         });
 
     } catch (error) {
-        console.error('Failed to create task:', error);
-        next();
+        console.error('Update task error details:', error);
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(err => err.message);
+            return response.status(400).json({
+                success: false,
+                message: 'Validation error: ' + messages.join(', ')
+            });
+        }
+        
+        if (error.name === 'CastError') {
+            return response.status(400).json({
+                success: false,
+                message: 'Invalid data format'
+            });
+        }
+        
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 }
 
@@ -212,50 +287,6 @@ const filterTasks = async function (request, response, next) {
         next();
     }
 }
-
-// const filterTasks = async function (request, response, next){
-//     try {
-//         const { title, status, priority, project, assignedTo } = request.query;
-
-//         let query = {};
-
-//         if (title) query.title = title;
-//         if (status) query.status = status;
-//         if (priority) query.priority = priority;
-//         if (project) query.project = project;
-//         if (assignedTo) query.assignedTo = assignedTo;
-
-//         // getting user's accessible projects first
-//         const userProjects = await Project.find({
-//             $or: [
-//                 {createdBy: request.user.id},
-//                 {members: request.user.id}
-//             ]
-//         }).select('_id');
-
-//         const projectIds = userProjects.map(project => project._id);
-
-//         // only show tasks from accessible projects
-//         query.project = { $in: projectIds };
-
-//         const tasks = await Task.find(query)
-//             .populate('project', 'name')
-//             .populate('assignedTo', 'name email')
-//             .populate('createdBy', 'name email')
-//             .sort({ createdAt: -1 });
-
-//         response.json({
-//             success: true,
-//             count: tasks.length,
-//             data: tasks
-//         });
-
-//     } catch (error){
-//         console.error(error);
-//         next();
-//     }
-// }
-
 const deleteTask = async function (request, response, next) {
     try {
         const task = await Task.findById(request.params.taskId);

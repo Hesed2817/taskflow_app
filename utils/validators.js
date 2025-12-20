@@ -70,10 +70,22 @@ const projectIdValidator = [
         .isMongoId().withMessage('Invalid project ID format')
 ];
 
-const memberValidator = [
+const memberIdValidator = [
     param('userId')
         .notEmpty().withMessage('User ID is required')
+        .isMongoId().withMessage('Invalid user ID format')
+];
+
+const memberValidator = [
+    body('userId')
+        .notEmpty().withMessage('User ID is required')
         .isMongoId().withMessage('Invalid user ID format'),
+];
+
+const transferOwnershipValidator = [
+    body('newOwnerId')
+        .notEmpty().withMessage('New owner ID is required')
+        .isMongoId().withMessage('Invalid new owner ID format'),
 ];
 
 // task validators
@@ -84,9 +96,9 @@ const taskValidator = [
         .isLength({ min: 3, max: 200 }).withMessage('Title must be 3-200 characters'),
 
     body('description')
-        .optional()
+        .optional({ values: 'falsy' })
         .trim()
-        .isLength({ max: 1000 }).withMessage('Description cannot exceed 200 characters'),
+        .isLength({ max: 1000 }).withMessage('Description cannot exceed 1000 characters'),
 
     body('status')
         .optional()
@@ -97,11 +109,41 @@ const taskValidator = [
         .isIn(['low', 'medium', 'high']).withMessage('Invalid priority value'),
 
     body('assignedTo')
-        .optional()
+        .optional({ values: 'falsy' })
         .isMongoId().withMessage('Invalid user ID format'),
 
     body('dueDate')
+        .optional({ values: 'falsy' })
+        .isISO8601().withMessage('Invalid date format (use ISO 8601)')
+        .toDate()
+];
+
+const taskUpdateValidator = [
+
+    body('title')
+        .optional({ values: 'falsy' }) // ← Make title optional for updates
+        .trim()
+        .isLength({ min: 3, max: 200 }).withMessage('Title must be 3-200 characters'),
+
+    body('description')
+        .optional({ values: 'falsy' })
+        .trim()
+        .isLength({ max: 1000 }).withMessage('Description cannot exceed 1000 characters'),
+
+    body('status')
         .optional()
+        .isIn(['todo', 'in-progress', 'done']).withMessage('Invalid status value'),
+
+    body('priority')
+        .optional()
+        .isIn(['low', 'medium', 'high']).withMessage('Invalid priority value'),
+
+    body('assignedTo')
+        .optional({ values: 'falsy' })
+        .isMongoId().withMessage('Invalid user ID format'),
+
+    body('dueDate')
+        .optional({ values: 'falsy' })
         .isISO8601().withMessage('Invalid date format (use ISO 8601)')
         .toDate()
 ];
@@ -164,9 +206,12 @@ module.exports = {
     registerValidator,
     loginValidator,
     projectValidator,
-    projectIdValidator,    
+    projectIdValidator,
+    transferOwnershipValidator,
     memberValidator,
+    memberIdValidator,
     taskValidator,
+    taskUpdateValidator,
     taskIdValidator,
     userSearchValidator,
     taskFilterValidator,

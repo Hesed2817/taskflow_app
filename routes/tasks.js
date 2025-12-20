@@ -12,6 +12,7 @@ const {
     taskValidator,
     taskIdValidator,
     taskFilterValidator,
+    taskUpdateValidator,
     validate
 } = require('../utils/validators');
 const router = express.Router({ mergeParams: true });
@@ -34,11 +35,11 @@ router.get('/:taskId',
     getTask
 );
 
-// PUT /projects/:taskId  
+// PUT /projects/tasks/:taskId  
 router.put('/:taskId',
     projectIdValidator,
     taskIdValidator,
-    taskValidator,
+    taskUpdateValidator,
     validate,
     updateTask
 );

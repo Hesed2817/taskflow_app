@@ -1,9 +1,8 @@
 const User = require('../models/User');
+const bcrypt = require('bcrypt')
 const generateToken = require('../utils/generateToken');
 
-// @route POST /api/auth/register
-
-// logic for registering a new user
+// Registering a user
 const registerUser = async function (request, response) {
     try {
         // extract the user input from the request body
@@ -26,38 +25,40 @@ const registerUser = async function (request, response) {
         // create a new user
         const user = await User.create({ username, email, password });
 
-        // create session for the new user
-        request.session.user = {
-            id: user._id,
-            username: user.username,
-            email: user.email
-        };
-
         // generate a token
         const token = generateToken(user._id);
 
-        // save session
-        request.session.save((error) => {
-            if (error) {
-                return console.error(error);
-            }
-            if (request.headers['content-type']?.includes('application/json')) {
-                response.status(201).json({
-                    success: true,
-                    data: {
-                        _id: user.id,
-                        username: user.username,
-                        email: user.email,
-                        token: token
-                    }
-                });
-            } else {
-                response.redirect('/dashboard');
-            }
-        })
-        
+        if (!request.headers['content-type']?.includes('application/json')) {
+            response.cookie('auth_token', token, {
+                httpOnly: true,
+                maxAge: 24 * 60 * 60 * 1000 // 24 hours
+            });
+        }
+
+        if (request.headers['content-type']?.includes('application/json')) {
+            response.status(201).json({
+                success: true,
+                data: {
+                    _id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    token: token
+                }
+            });
+        } else {
+            response.redirect('/dashboard');
+        }
+
     } catch (error) {
-        console.error('Failed to create user:', error);
+        console.error('Registration error:', error);
+        if (request.headers['content-type']?.includes('application/json')) {
+            response.status(500).json({
+                success: false,
+                message: 'Server error'
+            });
+        } else {
+            response.redirect('/register?error=Registration failed');
+        }
     }
 }
 
@@ -71,42 +72,50 @@ const loginUser = async function (request, response) {
 
         if (user && (await user.matchPassword(password))) {
 
+            console.log('✅ Password correct for:', email); // --1--
+
             // generate a jwt token
             const token = generateToken(user._id);
+            
+            console.log('✅ Token generated:', token.substring(0, 20) + '...'); // --2--
 
-            request.session.user = {
-                id: user._id,
-                username: user.username,
-                email: user.email
-            };
+            // set cookie for web requests
+            if (!request.headers['content-type']?.includes('application/json')) {
+                
+                console.log('🍪 Setting cookie...'); // --3--
+                
+                response.cookie('auth_token', token, {
+                    httpOnly: true,
+                    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+                });
+                
+                console.log('✅ Cookie set'); // --4--
 
-            request.session.save((error) => {
-                if (error) {
-                    return console.error(error);
-                    // return next(error);
-                }
+            }
 
-                if (request.headers['content-type']?.includes('application/json')) {
-                    // API call
-                    response.json({
-                        success: true,
-                        data: {
-                            _id: user.id,
-                            username: user.username,
-                            email: user.email,
-                            token: token
-                        }
-                    });
-
-
-                } else {
-                    // Page request 
-                    response.redirect('/dashboard');
-                }
-            });
-
+            if (request.headers['content-type']?.includes('application/json')) {
+                // API call
+                response.json({
+                    success: true,
+                    token,
+                    data: {
+                        _id: user.id,
+                        username: user.username,
+                        email: user.email                        
+                    }
+                });
+            } else {
+                // Page request 
+                
+                console.log('🔄 Redirecting to dashboard...'); // --5--
+                
+                response.redirect('/dashboard');
+            }
 
         } else {
+            
+            console.log('❌ Invalid credentials for:', email); //--6--
+            
             if (request.headers['content-type']?.includes('application/json')) {
                 response.status(401).json({
                     success: false,
@@ -118,13 +127,80 @@ const loginUser = async function (request, response) {
 
         }
     } catch (error) {
+
+        console.error('❌ Login error:', error); //--7--
+
         console.error('Failed to create user:', error);
-        // next(error);
+        if (request.headers['content-type']?.includes('application/json')) {
+            response.status(500).json({
+                success: false,
+                message: 'Server error'
+            });
+        } else {
+            response.redirect('/login?error=Login failed');
+        }
     }
 
 }
 
+const changePassword = async function (request, response) {
+    try {
+        const { currentPassword, newPassword } = request.body;
+        
+        // Validation
+        if (!currentPassword || !newPassword) {
+            return response.status(400).json({
+                success: false,
+                message: 'Please provide current and new password'
+            });
+        }
+        
+        if (newPassword.length < 6) {
+            return response.status(400).json({
+                success: false,
+                message: 'New password must be at least 6 characters'
+            });
+        }
+        
+        // Get user with password
+        const user = await User.findById(request.user.id).select('+password');
+        
+        if (!user) {
+            return response.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+        
+        // Verify current password
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return response.status(400).json({
+                success: false,
+                message: 'Current password is incorrect'
+            });
+        }
+        
+        // Update password
+        user.password = newPassword;
+        await user.save();
+        
+        response.json({
+            success: true,
+            message: 'Password updated successfully'
+        });
+        
+    } catch (error) {
+        console.error('Change password error:', error);
+        response.status(500).json({
+            success: false,
+            message: 'Server error' + error.message
+        });
+    }
+};
+
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    changePassword
 };

@@ -1,63 +1,396 @@
 <!-- views/layouts/main.ejs -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title || 'TaskFlow' %></title>
+    <title>
+        <%= title || 'TaskFlow' %>
+    </title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Basic reset to avoid CSS issues */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Reddit sans", sans-serif;
+        }
     </style>
 </head>
+
 <body>
-    <!-- Simple header that only shows when user exists -->
     <% if (locals.user) { %>
         <header style="background: #4f46e5; color: white; padding: 1rem;">
-            <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
-                <h1>TaskFlow</h1>
-                <div>
-                    <span>Welcome, <%= user.username %>!</span>
-                    <a href="/logout" style="color: white; margin-left: 1rem;">Logout</a>
-                </div>
+            <div
+                style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+                <h1 onclick="window.location.href='/dashboard'" style="cursor: pointer; margin: 0;">TaskFlow</h1>
+                <nav style="display: flex; gap: 1.5rem; align-items: center;">
+                    <a href="/dashboard" style="color: white; text-decoration: none;">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="/projects" style="color: white; text-decoration: none;">
+                        <i class="fas fa-project-diagram"></i> Projects
+                    </a>
+                    <a href="/tasks" style="color: white; text-decoration: none;">
+                        <i class="fas fa-tasks"></i> Tasks
+                    </a>
+                    <div style="position: relative;">
+                        <button onclick="toggleUserMenu()"
+                            style="background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                            <div
+                                style="width: 32px; height: 32px; background: white; color: #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                <%= user.username.charAt(0).toUpperCase() %>
+                            </div>
+                            <%= user.username %>
+                                <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div id="userMenu"
+                            style="display: none; position: absolute; right: 0; top: 100%; background: white; color: #333; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); min-width: 200px; margin-top: 0.5rem; z-index: 1000;">
+                            <a href="/profile"
+                                style="display: block; padding: 0.75rem 1rem; color: #333; text-decoration: none; border-bottom: 1px solid #e5e7eb;">
+                                <i class="fas fa-user"></i> My Profile
+                            </a>
+                            <a href="/logout"
+                                style="display: block; padding: 0.75rem 1rem; color: #dc2626; text-decoration: none;">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </nav>
             </div>
         </header>
-    <% } %>
-    
-    <main style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
-        <!-- Simple alerts -->
-        <% if (locals.error) { %>
-            <div style="background: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
-                <%= error %>
-            </div>
         <% } %>
-        
-        <% if (locals.success) { %>
-            <div style="background: #d1fae5; color: #059669; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
-                <%= success %>
+
+            <main style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+                <!-- Replace the entire alert section in main.ejs with this: -->
+
+                <!-- Alert Container -->
+                <div id="alertContainer"
+                    style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px; display: flex; flex-direction: column; gap: 10px;">
+                </div>
+
+                <!-- Alert Template (hidden by default) -->
+                <div id="alertTemplate" style="display: none;">
+                    <div class="alert"
+                        style="background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 1rem; display: flex; align-items: flex-start; gap: 0.75rem; border-left: 4px solid #4f46e5; animation: slideIn 0.3s ease-out;">
+                        <div class="alert-icon" style="font-size: 1.25rem;"></div>
+                        <div style="flex: 1;">
+                            <div class="alert-title" style="font-weight: bold; margin-bottom: 0.25rem;"></div>
+                            <div class="alert-message" style="color: #4b5563; font-size: 0.875rem;"></div>
+                        </div>
+                        <button onclick="this.parentElement.remove()"
+                            style="background: none; border: none; color: #9ca3af; cursor: pointer; padding: 0.25rem; font-size: 1.25rem; line-height: 1;">
+                            &times;
+                        </button>
+                    </div>
+                </div>
+
+                <style>
+                    @keyframes slideIn {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+
+                    @keyframes fadeOut {
+                        from {
+                            opacity: 1;
+                        }
+
+                        to {
+                            opacity: 0;
+                        }
+                    }
+
+                    .alert.fade-out {
+                        animation: fadeOut 0.3s ease-out forwards;
+                    }
+                </style>
+
+            </main>
+
+            <!-- Update task modal -->
+            <div id="quickUpdateModal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+                <div style="background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="margin: 0;">Update Task</h3>
+                        <button onclick="closeQuickUpdateModal()"
+                            style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 1.25rem;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <form id="quickUpdateForm">
+                        <input type="hidden" id="updateTaskId">
+                        <input type="hidden" id="updateProjectId">
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Status</label>
+                            <select id="updateStatus"
+                                style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px;">
+                                <option value="todo">To Do</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="done">Done</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Priority</label>
+                            <select id="updatePriority"
+                                style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px;">
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button type="submit"
+                                style="background: #4f46e5; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer;">
+                                Update
+                            </button>
+                            <button type="button" onclick="closeQuickUpdateModal()"
+                                style="background: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        <% } %>                
-    </main>
-    
-    <script src="/js/script.js"></script>
-    <script>
-        // Simple form handling
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add loading state to forms
-            const forms = document.querySelectorAll('form');
-            forms.forEach(form => {
-                form.addEventListener('submit', function() {
-                    const submitBtn = this.querySelector('button[type="submit"]');
-                    if (submitBtn) {
-                        submitBtn.disabled = true;
-                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+
+            <script>
+                // Alert system
+                function showAlert(type, message, title = '', duration = 5000) {
+                    const container = document.getElementById('alertContainer');
+                    const template = document.getElementById('alertTemplate');
+
+                    // Create alert from template
+                    const alertEl = template.cloneNode(true);
+                    alertEl.id = '';
+                    alertEl.style.display = 'block';
+
+                    // Configure based on type
+                    let icon, color;
+                    switch (type) {
+                        case 'success':
+                            icon = '✓';
+                            color = '#10b981';
+                            title = title || 'Success';
+                            break;
+                        case 'error':
+                            icon = '✗';
+                            color = '#dc2626';
+                            title = title || 'Error';
+                            break;
+                        case 'warning':
+                            icon = '⚠';
+                            color = '#f59e0b';
+                            title = title || 'Warning';
+                            break;
+                        case 'info':
+                            icon = 'ℹ';
+                            color = '#3b82f6';
+                            title = title || 'Info';
+                            break;
+                        default:
+                            icon = 'ℹ';
+                            color = '#4f46e5';
+                            title = title || 'Notice';
+                    }
+
+                    // Style the alert
+                    alertEl.querySelector('.alert').style.borderLeftColor = color;
+                    alertEl.querySelector('.alert-icon').style.color = color;
+                    alertEl.querySelector('.alert-icon').textContent = icon;
+                    alertEl.querySelector('.alert-title').textContent = title;
+                    alertEl.querySelector('.alert-message').textContent = message;
+
+                    // Add to container
+                    container.appendChild(alertEl);
+
+                    // Auto-dismiss after duration
+                    if (duration > 0) {
+                        setTimeout(() => {
+                            dismissAlert(alertEl);
+                        }, duration);
+                    }
+
+                    return alertEl;
+                }
+
+                function dismissAlert(alertEl) {
+                    alertEl.querySelector('.alert').classList.add('fade-out');
+                    setTimeout(() => {
+                        if (alertEl.parentNode) {
+                            alertEl.parentNode.removeChild(alertEl);
+                        }
+                    }, 300);
+                }
+
+                // Show alerts from URL parameters on page load
+                document.addEventListener('DOMContentLoaded', function () {
+                    const urlParams = new URLSearchParams(window.location.search);
+
+                    // Show success message
+                    const successMsg = urlParams.get('success');
+                    if (successMsg) {
+                        showAlert('success', successMsg);
+                        // Clean URL (remove success param without reloading)
+                        const newUrl = window.location.pathname +
+                            window.location.search.replace(/[?&]success=[^&]+/, '').replace(/^&/, '?');
+                        window.history.replaceState({}, document.title, newUrl);
+                    }
+
+                    // Show error message
+                    const errorMsg = urlParams.get('error');
+                    if (errorMsg) {
+                        showAlert('error', errorMsg);
+                        // Clean URL (remove error param without reloading)
+                        const newUrl = window.location.pathname +
+                            window.location.search.replace(/[?&]error=[^&]+/, '').replace(/^&/, '?');
+                        window.history.replaceState({}, document.title, newUrl);
+                    }
+
+                    // Show info message (if you add it later)
+                    const infoMsg = urlParams.get('info');
+                    if (infoMsg) {
+                        showAlert('info', infoMsg);
+                        // Clean URL
+                        const newUrl = window.location.pathname +
+                            window.location.search.replace(/[?&]info=[^&]+/, '').replace(/^&/, '?');
+                        window.history.replaceState({}, document.title, newUrl);
                     }
                 });
-            });
-        });
-    </script>
+
+                // Global function to show alerts from anywhere
+                window.showSuccess = (message, title) => showAlert('success', message, title);
+                window.showError = (message, title) => showAlert('error', message, title);
+                window.showWarning = (message, title) => showAlert('warning', message, title);
+                window.showInfo = (message, title) => showAlert('info', message, title);
+
+                // Simple form handling
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Add loading state to forms
+                    const forms = document.querySelectorAll('form');
+                    forms.forEach(form => {
+                        form.addEventListener('submit', function () {
+                            const submitBtn = this.querySelector('button[type="submit"]');
+                            if (submitBtn) {
+                                submitBtn.disabled = true;
+                                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                            }
+                        });
+                    });
+                });
+                function toggleUserMenu() {
+                    const menu = document.getElementById('userMenu');
+                    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                }
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function (event) {
+                    const menu = document.getElementById('userMenu');
+                    const button = document.querySelector('button[onclick="toggleUserMenu()"]');
+
+                    if (menu && button && !menu.contains(event.target) && !button.contains(event.target)) {
+                        menu.style.display = 'none';
+                    }
+                });
+                // Quick Update Modal Functions
+                let currentTaskData = null;
+
+                function openQuickUpdateModal(taskId, projectId, currentStatus, currentPriority) {
+                    currentTaskData = { taskId, projectId };
+
+                    // Set current values
+                    if (currentStatus) {
+                        document.getElementById('updateStatus').value = currentStatus;
+                    }
+                    if (currentPriority) {
+                        document.getElementById('updatePriority').value = currentPriority;
+                    }
+
+                    document.getElementById('updateTaskId').value = taskId;
+                    document.getElementById('updateProjectId').value = projectId;
+                    document.getElementById('quickUpdateModal').style.display = 'flex';
+                }
+
+                function closeQuickUpdateModal() {
+                    document.getElementById('quickUpdateModal').style.display = 'none';
+                    currentTaskData = null;
+                }
+
+                // Handle quick update form submission
+                document.getElementById('quickUpdateForm').addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    console.log('=== SUBMITTING UPDATE ===');
+
+                    const form = e.target;
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                    submitBtn.disabled = true;
+
+                    try {
+                        const data = {
+                            status: document.getElementById('updateStatus').value,
+                            priority: document.getElementById('updatePriority').value
+                        };
+
+                        console.log('Data to send:', data);
+                        console.log('Status value type:', typeof data.status);
+                        console.log('Priority value type:', typeof data.priority);
+
+                        const response = await fetch(`/api/projects/${currentTaskData.projectId}/tasks/${currentTaskData.taskId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data),
+                            credentials: 'include'
+                        });
+
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            const text = await response.text();
+                            throw new Error(`Expected JSON but got: ${text.substring(0, 100)}`);
+                        }
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            closeQuickUpdateModal();
+                            showAlert('success', 'Task updated successfully');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            showAlert('error', result.message || 'Failed to update task');
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.disabled = false;
+                        }
+                    } catch (error) {
+                        console.error('Quick update error:', error);
+                        showAlert('error', 'Error: ' + error.message);
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
+                });
+            </script>
 </body>
+
 </html>

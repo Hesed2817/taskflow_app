@@ -29,17 +29,16 @@ Content-Type: application/json
 }
 
 ### accessing a protected route with a token
-post http://localhost:3000/api/projects/693735a2900253e8fb24c415/tasks/
+post http://localhost:3000/api/projects/693735a2900253e8fb24c415/members
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjhjNGVlOGQ4OThhN2Q1ODYxZDE4NyIsImlhdCI6MTc2NTEzOTQ0MywiZXhwIjoxNzY3NzMxNDQzfQ.9v4rGeKjfSlu-H8kDatXLvsLi6A58hE32hkDdM5arkw
 
 {
-  "title": "Test task",
-  "dueDate": "December 31, 2024"
+  "userId": "69349ab3cc3d7184c3bbd77d"
 }
 
 
 ### Search for a user to add to a project
-GET http://localhost:3000/api/tasks?search=<script>alert('xss')</script>
+GET http://localhost:3000/api/taskshesed
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjhjNDQzOGQ4OThhN2Q1ODYxZDE4MyIsImlhdCI6MTc2NTA1OTY4MCwiZXhwIjoxNzY3NjUxNjgwfQ.HZz4yd1rOgk4z3g0jSa_shKdHciGARFTmCt-PA4wAXc
