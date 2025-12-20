@@ -1,0 +1,726 @@
+<%- include('../layouts/main.ejs') -%>
+
+    <div>
+        <!-- Project Header -->
+        <div
+            style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
+                <div>
+                    <h1 style="margin: 0 0 0.5rem 0;">
+                        <%= project.name %>
+                    </h1>
+                    <% if (project.description) { %>
+                        <p style="color: #666; margin: 0;">
+                            <%= project.description %>
+                        </p>
+                        <% } %>
+                </div>
+
+                <% if (isOwner) { %>
+                    <a href="/projects/<%= project._id %>/edit" style="color: #f59e0b; text-decoration: none;">
+                        <i class="fas fa-edit"></i> Edit Project
+                    </a>
+                    <% } %>
+            </div>
+
+            <div style="display: flex; gap: 2rem; color: #666; font-size: 0.875rem;">
+                <div>
+                    <strong>Created by:</strong>
+                    <%= project.createdBy.username %>
+                </div>
+                <div>
+                    <strong>Created on:</strong>
+                    <%= new Date(project.createdAt).toLocaleDateString() %>
+                </div>
+                <div>
+                    <strong>Team Members:</strong>
+                    <% const teamMembersCount=project.members.filter(member=>member._id.toString() !==
+                        project.createdBy._id.toString()).length;%>
+                        <%= teamMembersCount %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+            <!-- Left Column: Tasks -->
+            <div>
+                <div
+                    style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2 style="margin: 0;">Tasks</h2>
+                        <button onclick="showTaskForm()"
+                            style="background: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                    </div>
+
+                    <!-- Task Form (Hidden by default) -->
+                    <div id="taskForm"
+                        style="display: none; margin-bottom: 1.5rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3 style="margin: 0;">Create New Task</h3>
+                            <button type="button" onclick="hideTaskForm()"
+                                style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 1.25rem;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <form id="createTaskForm">
+                            <input type="hidden" name="project" value="<%= project._id %>">
+
+                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                <div>
+                                    <label
+                                        style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333;">
+                                        Task Title *
+                                    </label>
+                                    <input type="text" name="title" required placeholder="What needs to be done?"
+                                        style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 1rem;">
+                                </div>
+
+                                <div>
+                                    <label
+                                        style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333;">
+                                        Priority *
+                                    </label>
+                                    <select name="priority" required
+                                        style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 1rem;">
+                                        <option value="low">Low</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333;">
+                                    Description
+                                </label>
+                                <textarea name="description" rows="3"
+                                    placeholder="Add details, instructions, or context..."
+                                    style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 1rem; resize: vertical;"></textarea>
+                            </div>
+
+                            <div
+                                style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                                <div>
+                                    <label
+                                        style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333;">
+                                        Status *
+                                    </label>
+                                    <select name="status" required
+                                        style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 1rem;">
+                                        <option value="todo" selected>To Do</option>
+                                        <option value="in-progress">In Progress</option>
+                                        <option value="done">Done</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label
+                                        style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333;">
+                                        Assign To
+                                    </label>
+                                    <select name="assignedTo"
+                                        style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 1rem;">
+                                        <option value="">Unassigned</option>
+                                        <option value="<%= user.id %>">Me (<%= user.username %>)</option>
+                                        <% project.members.forEach(member=> { %>
+                                            <% if (member._id.toString() !==user.id) { %>
+                                                <option value="<%= member._id %>">
+                                                    <%= member.username %>
+                                                </option>
+                                                <% } %>
+                                                    <% }) %>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label
+                                        style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333;">
+                                        Due Date
+                                    </label>
+                                    <input type="date" name="dueDate"
+                                        min="<%= new Date().toISOString().split('T')[0] %>"
+                                        style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 1rem;">
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                                <button type="submit"
+                                    style="background: #10b981; color: white; border: none; padding: 0.75rem 2rem; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem;">
+                                    <i class="fas fa-plus"></i> Create Task
+                                </button>
+                                <button type="button" onclick="hideTaskForm()"
+                                    style="background: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; padding: 0.75rem 2rem; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem;">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Tasks List -->
+                    <% if (tasks.length> 0) { %>
+                        <div style="display: grid; gap: 0.75rem;">
+                            <% tasks.forEach(task=> { %>
+                                <div onclick="window.location.href='/tasks/<%= task._id %>'"
+                                    style="padding: 1rem; border: 1px solid #e5e7eb; border-radius: 4px; border-left: 4px solid #10b981; cursor: pointer; transition: all 0.2s;"
+                                    onmouseover="this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'"
+                                    onmouseout="this.style.boxShadow='none'">
+                                    <div
+                                        style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                        <h3 style="margin: 0; font-size: 1rem; color: #333;">
+                                            <%= task.title %>
+                                                <% if (task.priority==='high' ) { %>
+                                                    <span
+                                                        style="color: #dc2626; font-size: 0.75rem; margin-left: 0.5rem;">
+                                                        <i class="fas fa-exclamation-circle"></i>
+                                                    </span>
+                                                    <% } %>
+                                        </h3>
+                                        <span
+                                            style="background: #d1fae5; color: #059669; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.75rem;">
+                                            <%= task.status %>
+                                        </span>
+                                    </div>
+
+                                    <% if (task.description) { %>
+                                        <p style="color: #666; font-size: 0.875rem; margin: 0 0 0.5rem 0;">
+                                            <%= task.description.substring(0, 80) %>
+                                                <%= task.description.length> 80 ? '...' : '' %>
+                                        </p>
+                                        <% } %>
+
+                                            <div
+                                                style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #6b7280;">
+                                                <div>
+                                                    <% if (task.assignedTo) { %>
+                                                        <i class="fas fa-user"></i>
+                                                        <%= task.assignedTo.username %>
+                                                            <% } else { %>
+                                                                <i class="fas fa-user-slash"></i> Unassigned
+                                                                <% } %>
+                                                </div>
+                                                <div>
+                                                    <% if (task.dueDate) { %>
+                                                        <i class="fas fa-calendar-day"></i>
+                                                        <%= new Date(task.dueDate).toLocaleDateString() %>
+                                                            <% } else { %>
+                                                                <%= new Date(task.createdAt).toLocaleDateString() %>
+                                                                    <% } %>
+                                                </div>
+                                            </div>
+
+                                            <!-- Quick Actions (prevent click propagation) -->
+                                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;"
+                                                onclick="event.stopPropagation();">
+                                                <button
+                                                    onclick="quickUpdateTask('<%= task._id %>', '<%= task.project._id %>', '<%= task.status %>', '<%= task.priority %>')"
+                                                    style="background: #fef3c7; color: #92400e; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem;"
+                                                    title="Update task">
+                                                    <i class="fas fa-edit"></i> Update
+                                                </button>
+                                                <button
+                                                    onclick="deleteTask('<%= task._id %>', '<%= task.project._id %>', event)"
+                                                    style="background: #fee2e2; color: #dc2626; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem;"
+                                                    title="Delete task">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                </div>
+                                <% }) %>
+                        </div>
+                        <% } else { %>
+                            <p style="text-align: center; color: #9ca3af; padding: 2rem;">No tasks yet. Add your first
+                                task!</p>
+                            <% } %>
+                </div>
+            </div>
+
+            <!-- Right Column: Members & Actions -->
+            <div>
+                <!-- Project Members Section -->
+                <div
+                    style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
+                    <h3 style="margin: 0 0 1rem 0;">Project Team</h3>
+
+                    <div style="margin-bottom: 1rem;">
+                        <!-- Owner (separate from members) -->
+                        <div
+                            style="display: flex; align-items: center; padding: 0.5rem; background: #f9fafb; border-radius: 4px; margin-bottom: 0.5rem;">
+                            <div
+                                style="width: 32px; height: 32px; background: #4f46e5; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem;">
+                                <%= project.createdBy.username.charAt(0).toUpperCase() %>
+                            </div>
+                            <div>
+                                <div style="font-weight: bold;">
+                                    <%= project.createdBy.username %>
+                                </div>
+                                <div style="font-size: 0.75rem; color: #6b7280;">
+                                    Owner • <%= project.createdBy.email %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Members (excluding owner) -->
+                        <% const teamMembers=project.members.filter(member=>member._id.toString() !==
+                            project.createdBy._id.toString())%>
+
+                            <% if (teamMembers.length> 0) { %>
+                                <% teamMembers.forEach(member=> { %>
+                                    <div
+                                        style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem; background: #f9fafb; border-radius: 4px; margin-bottom: 0.5rem;">
+                                        <div style="display: flex; align-items: center;">
+                                            <div
+                                                style="width: 32px; height: 32px; background: #10b981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 0.75rem;">
+                                                <%= member.username.charAt(0).toUpperCase() %>
+                                            </div>
+                                            <div>
+                                                <div style="font-weight: bold;">
+                                                    <%= member.username %>
+                                                </div>
+                                                <div style="font-size: 0.75rem; color: #6b7280;">
+                                                    Member • <%= member.email %>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <% if (isOwner) { %>
+                                            <button
+                                                onclick="removeMember('<%= member._id %>', '<%= member.username %>')"
+                                                style="background: none; border: none; color: #dc2626; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 4px;"
+                                                title="Remove member">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                            <% } %>
+                                    </div>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <div
+                                                style="text-align: center; padding: 1rem; color: #9ca3af; font-style: italic;">
+                                                No team members yet
+                                            </div>
+                                            <% } %>
+                    </div>
+
+                    <div style="color: #6b7280; font-size: 0.875rem; text-align: center; margin-top: 1rem;">
+                        <%= teamMembers.length %> team member(s)
+                    </div>
+
+                    <% if (isOwner) { %>
+                        <button onclick="showMemberForm()"
+                            style="width: 100%; background: #f3f4f6; color: #4f46e5; border: 1px dashed #d1d5db; padding: 0.5rem; border-radius: 4px; cursor: pointer; margin-top: 1rem;">
+                            <i class="fas fa-user-plus"></i> Add Team Member
+                        </button>
+                        <% } %>
+                </div>
+
+                <% if (isOwner) { %>
+                    <!-- Add Member Form (Hidden by default) -->
+                    <div id="memberForm"
+                        style="display: none; margin-top: 1rem; padding: 1rem; background: #f9fafb; border-radius: 4px;">
+                        <h4 style="margin: 0 0 1rem 0;">Add Team Member</h4>
+                        <form id="addMemberForm">
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">User
+                                    Email</label>
+                                <input type="email" id="searchEmail" placeholder="Enter user's email address"
+                                    style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+                                <div id="userSuggestions"
+                                    style="margin-top: 0.5rem; max-height: 200px; overflow-y: auto;"></div>
+                            </div>
+
+                            <div id="selectedUser"
+                                style="display: none; margin-bottom: 1rem; padding: 1rem; background: white; border-radius: 4px; border: 1px solid #d1d5db;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <strong id="selectedUserName"></strong>
+                                        <div style="font-size: 0.875rem; color: #6b7280;" id="selectedUserEmail"></div>
+                                    </div>
+                                    <button type="button" onclick="clearSelectedUser()"
+                                        style="background: none; border: none; color: #9ca3af; cursor: pointer;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <input type="hidden" name="userId" id="selectedUserId">
+                            </div>
+
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="submit"
+                                    style="background: #10b981; color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 4px; cursor: pointer;">
+                                    Add Member
+                                </button>
+                                <button type="button" onclick="hideMemberForm()"
+                                    style="background: #9ca3af; color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 4px; cursor: pointer;">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <% } %>
+
+                        <!-- Quick Actions -->
+                        <div
+                            style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <h3 style="margin: 0 0 1rem 0;">Quick Actions</h3>
+
+                            <div style="display: grid; gap: 0.5rem;">
+                                <a href="/projects/<%= project._id %>/tasks"
+                                    style="display: block; padding: 0.75rem; background: #f9fafb; color: #333; text-decoration: none; border-radius: 4px;">
+                                    <i class="fas fa-tasks"></i> View All Tasks
+                                </a>
+
+                                <% if (isOwner) { %>
+                                    <a href="/projects/<%= project._id %>/settings"
+                                        style="display: block; padding: 0.75rem; background: #f9fafb; color: #333; text-decoration: none; border-radius: 4px;">
+                                        <i class="fas fa-cog"></i> Project Settings
+                                    </a>
+
+                                    <button
+                                        onclick="if(confirm('Are you sure you want to delete this project?')) { deleteProject(); }"
+                                        style="width: 100%; text-align: left; padding: 0.75rem; background: #fef2f2; color: #dc2626; border: none; border-radius: 4px; cursor: pointer;">
+                                        <i class="fas fa-trash"></i> Delete Project
+                                    </button>
+                                    <% } %>
+                            </div>
+                        </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Task Form Functions
+        function showTaskForm() {
+            document.getElementById('taskForm').style.display = 'block';
+        }
+
+        function hideTaskForm() {
+            document.getElementById('taskForm').style.display = 'none';
+        }
+
+        // Task Creation        
+        document.getElementById('createTaskForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            submitBtn.disabled = true;
+
+            try {
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                console.log('Raw form data:', data); // Debug log
+
+                // Process data for API
+                const taskData = {
+                    title: data.title,
+                    description: data.description || undefined, // Send undefined if empty
+                    status: data.status || 'todo',
+                    priority: data.priority || 'medium',
+                    assignedTo: data.assignedTo || null, // Send null if empty
+                    dueDate: data.dueDate || undefined
+                };
+
+                // Remove undefined fields
+                Object.keys(taskData).forEach(key => {
+                    if (taskData[key] === undefined) {
+                        delete taskData[key];
+                    }
+                });
+
+                console.log('Processed task data:', taskData); // Debug log
+
+                const response = await fetch(`/api/projects/${data.project}/tasks`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(taskData),
+                    credentials: 'include'
+                });
+
+                console.log('Response status:', response.status); // Debug log
+
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.error('Non-JSON response:', text); // Debug log
+                    throw new Error(`Server error: ${text.substring(0, 100)}`);
+                }
+
+                const result = await response.json();
+                console.log('API Response:', result); // Debug log
+
+                if (result.success) {
+                    showAlert('success', 'Task created successfully!');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                } else {
+                    let errorMessage = result.message || 'Failed to create task';
+                    if (result.errors) {
+                        errorMessage += '\n' + result.errors.map(err => {
+                            const key = Object.keys(err)[0];
+                            return `${key}: ${err[key]}`;
+                        }).join('\n');
+                    }
+                    showAlert('error', errorMessage);
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Create task error:', error);
+                showAlert('error', 'Network error: ' + error.message);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // ========== MEMBER MANAGEMENT FUNCTIONS ==========
+        function showMemberForm() {
+            document.getElementById('memberForm').style.display = 'block';
+        }
+
+        function hideMemberForm() {
+            document.getElementById('memberForm').style.display = 'none';
+            clearSelectedUser();
+        }
+
+        function clearSelectedUser() {
+            document.getElementById('selectedUser').style.display = 'none';
+            document.getElementById('searchEmail').value = '';
+            document.getElementById('userSuggestions').innerHTML = '';
+            document.getElementById('selectedUserId').value = '';
+        }
+
+        // ========== USER SEARCH ==========
+        let searchTimeout;
+        document.getElementById('searchEmail').addEventListener('input', function (e) {
+            const email = e.target.value.trim();
+
+            clearTimeout(searchTimeout);
+
+            if (email.length < 3) {
+                document.getElementById('userSuggestions').innerHTML = '';
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    console.log('Searching users with email:', email);
+
+                    // ✅ CRITICAL: Use credentials: 'include' for cookies
+                    const response = await fetch(`/api/users/search?email=${encodeURIComponent(email)}`, {
+                        credentials: 'include' // ← THIS SENDS THE COOKIE
+                    });
+
+                    console.log('Search response:', response.status);
+
+                    const result = await response.json();
+                    console.log('Search result:', result);
+
+                    if (result.success && result.data.length > 0) {
+                        const suggestions = result.data.map(user => `
+                    <div style="padding: 0.5rem; border-bottom: 1px solid #e5e7eb; cursor: pointer;"
+                         onclick="selectUser('${user._id}', '${user.username}', '${user.email}')">
+                        <strong>${user.username}</strong>
+                        <div style="font-size: 0.875rem; color: #6b7280;">${user.email}</div>
+                    </div>
+                `).join('');
+
+                        document.getElementById('userSuggestions').innerHTML = suggestions;
+                    } else {
+                        document.getElementById('userSuggestions').innerHTML = `
+                    <div style="padding: 0.5rem; color: #9ca3af;">
+                        No users found with that email
+                    </div>
+                `;
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                }
+            }, 300);
+        });
+
+        function selectUser(userId, userName, userEmail) {
+            document.getElementById('selectedUser').style.display = 'block';
+            document.getElementById('selectedUserName').textContent = userName;
+            document.getElementById('selectedUserEmail').textContent = userEmail;
+            document.getElementById('selectedUserId').value = userId;
+            document.getElementById('userSuggestions').innerHTML = '';
+            document.getElementById('searchEmail').value = '';
+        }
+
+        // ========== ADD MEMBER ==========
+        document.getElementById('addMemberForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const userId = document.getElementById('selectedUserId').value;
+
+            if (!userId) {
+                alert('Please select a user first');
+                return;
+            }
+
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+            submitBtn.disabled = true;
+
+            try {
+                console.log('Adding member:', userId, 'to project:', '<%= project._id %>');
+
+                const response = await fetch('/api/projects/<%= project._id %>/members', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId: userId }),
+                    credentials: 'include'
+                });
+
+                console.log('Add member response:', response.status);
+
+                const result = await response.json();
+                console.log('Add member result:', result);
+
+                if (result.success) {
+                    showAlert('success', 'Member added successfully!');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    alert(result.message || 'Failed to add member');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Add member error:', error);
+                showAlert('error', 'Network error:' + error.message);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // ========== REMOVE MEMBER ==========
+        async function removeMember(userId, userName) {
+            if (!confirm(`Remove ${userName} from this project?`)) {
+                return;
+            }
+
+            try {
+                const projectId = '<%= project._id %>';
+
+                const response = await fetch(`/api/projects/${projectId}/members/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('success', 'Member removed successfully!');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    // Show error message with task count info
+                    let errorMessage = result.message || 'Failed to remove member';
+                    if (result.errors) {
+                        errorMessage += '\n' + result.errors.map(err => {
+                            const key = Object.keys(err)[0];
+                            return `${key}: ${err[key]}`;
+                        }).join('\n');
+                    }
+                    showAlert('error', errorMessage);
+                }
+
+            } catch (error) {
+                console.error('Remove member error:', error);
+                showAlert('error', error.message);
+            }
+        }
+
+        // ========== UPDATE TASK ==========
+        function quickUpdateTask(taskId, projectId, currentStatus = 'todo', currentPriority = 'medium') {
+            openQuickUpdateModal(taskId, projectId, currentStatus, currentPriority);
+        }
+
+        // ========== DELETE TASK ==========
+        async function deleteTask(taskId, projectId, event) {
+            if (event) event.stopPropagation();
+
+            if (!confirm('Are you sure you want to delete this task?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/projects/${projectId}/tasks/${taskId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('success', 'Task deleted successfully!');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showAlert('error', result.message);
+                }
+            } catch (error) {
+                console.error('Delete task error:', error);
+                alert('error', 'Network error: ' + error.message);
+            }
+        }
+
+        // Delete Project Function
+        async function deleteProject() {
+            if (!confirm('Are you sure? This will delete the project and all its tasks.')) {
+                return;
+            }
+
+            try {
+                console.log('Deleting project:', '<%= project._id %>');
+
+                const response = await fetch('/api/projects/<%= project._id %>', {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                console.log('Delete response:', response.status);
+
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return;
+                }
+
+                const result = await response.json();
+                console.log('Delete result:', result);
+
+                if (result.success) {
+                    window.location.href = '/projects?success=Project deleted successfully';
+                } else {
+                    showAlert('error', result.message || 'Failed to delete project');
+                }
+            } catch (error) {
+                console.error('Delete project error:', error);
+                showAlert('error', 'Network error: ' + error.message);
+            }
+        }
+    </script>

@@ -1,0 +1,56 @@
+<%- include('../layouts/main.ejs') -%>
+
+<div style="max-width: 400px; margin: 2rem auto;">
+    <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h2 style="margin-bottom: 1.5rem; color: #333;">Create Account</h2>
+        
+        <!-- ✅ Traditional form - no JavaScript needed -->
+        <form action="/api/auth/register" method="POST" style="margin-bottom: 1.5rem;">
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Username</label>
+                <input 
+                    type="text" 
+                    name="username" 
+                    required
+                    style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;"
+                    placeholder="John Doe"
+                >
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email</label>
+                <input 
+                    type="email" 
+                    name="email" 
+                    required
+                    style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;"
+                    placeholder="your@email.com"
+                >
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Password</label>
+                <input 
+                    type="password" 
+                    name="password" 
+                    required
+                    minlength="6"
+                    style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;"
+                    placeholder="At least 6 characters"
+                >
+            </div>
+            
+            <button 
+                type="submit"
+                style="width: 100%; padding: 0.75rem; background: #10b981; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;"
+            >
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+        
+        <div style="text-align: center; color: #666;">
+            Already have an account? 
+            <a href="/login" style="color: #4f46e5; text-decoration: none;">Login here</a>
+        </div>
+    </div>
+</div>
