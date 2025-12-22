@@ -1,0 +1,184 @@
+<%- include('../layouts/main.ejs') -%>
+
+<div style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+    <!-- Search Header -->
+    <div style="margin-bottom: 2rem;">
+        <a href="/dashboard" style="color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        
+        <h1 style="margin: 0 0 1rem 0;">Search</h1>
+        
+        <!-- Simple Search Bar -->
+        <form action="/search" method="GET" style="margin-bottom: 2rem;">
+            <div style="display: flex; gap: 0.5rem;">
+                <input 
+                    type="text" 
+                    name="q" 
+                    value="<%= searchQuery %>"
+                    placeholder="Search projects and tasks..."
+                    style="flex: 1; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;"
+                    autofocus
+                >
+                <button 
+                    type="submit"
+                    style="background: #4f46e5; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: bold;"
+                >
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </form>
+
+        <!-- Search Tips -->
+        <% if (!searchQuery) { %>
+            <div style="background: #f9fafb; padding: 1.5rem; border-radius: 8px; text-align: center;">
+                <i class="fas fa-search" style="font-size: 2rem; color: #9ca3af; margin-bottom: 1rem; display: block;"></i>
+                <h3 style="margin: 0 0 0.5rem 0; color: #333;">What are you looking for?</h3>
+                <p style="color: #666; margin: 0;">Search for projects by name or description, or tasks by title.</p>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Search Results -->
+    <% if (searchQuery) { %>
+        <div>
+            <!-- Results Summary -->
+            <div style="margin-bottom: 2rem;">
+                <h2 style="margin: 0 0 0.5rem 0;">
+                    <% if (hasResults) { %>
+                        Results for "<%= searchQuery %>"
+                    <% } else { %>
+                        No results found for "<%= searchQuery %>"
+                    <% } %>
+                </h2>
+                <p style="color: #666;">
+                    Found <%= projects.length %> project(s) and <%= tasks.length %> task(s)
+                </p>
+            </div>
+
+            <!-- Projects Results -->
+            <% if (projects.length > 0) { %>
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="margin: 0 0 1rem 0; color: #333;">Projects</h3>
+                    <div style="display: grid; gap: 1rem;">
+                        <% projects.forEach(project => { %>
+                            <a 
+                                href="/projects/<%= project._id %>" 
+                                style="display: block; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;"
+                                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
+                                onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'"
+                            >
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                    <h4 style="margin: 0; color: #4f46e5;"><%= project.name %></h4>
+                                    <span style="background: #d1fae5; color: #059669; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem;">
+                                        Project
+                                    </span>
+                                </div>
+                                
+                                <% if (project.description) { %>
+                                    <p style="color: #666; margin: 0 0 1rem 0;">
+                                        <%= project.description %>
+                                    </p>
+                                <% } %>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; color: #6b7280;">
+                                    <span>
+                                        <i class="fas fa-user"></i> <%= project.createdBy.username %>
+                                    </span>
+                                    <span>
+                                        Created <%= new Date(project.createdAt).toLocaleDateString() %>
+                                    </span>
+                                </div>
+                            </a>
+                        <% }) %>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Tasks Results -->
+            <% if (tasks.length > 0) { %>
+                <div>
+                    <h3 style="margin: 0 0 1rem 0; color: #333;">Tasks</h3>
+                    <div style="display: grid; gap: 1rem;">
+                        <% tasks.forEach(task => { %>
+                            <a 
+                                href="/tasks/<%= task._id %>" 
+                                style="display: block; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;"
+                                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
+                                onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'"
+                            >
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                    <h4 style="margin: 0; color: #333;"><%= task.title %></h4>
+                                    <span style="background: #d1fae5; color: #059669; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem;">
+                                        <%= task.status %>
+                                    </span>
+                                </div>
+                                
+                                <div style="margin-bottom: 1rem;">
+                                    <span style="background: #f3f4f6; color: #4f46e5; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem; display: inline-block;">
+                                        <i class="fas fa-project-diagram"></i> <%= task.project.name %>
+                                    </span>
+                                </div>
+                                
+                                <% if (task.description) { %>
+                                    <p style="color: #666; margin: 0 0 1rem 0;">
+                                        <%= task.description.substring(0, 150) %>
+                                        <%= task.description.length > 150 ? '...' : '' %>
+                                    </p>
+                                <% } %>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; color: #6b7280;">
+                                    <span>
+                                        <% if (task.assignedTo) { %>
+                                            <i class="fas fa-user"></i> <%= task.assignedTo.username %>
+                                        <% } else { %>
+                                            <i class="fas fa-user-slash"></i> Unassigned
+                                        <% } %>
+                                    </span>
+                                    <span>
+                                        Created <%= new Date(task.createdAt).toLocaleDateString() %>
+                                    </span>
+                                </div>
+                            </a>
+                        <% }) %>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- No Results Message -->
+            <% if (!hasResults) { %>
+                <div style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 8px;">
+                    <i class="fas fa-search" style="font-size: 3rem; color: #9ca3af; margin-bottom: 1rem; display: block;"></i>
+                    <h3 style="margin: 0 0 0.5rem 0; color: #333;">No matches found</h3>
+                    <p style="color: #666; margin: 0 0 1.5rem 0;">Try different keywords or check your spelling</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <a href="/projects" style="background: #4f46e5; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none;">
+                            <i class="fas fa-project-diagram"></i> Browse Projects
+                        </a>
+                        <a href="/tasks" style="background: #10b981; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none;">
+                            <i class="fas fa-tasks"></i> Browse Tasks
+                        </a>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+<script>
+// Focus search input and select text on page load if there's a query
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('input[name="q"]');
+    if (searchInput && searchInput.value) {
+        searchInput.select();
+    }
+    
+    // Clear search with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && searchInput && searchInput.value) {
+            searchInput.value = '';
+            searchInput.focus();
+        }
+    });
+});
+</script>
