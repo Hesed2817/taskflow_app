@@ -90,6 +90,88 @@ router.get('/dashboard', protect, async function (request, response) {
     }
 });
 
+// Search page
+router.get('/search', protect, async function (request, response) {
+    try {
+        const Project = require('../models/Project');
+        const Task = require('../models/Task');
+        const { q: searchQuery } = request.query; // Use 'q' for query parameter
+
+        let projects = [];
+        let tasks = [];
+        let hasResults = false;
+
+        // Only search if query is provided
+        if (searchQuery && searchQuery.trim()) {
+            const query = searchQuery.trim();
+            const searchRegex = new RegExp(query, 'i');
+
+            // Search projects
+            projects = await Project.find({
+                $or: [
+                    { createdBy: request.user.id },
+                    { members: request.user.id }
+                ],
+                $or: [
+                    { name: searchRegex },
+                    { description: searchRegex }
+                ]
+            })
+            .populate('createdBy', 'username')
+            .sort({ createdAt: -1 })
+            .limit(10);
+
+            // Search tasks
+            // First get projects user has access to
+            const accessibleProjects = await Project.find({
+                $or: [
+                    { createdBy: request.user.id },
+                    { members: request.user.id }
+                ]
+            }).distinct('_id');
+
+            if (accessibleProjects.length > 0) {
+                tasks = await Task.find({
+                    project: { $in: accessibleProjects },
+                    $or: [
+                        { title: searchRegex },
+                        { description: searchRegex }
+                    ]
+                })
+                .populate('project', 'name')
+                .populate('assignedTo', 'username')
+                .sort({ createdAt: -1 })
+                .limit(10);
+            }
+
+            hasResults = projects.length > 0 || tasks.length > 0;
+        }
+
+        response.render('search/index', {
+            title: 'Search',
+            user: request.user,
+            searchQuery: searchQuery || '',
+            projects: projects,
+            tasks: tasks,
+            hasResults: hasResults,
+            error: request.query.error || null,
+            success: request.query.success || null
+        });
+
+    } catch (error) {
+        console.error('Search error:', error);
+        response.render('search/index', {
+            title: 'Search',
+            user: request.user,
+            searchQuery: '',
+            projects: [],
+            tasks: [],
+            hasResults: false,
+            error: 'Search failed. Please try again.'
+        });
+    }
+});
+
 // All Projects
 router.get('/projects', protect, async function (request, response) {
     try {
@@ -127,7 +209,7 @@ router.get('/projects', protect, async function (request, response) {
 // Create project
 router.get('/projects/new', protect, function (request, response) {
     response.render('projects/create', {
-        title: 'Create New Project',
+        title: 'Create Project',
         user: request.user, 
         error: request.query.error || null,
         success: request.query.success || null
@@ -328,7 +410,7 @@ router.get('/tasks', protect, async function (request, response) {
     }
 });
 
-// Task detail
+// Task details
 router.get('/tasks/:id', protect, async function (request, response) {
     try {
         const Task = require('../models/Task');
