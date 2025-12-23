@@ -24,7 +24,8 @@ router.get('/login', (request, response) => {
         title: 'Login',
         user: null,  // Always pass user, even if null
         error: request.query.error || null,
-        success: request.query.success || null
+        success: request.query.success || null,
+        cssFile: 'auth'
     });
 });
 
@@ -38,7 +39,8 @@ router.get('/register', (request, response) => {
         title: 'Register',
         user: null,
         error: request.query.error || null,
-        success: request.query.success || null
+        success: request.query.success || null,
+        cssFile: 'auth'
     });
 });
 
@@ -71,6 +73,7 @@ router.get('/dashboard', protect, async function (request, response) {
         // Render dashboard with REAL data
         response.render('dashboard', {
             title: 'Dashboard',
+            cssFile: 'dashboard',
             user: request.user,
             projects: projects,
             tasks: tasks,
@@ -149,6 +152,7 @@ router.get('/search', protect, async function (request, response) {
 
         response.render('search/index', {
             title: 'Search',
+            cssFile: 'search',
             user: request.user,
             searchQuery: searchQuery || '',
             projects: projects,
@@ -189,6 +193,7 @@ router.get('/projects', protect, async function (request, response) {
 
         response.render('projects/list', {
             title: 'My Projects',
+            cssFile: 'projects',
             user: request.user,
             projects: projects,
             error: request.query.error || null,
@@ -248,6 +253,7 @@ router.get('/projects/:id', protect, async function (request, response) {
 
         response.render('projects/detail', {
             title: project.name,
+            cssFile: 'projects',
             user: request.user,
             project: project,
             tasks: tasks,
@@ -280,6 +286,7 @@ router.get('/projects/:id/edit', protect, async function (request, response) {
 
         response.render('projects/edit', {
             title: 'Edit Project: ' + project.name,
+            cssFile: 'projects',
             user: request.user,
             project: project,
             error: request.query.error || null,
@@ -313,6 +320,7 @@ router.get('/projects/:id/settings', protect, async function (request, response)
         response.render('projects/settings', {
             title: `Settings - ${project.name}`,
             user: request.user,
+            cssFile: 'projects',
             project: project,
             error: request.query.error || null,
             success: request.query.success || null
@@ -391,6 +399,7 @@ router.get('/tasks', protect, async function (request, response) {
 
         response.render('tasks/index', {
             title: 'All Tasks',
+            cssFile: 'tasks',
             user: request.user,
             tasks: tasks,
             projects: projects,
@@ -438,6 +447,7 @@ router.get('/tasks/:id', protect, async function (request, response) {
 
         response.render('tasks/detail', {
             title: task.title,
+            cssFile: 'tasks',
             user: request.user,
             task: task,
             isOwner: isOwner || task.createdBy._id.toString() === request.user.id,
@@ -493,6 +503,7 @@ router.get('/tasks/:id/edit', protect, async function (request, response) {
 
         response.render('tasks/edit', {
             title: `Edit: ${task.title}`,
+            cssFile: 'tasks',
             user: request.user,
             task: task,
             allMembers: allMembers,
@@ -575,6 +586,7 @@ router.get('/projects/:id/tasks', protect, async function (request, response) {
 
         response.render('projects/tasks', {
             title: `Tasks - ${project.name}`,
+            cssFile: 'projects',
             user: request.user,
             project: project,
             tasks: tasks,
@@ -625,6 +637,7 @@ router.get('/profile', protect, async function (request, response) {
 
         response.render('profile/index', {
             title: 'My Profile',
+            cssFile: 'profile',
             user: request.user,
             projectsCount: projectsCount,
             tasksCount: tasksCount,
@@ -650,6 +663,7 @@ router.get('/profile', protect, async function (request, response) {
 router.get('/profile/edit', protect, function (request, response) {
     response.render('profile/edit', {
         title: 'Edit Profile',
+        cssFile: 'profile',
         user: request.user,
         error: request.query.error || null,
         success: request.query.success || null
@@ -660,6 +674,7 @@ router.get('/profile/edit', protect, function (request, response) {
 router.get('/profile/change-password', protect, function (request, response) {
     response.render('profile/change-password', {
         title: 'Change Password',
+        cssFile: 'profile',
         user: request.user,
         error: request.query.error || null,
         success: request.query.success || null

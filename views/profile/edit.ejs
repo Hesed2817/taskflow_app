@@ -1,18 +1,18 @@
 <%- include('../layouts/main.ejs') -%>
 
-<div style="max-width: 600px; margin: 0 auto; padding: 2rem;">
-    <div style="margin-bottom: 2rem;">
-        <a href="/profile" style="color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+<div class="profile-container">
+    <div class="profile-header-section">
+        <a href="/profile" class="profile-back-link">
             <i class="fas fa-arrow-left"></i> Back to Profile
         </a>
-        <h1 style="margin: 1rem 0;">Edit Profile</h1>
-        <p style="color: #666;">Update your account information</p>
+        <h1 class="profile-title">Edit Profile</h1>
+        <p class="profile-subtitle">Update your account information</p>
     </div>
     
-    <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <form id="editProfileForm">
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333;">
+    <div class="profile-card">
+        <form id="editProfileForm" class="profile-form">
+            <div class="profile-form-group">
+                <label class="profile-form-label">
                     Username *
                 </label>
                 <input 
@@ -20,12 +20,13 @@
                     name="username" 
                     required
                     value="<%= user.username %>"
-                    style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 1rem;"
+                    class="profile-form-input"
+                    autocomplete="username"
                 >
             </div>
             
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333;">
+            <div class="profile-form-group">
+                <label class="profile-form-label">
                     Email Address *
                 </label>
                 <input 
@@ -33,21 +34,16 @@
                     name="email" 
                     required
                     value="<%= user.email %>"
-                    style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 1rem;"
+                    class="profile-form-input"
+                    autocomplete="email"
                 >
             </div>
             
-            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button 
-                    type="submit"
-                    style="background: #4f46e5; color: white; border: none; padding: 0.75rem 2rem; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem;"
-                >
+            <div class="profile-form-actions">
+                <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Save Changes
                 </button>
-                <a 
-                    href="/profile"
-                    style="background: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; padding: 0.75rem 2rem; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 1rem;"
-                >
+                <a href="/profile" class="btn btn-secondary">
                     Cancel
                 </a>
             </div>
@@ -84,15 +80,39 @@ document.getElementById('editProfileForm').addEventListener('submit', async func
         if (result.success) {
             window.location.href = '/profile?success=Profile updated successfully';
         } else {
-            alert(result.message || 'Failed to update profile');
+            showAlert('error', result.message || 'Failed to update profile');
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
         }
     } catch (error) {
         console.error('Update profile error:', error);
-        alert('Network error: ' + error.message);
+        showAlert('error', 'Network error: ' + error.message);
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
     }
 });
+
+// Add character count for username
+const usernameInput = document.querySelector('input[name="username"]');
+if (usernameInput) {
+    const charCounter = document.createElement('div');
+    charCounter.className = 'password-requirements';
+    charCounter.style.marginTop = 'var(--space-xs)';
+    usernameInput.parentElement.appendChild(charCounter);
+    
+    usernameInput.addEventListener('input', function() {
+        const length = this.value.length;
+        charCounter.textContent = `${length} characters`;
+        if (length < 3) {
+            charCounter.style.color = 'var(--color-danger)';
+        } else if (length > 20) {
+            charCounter.style.color = 'var(--color-warning)';
+        } else {
+            charCounter.style.color = 'var(--color-success)';
+        }
+    });
+    
+    // Trigger initial calculation
+    usernameInput.dispatchEvent(new Event('input'));
+}
 </script>

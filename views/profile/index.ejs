@@ -1,62 +1,62 @@
 <%- include('../layouts/main.ejs') -%>
 
-<div style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+<div class="profile-container">
     <!-- Profile Header -->
-    <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-        <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem;">
-            <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #4f46e5, #8b5cf6); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold;">
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="profile-avatar">
                 <%= user.username.charAt(0).toUpperCase() %>
             </div>
-            <div style="flex: 1;">
-                <h1 style="margin: 0 0 0.5rem 0;"><%= user.username %></h1>
-                <p style="color: #666; margin: 0 0 1rem 0;"><%= user.email %></p>
-                <div style="display: flex; gap: 1rem;">
-                    <a href="/profile/edit" style="background: #4f46e5; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none;">
+            <div class="profile-info">
+                <h1 class="profile-name"><%= user.username %></h1>
+                <p class="profile-email"><%= user.email %></p>
+                <div class="profile-actions">
+                    <a href="/profile/edit" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Edit Profile
                     </a>
-                    <a href="/profile/change-password" style="background: #f3f4f6; color: #333; border: 1px solid #d1d5db; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none;">
+                    <a href="/profile/change-password" class="btn btn-secondary">
                         <i class="fas fa-key"></i> Change Password
                     </a>
                 </div>
             </div>
         </div>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;">
-            <div style="text-align: center; padding: 1.5rem; background: #f9fafb; border-radius: 8px;">
-                <div style="font-size: 2.5rem; font-weight: bold; color: #4f46e5;"><%= projectsCount %></div>
-                <div style="color: #666;">Projects</div>
+        <div class="profile-stats">
+            <div class="profile-stat profile-stat-projects">
+                <div class="profile-stat-number"><%= projectsCount %></div>
+                <div class="profile-stat-label">Projects</div>
             </div>
             
-            <div style="text-align: center; padding: 1.5rem; background: #f9fafb; border-radius: 8px;">
-                <div style="font-size: 2.5rem; font-weight: bold; color: #10b981;"><%= tasksCount %></div>
-                <div style="color: #666;">Total Tasks</div>
+            <div class="profile-stat profile-stat-tasks">
+                <div class="profile-stat-number"><%= tasksCount %></div>
+                <div class="profile-stat-label">Total Tasks</div>
             </div>
             
-            <div style="text-align: center; padding: 1.5rem; background: #f9fafb; border-radius: 8px;">
-                <div style="font-size: 2.5rem; font-weight: bold; color: #f59e0b;"><%= tasksAssignedCount %></div>
-                <div style="color: #666;">Tasks Assigned</div>
+            <div class="profile-stat profile-stat-assigned">
+                <div class="profile-stat-number"><%= tasksAssignedCount %></div>
+                <div class="profile-stat-label">Tasks Assigned</div>
             </div>
         </div>
     </div>
 
     <!-- Account Details -->
-    <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-        <h2 style="margin: 0 0 1.5rem 0;">Account Information</h2>
+    <div class="profile-card">
+        <h2 style="margin: 0 0 var(--space-lg) 0;">Account Information</h2>
         
-        <div style="display: grid; gap: 1.5rem;">
-            <div>
-                <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">Username</div>
-                <div style="font-size: 1.125rem; font-weight: bold;"><%= user.username %></div>
+        <div class="account-details">
+            <div class="account-detail">
+                <div class="account-detail-label">Username</div>
+                <div class="account-detail-value"><%= user.username %></div>
             </div>
             
-            <div>
-                <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">Email Address</div>
-                <div style="font-size: 1.125rem; font-weight: bold;"><%= user.email %></div>
+            <div class="account-detail">
+                <div class="account-detail-label">Email Address</div>
+                <div class="account-detail-value"><%= user.email %></div>
             </div>
             
-            <div>
-                <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.25rem;">Member Since</div>
-                <div style="font-size: 1.125rem; font-weight: bold;">
+            <div class="account-detail">
+                <div class="account-detail-label">Member Since</div>
+                <div class="account-detail-value">
                     <%= new Date(user.createdAt).toLocaleDateString('en-US', { 
                         year: 'numeric',
                         month: 'long',
@@ -68,33 +68,70 @@
     </div>
 
     <!-- Quick Links -->
-    <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <h2 style="margin: 0 0 1.5rem 0;">Quick Actions</h2>
+    <div class="profile-card">
+        <h2 style="margin: 0 0 var(--space-lg) 0;">Quick Actions</h2>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-            <a href="/dashboard" style="display: block; padding: 1.5rem; background: #f9fafb; border-radius: 8px; text-decoration: none; color: #333; border-left: 4px solid #4f46e5;">
-                <div style="font-size: 1.5rem; color: #4f46e5; margin-bottom: 0.5rem;">
+        <div class="quick-links">
+            <a href="/dashboard" class="quick-link quick-link-dashboard">
+                <div class="quick-link-icon">
                     <i class="fas fa-tachometer-alt"></i>
                 </div>
-                <div style="font-weight: bold;">Dashboard</div>
-                <div style="font-size: 0.875rem; color: #666;">Go to your dashboard</div>
+                <div class="quick-link-title">Dashboard</div>
+                <div class="quick-link-desc">Go to your dashboard</div>
             </a>
             
-            <a href="/projects" style="display: block; padding: 1.5rem; background: #f9fafb; border-radius: 8px; text-decoration: none; color: #333; border-left: 4px solid #10b981;">
-                <div style="font-size: 1.5rem; color: #10b981; margin-bottom: 0.5rem;">
+            <a href="/projects" class="quick-link quick-link-projects">
+                <div class="quick-link-icon">
                     <i class="fas fa-project-diagram"></i>
                 </div>
-                <div style="font-weight: bold;">Projects</div>
-                <div style="font-size: 0.875rem; color: #666;">View all projects</div>
+                <div class="quick-link-title">Projects</div>
+                <div class="quick-link-desc">View all projects</div>
             </a>
             
-            <a href="/tasks" style="display: block; padding: 1.5rem; background: #f9fafb; border-radius: 8px; text-decoration: none; color: #333; border-left: 4px solid #f59e0b;">
-                <div style="font-size: 1.5rem; color: #f59e0b; margin-bottom: 0.5rem;">
+            <a href="/tasks" class="quick-link quick-link-tasks">
+                <div class="quick-link-icon">
                     <i class="fas fa-tasks"></i>
                 </div>
-                <div style="font-weight: bold;">Tasks</div>
-                <div style="font-size: 0.875rem; color: #666;">View all tasks</div>
+                <div class="quick-link-title">Tasks</div>
+                <div class="quick-link-desc">View all tasks</div>
             </a>
         </div>
     </div>
 </div>
+
+<!-- Success message handling -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const successMsg = urlParams.get('success');
+    
+    if (successMsg) {
+        showAlert('success', successMsg);
+        // Clean URL without reloading
+        const newUrl = window.location.pathname + window.location.search.replace(/[?&]success=[^&]+/, '').replace(/^&/, '?');
+        window.history.replaceState({}, document.title, newUrl);
+    }
+    
+    // Add real-time stats update if you want live updates   
+    updateProfileStats();
+});
+
+// Optional: Function to update stats without page reload
+async function updateProfileStats() {
+    try {
+        const response = await fetch('/api/users/me/stats', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update stats on the page
+            document.querySelectorAll('.profile-stat-number')[0].textContent = data.projectsCount;
+            document.querySelectorAll('.profile-stat-number')[1].textContent = data.tasksCount;
+            document.querySelectorAll('.profile-stat-number')[2].textContent = data.tasksAssignedCount;
+        }
+    } catch (error) {
+        console.error('Failed to update stats:', error);
+    }
+}
+</script>

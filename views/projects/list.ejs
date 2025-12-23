@@ -1,85 +1,79 @@
 <%- include('../layouts/main.ejs') -%>
 
-    <div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h1>My Projects</h1>
-            <a href="/projects/new"
-                style="background: #4f46e5; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none;">
+<div class="projects-container">
+    <div class="projects-list-header">
+        <div class="projects-list-header-content">
+            <h1 class="project-title">My Projects</h1>
+        </div>
+        <div class="projects-list-header-actions">
+            <a href="/projects/new" class="btn btn-primary">
                 <i class="fas fa-plus"></i> New Project
             </a>
         </div>
-
-        <% if (projects.length> 0) { %>
-            <div style="display: grid; gap: 1rem;">
-                <% projects.forEach(project=> { %>
-                    <div
-                        style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                            <div>
-                                <h2 style="margin: 0 0 0.5rem 0;">
-                                    <a href="/projects/<%= project._id %>" style="color: #333; text-decoration: none;">
-                                        <%= project.name %>
-                                    </a>
-                                </h2>
-                                <% if (project.description) { %>
-                                    <p style="color: #666; margin: 0;">
-                                        <%= project.description %>
-                                    </p>
-                                    <% } %>
-                            </div>
-
-                            <div style="text-align: right;">
-                                <span
-                                    style="background: #d1fae5; color: #059669; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem;">
-                                    <%= project.createdBy._id.toString()===user.id ? 'Owner' : 'Member' %>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
-                            <div style="color: #666; font-size: 0.875rem;">
-                                <i class="fas fa-users"></i>
-                                <% 
-                                const teamMembersCount=project.members.filter(member=>
-                                    member._id.toString() !== project.createdBy._id.toString()
-                                    ).length;
-                                    %>
-                                    <%= teamMembersCount %>
-                                        <%= teamMembersCount===1 ? "member" : "members" %>
-                                            • Created <%= new Date(project.createdAt).toLocaleDateString() %>
-                            </div>
-
-                            <div>
-                                <a href="/projects/<%= project._id %>"
-                                    style="color: #4f46e5; text-decoration: none; margin-right: 1rem;">
-                                    <i class="fas fa-eye"></i> View
-                                </a>
-                                <% if (project.createdBy._id.toString()===user.id) { %>
-                                    <a href="/projects/<%= project._id %>/edit"
-                                        style="color: #f59e0b; text-decoration: none;">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </a>
-                                    <% } %>
-                            </div>
-                        </div>
-                    </div>
-                    <% }) %>
-            </div>
-            <% } else { %>
-                <div
-                    style="text-align: center; padding: 4rem; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                    <div style="font-size: 4rem; color: #d1d5db; margin-bottom: 1rem;">
-                        <i class="fas fa-project-diagram"></i>
-                    </div>
-                    <h3 style="color: #333; margin-bottom: 0.5rem;">No projects yet</h3>
-                    <p style="color: #666; margin-bottom: 2rem;">Create your first project to start organizing your work
-                    </p>
-                    <a href="/projects/new"
-                        style="background: #4f46e5; color: white; padding: 0.75rem 2rem; border-radius: 4px; text-decoration: none; font-weight: bold;">
-                        <i class="fas fa-plus"></i> Create First Project
-                    </a>
-                </div>
-                <% } %>
     </div>
+
+    <% if (projects.length > 0) { %>
+        <div class="projects-grid">
+            <% projects.forEach(project => { %>
+                <div class="project-card">
+                    <div class="project-card-header">
+                        <div>
+                            <h2 class="project-card-title">
+                                <a href="/projects/<%= project._id %>">
+                                    <%= project.name %>
+                                </a>
+                            </h2>
+                            <% if (project.description) { %>
+                                <p class="project-card-description">
+                                    <%= project.description %>
+                                </p>
+                            <% } %>
+                        </div>
+
+                        <div style="text-align: right;">
+                            <span class="project-card-badge <%= project.createdBy._id.toString() === user.id ? 'project-card-owner' : '' %>">
+                                <%= project.createdBy._id.toString() === user.id ? 'Owner' : 'Member' %>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="project-card-footer">
+                        <div class="project-card-meta">
+                            <i class="fas fa-users"></i>
+                            <% 
+                            const teamMembersCount = project.members.filter(member =>
+                                member._id.toString() !== project.createdBy._id.toString()
+                            ).length;
+                            %>
+                            <%= teamMembersCount %>
+                            <%= teamMembersCount === 1 ? "member" : "members" %>
+                            • Created <%= new Date(project.createdAt).toLocaleDateString() %>
+                        </div>
+
+                        <div class="project-card-actions">
+                            <a href="/projects/<%= project._id %>" class="project-card-action">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            <% if (project.createdBy._id.toString() === user.id) { %>
+                                <a href="/projects/<%= project._id %>/edit" class="project-card-action project-card-action-edit">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <div class="projects-empty-state">
+            <div class="projects-empty-icon">
+                <i class="fas fa-project-diagram"></i>
+            </div>
+            <h3 class="projects-empty-title">No projects yet</h3>
+            <p class="projects-empty-text">Create your first project to start organizing your work</p>
+            <a href="/projects/new" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create First Project
+            </a>
+        </div>
+    <% } %>
+</div>
