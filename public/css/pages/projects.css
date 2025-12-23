@@ -479,7 +479,7 @@
     width: 24px;
     height: 24px;
     background: linear-gradient(135deg, var(--color-success), #10b981);
-    color: white;
+    color: var(--color-bg);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -928,7 +928,7 @@
 
 .task-card-small-action-btn:hover {
     background-color: var(--color-warning);
-    color: white;
+    color: var(--color-bg);
 }
 
 .task-card-small-action-btn-delete {
@@ -938,7 +938,7 @@
 
 .task-card-small-action-btn-delete:hover {
     background-color: var(--color-danger);
-    color: white;
+    color: var(--color-bg);
 }
 
 /* Members Section */
@@ -989,7 +989,7 @@
     justify-content: center;
     margin-right: var(--space-sm);
     font-weight: bold;
-    color: white;
+    color: var(--color-bg);
     flex-shrink: 0;
 }
 
@@ -1213,7 +1213,7 @@
 
 .quick-action-btn:hover {
     background-color: var(--color-danger);
-    color: white;
+    color: var(--color-bg);
 }
 
 /* Project Settings Page */
@@ -1285,7 +1285,7 @@
 }
 
 .danger-zone-section {
-    background-color: white;
+    background-color: var(--color-bg);
     padding: var(--space-lg);
     border-radius: var(--radius-md);
     margin-bottom: var(--space-lg);
@@ -1342,7 +1342,7 @@
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    color: white;
+    color: var(--color-bg);
     flex-shrink: 0;
 }
 

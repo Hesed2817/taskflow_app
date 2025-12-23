@@ -1,103 +1,280 @@
 <%- include('./layouts/main.ejs') -%>
 
 <div class="dashboard-container">
-    <div class="dashboard-welcome">
-        <h1>Welcome, <%= user.username %>!</h1>
-        <p>Here's an overview of your projects and tasks</p>
+    <!-- Hero Welcome Section -->
+    <div class="dashboard-hero">
+        <div class="dashboard-hero-content">
+            <h1>Welcome back, <%= user.username %>! 👋</h1>
+            <p>Here's what's happening with your projects and tasks today.</p>
+            
+            <div class="dashboard-hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value"><%= projects.length %></div>
+                    <div class="hero-stat-label">Active Projects</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value"><%= tasks.length %></div>
+                    <div class="hero-stat-label">Total Tasks</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">
+                        <%= tasks.filter(t => t.status === 'done').length %>
+                    </div>
+                    <div class="hero-stat-label">Completed</div>
+                </div>
+            </div>
+        </div>
     </div>
-    
+
     <!-- Search Bar -->
-    <div class="dashboard-search">
-        <form action="/search" method="GET" class="search-form">
-            <input 
-                type="text" 
-                name="q" 
-                placeholder="Search projects and tasks..."
-                class="search-input"
-            >
-            <button type="submit" class="search-btn">
-                <i class="fas fa-search"></i>
-            </button>
-        </form>
+    <div class="dashboard-search-section">
+        <div class="dashboard-search">
+            <form action="/search" method="GET" class="search-form">
+                <input 
+                    type="text" 
+                    name="q" 
+                    placeholder="Search projects, tasks, or team members..."
+                    class="search-input"
+                >
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+        </div>
     </div>
-    
-    <!-- Stats Grid -->
+
+    <!-- Quick Actions -->
+    <div class="dashboard-quick-actions">
+        <h2 class="section-title">
+            <i class="fas fa-bolt"></i> Quick Actions
+        </h2>
+        <div class="quick-actions-grid">
+            <a href="/projects/new" class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <h3 class="quick-action-title">Create Project</h3>
+                <p class="quick-action-description">Start a new project to organize your team's work</p>
+            </a>
+            
+            <a href="/tasks" class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3 class="quick-action-title">View All Tasks</h3>
+                <p class="quick-action-description">See all your tasks across different projects</p>
+            </a>
+            
+            <a href="/projects" class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3 class="quick-action-title">Browse Projects</h3>
+                <p class="quick-action-description">Explore all your active projects</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
     <div class="dashboard-stats">
-        <!-- Stats Card -->
         <div class="stat-card">
-            <h3>Projects</h3>
-            <p><%= projects.length %></p>
-            <a href="/projects">View all <i class="fas fa-arrow-right"></i></a>
+            <div class="stat-card-header">
+                <div class="stat-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3 class="stat-card-title">Projects Overview</h3>
+            </div>
+            <div class="stat-card-value"><%= projects.length %></div>
+            <p>Total active projects in your workspace</p>
+            <a href="/projects" class="stat-card-link">
+                View all projects <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
         
-        <!-- Quick Actions -->
-        <div class="quick-actions-card">
-            <h3>Quick Actions</h3>
-            <div class="quick-actions">
-                <a href="/projects/new" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> New Project
-                </a>
-                <a href="/tasks" class="btn btn-success">
-                    <i class="fas fa-tasks"></i> View Tasks
-                </a>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3 class="stat-card-title">Tasks Summary</h3>
             </div>
+            <div class="stat-card-value"><%= tasks.length %></div>
+            <p>Tasks across all your projects</p>
+            <a href="/tasks" class="stat-card-link">
+                Manage tasks <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="stat-card-title">Productivity</h3>
+            </div>
+            <div class="stat-card-value">
+                <% 
+                const completedTasks = tasks.filter(t => t.status === 'done').length;
+                const completionRate = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
+                %>
+                <%= completionRate %>%
+            </div>
+            <p>Task completion rate across all projects</p>
+            <a href="/tasks?status=done" class="stat-card-link">
+                View completed <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
     </div>
-    
-    <!-- Recent Projects -->
-    <div class="recent-section">
-        <div class="recent-header">
-            <h2>Recent Projects</h2>
-            <a href="/projects">View All <i class="fas fa-arrow-right"></i></a>
-        </div>
-        
-        <% if (projects.length > 0) { %>
-            <div class="recent-list">
-                <% projects.forEach(project => { %>
-                    <div class="recent-item">
-                        <h3><%= project.name %></h3>
-                        <p><%= project.description || 'No description' %></p>
-                        <a href="/projects/<%= project._id %>">
-                            View Details <i class="fas fa-arrow-right"></i>
+
+    <!-- Recent Projects & Tasks -->
+    <div class="dashboard-recent">
+        <!-- Recent Projects -->
+        <div class="recent-section">
+            <div class="recent-header">
+                <h2>Recent Projects</h2>
+                <a href="/projects">
+                    View all <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <% if (projects.length > 0) { %>
+                <div class="recent-list">
+                    <% projects.slice(0, 4).forEach(project => { %>
+                        <a href="/projects/<%= project._id %>" class="recent-item project-item">
+                            <div class="recent-item-header">
+                                <h3 class="recent-item-title"><%= project.name %></h3>
+                                <span class="recent-item-badge">Project</span>
+                            </div>
+                            
+                            <% if (project.description) { %>
+                                <p class="recent-item-description">
+                                    <%= project.description.substring(0, 120) %>
+                                    <%= project.description.length > 120 ? '...' : '' %>
+                                </p>
+                            <% } %>
+                            
+                            <div class="recent-item-meta">
+                                <div class="recent-item-user">
+                                    <i class="fas fa-user"></i> <%= project.createdBy.username %>
+                                </div>
+                                <div>
+                                    <i class="fas fa-calendar"></i> 
+                                    <%= new Date(project.createdAt).toLocaleDateString() %>
+                                </div>
+                            </div>
                         </a>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-project-diagram"></i>
                     </div>
-                <% }) %>
-            </div>
-        <% } else { %>
-            <div class="empty-state">
-                <p>No projects yet. Create your first project!</p>
-            </div>
-        <% } %>
-    </div>
-    
-    <!-- Recent Tasks -->
-    <div class="recent-section">
-        <div class="recent-header">
-            <h2>Recent Tasks</h2>
-            <a href="/tasks">View All <i class="fas fa-arrow-right"></i></a>
+                    <h3 class="empty-state-title">No projects yet</h3>
+                    <p class="empty-state-text">Create your first project to start organizing your work</p>
+                    <a href="/projects/new" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Project
+                    </a>
+                </div>
+            <% } %>
         </div>
-        
-        <% if (tasks.length > 0) { %>
-            <div class="recent-list">
-                <% tasks.forEach(task => { %>
-                    <div class="recent-item task-card">
-                        <div class="flex justify-between items-center mb-sm">
-                            <h3><%= task.title %></h3>
-                            <span class="task-status badge badge-success">
-                                <%= task.status %>
-                            </span>
-                        </div>
-                        <p class="mb-sm">Project: <%= task.project.name %></p>
-                        <a href="/tasks/<%= task._id %>">
-                            View Task <i class="fas fa-arrow-right"></i>
+
+        <!-- Recent Tasks -->
+        <div class="recent-section">
+            <div class="recent-header">
+                <h2>Recent Tasks</h2>
+                <a href="/tasks">
+                    View all <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <% if (tasks.length > 0) { %>
+                <div class="recent-list">
+                    <% tasks.slice(0, 4).forEach(task => { %>
+                        <a href="/tasks/<%= task._id %>" class="recent-item task-item">
+                            <div class="recent-item-header">
+                                <h3 class="recent-item-title"><%= task.title %></h3>
+                                <span class="recent-item-badge">
+                                    <%= task.status %>
+                                </span>
+                            </div>
+                            
+                            <div style="margin-bottom: var(--space-md);">
+                                <span style="background: var(--color-bg-secondary); color: var(--color-primary); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-full); font-size: 0.75rem; display: inline-flex; align-items: center; gap: var(--space-xs);">
+                                    <i class="fas fa-project-diagram"></i> <%= task.project.name %>
+                                </span>
+                            </div>
+                            
+                            <% if (task.description) { %>
+                                <p class="recent-item-description">
+                                    <%= task.description.substring(0, 100) %>
+                                    <%= task.description.length > 100 ? '...' : '' %>
+                                </p>
+                            <% } %>
+                            
+                            <div class="recent-item-meta">
+                                <div class="recent-item-user">
+                                    <% if (task.assignedTo) { %>
+                                        <i class="fas fa-user"></i> <%= task.assignedTo.username %>
+                                    <% } else { %>
+                                        <i class="fas fa-user-slash"></i> Unassigned
+                                    <% } %>
+                                </div>
+                                <div>
+                                    <% if (task.dueDate) { %>
+                                        <i class="fas fa-clock"></i> 
+                                        <%= new Date(task.dueDate).toLocaleDateString() %>
+                                    <% } else { %>
+                                        <i class="fas fa-calendar"></i> 
+                                        <%= new Date(task.createdAt).toLocaleDateString() %>
+                                    <% } %>
+                                </div>
+                            </div>
                         </a>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-tasks"></i>
                     </div>
-                <% }) %>
-            </div>
-        <% } else { %>
-            <div class="empty-state">
-                <p>No tasks yet. Add tasks to your projects!</p>
-            </div>
-        <% } %>
+                    <h3 class="empty-state-title">No tasks yet</h3>
+                    <p class="empty-state-text">Add tasks to your projects to see them here</p>
+                    <a href="/projects" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Browse Projects
+                    </a>
+                </div>
+            <% } %>
+        </div>
     </div>
 </div>
+
+<!-- Optional: Add some animations -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add subtle animation to stats cards
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease-out';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100 * index);
+    });
+    
+    // Add hover effect to quick action cards
+    const quickActionCards = document.querySelectorAll('.quick-action-card');
+    quickActionCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+});
+</script>

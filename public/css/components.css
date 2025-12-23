@@ -218,6 +218,8 @@
 .status-done {
     background-color: var(--color-success-light);
     color: var(--color-success);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-full);
 }
 
 /* ALERTS - Will be migrated from inline styles */
