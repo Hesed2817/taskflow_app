@@ -23,7 +23,7 @@
     <!-- Page-specific CSS -->
     <% if (cssFile) { %>
         <link rel="stylesheet" href="/css/pages/<%= cssFile %>.css">
-    <% } %>
+        <% } %>
 </head>
 
 <body>
@@ -83,7 +83,7 @@
                 <div id="alertContainer" class="alert-container"></div>
 
                 <!-- Alert Template (hidden by default) -->
-                <div id="alertTemplate" class="alert-template">
+                <template id="alertTemplate" class="alert-template">
                     <div class="alert">
                         <div class="alert-icon"></div>
                         <div class="alert-content">
@@ -94,7 +94,7 @@
                             &times;
                         </button>
                     </div>
-                </div>
+                </template>
 
                 <style>
                     @keyframes slideIn {
@@ -245,51 +245,82 @@
                     }
                 });
 
-                // Updated Alert System (compatible with new CSS)
+                // Alert System              
                 function showAlert(type, message, title = '', duration = 5000) {
+                    // Validate inputs
+                    if (!message || typeof message !== 'string' || message.trim() === '') {
+                        console.warn('showAlert called with empty message');
+                        return null;
+                    }
+
+                    // Get container and template
                     const container = document.getElementById('alertContainer');
                     const template = document.getElementById('alertTemplate');
 
-                    // Create alert from template
-                    const alertEl = template.cloneNode(true);
-                    alertEl.id = '';
-                    alertEl.classList.remove('alert-template');
+                    if (!container || !template) {
+                        console.error('Alert container or template not found');
+                        return null;
+                    }
+
+                    // Clone the template content (not the template itself)
+                    const alertContent = template.content.cloneNode(true);
+                    const alertEl = alertContent.querySelector('.alert');
 
                     // Configure based on type
-                    let icon, alertClass;
+                    let icon, color, defaultTitle;
                     switch (type) {
                         case 'success':
                             icon = '✓';
-                            alertClass = 'alert-success';
-                            title = title || 'Success';
+                            color = 'var(--color-success)';
+                            defaultTitle = 'Success';
                             break;
                         case 'error':
                             icon = '✗';
-                            alertClass = 'alert-error';
-                            title = title || 'Error';
+                            color = 'var(--color-danger)';
+                            defaultTitle = 'Error';
                             break;
                         case 'warning':
                             icon = '⚠';
-                            alertClass = 'alert-warning';
-                            title = title || 'Warning';
+                            color = 'var(--color-warning)';
+                            defaultTitle = 'Warning';
                             break;
                         case 'info':
                             icon = 'ℹ';
-                            alertClass = 'alert-info';
-                            title = title || 'Info';
+                            color = 'var(--color-info)';
+                            defaultTitle = 'Info';
                             break;
                         default:
                             icon = 'ℹ';
-                            alertClass = '';
-                            title = title || 'Notice';
+                            color = 'var(--color-primary)';
+                            defaultTitle = 'Notice';
                     }
 
+                    // Use provided title or default
+                    const finalTitle = title || defaultTitle;
+
                     // Configure the alert
-                    const alertDiv = alertEl.querySelector('.alert');
-                    alertDiv.classList.add(alertClass);
-                    alertDiv.querySelector('.alert-icon').textContent = icon;
-                    alertDiv.querySelector('.alert-title').textContent = title;
-                    alertDiv.querySelector('.alert-message').textContent = message;
+                    alertEl.classList.add(`alert-${type}`);
+                    alertEl.style.borderLeftColor = color;
+
+                    const iconEl = alertEl.querySelector('.alert-icon');
+                    const titleEl = alertEl.querySelector('.alert-title');
+                    const messageEl = alertEl.querySelector('.alert-message');
+
+                    if (iconEl) {
+                        iconEl.textContent = icon;
+                        iconEl.style.color = color;
+                    }
+
+                    if (titleEl) titleEl.textContent = finalTitle;
+                    if (messageEl) messageEl.textContent = message;
+
+                    // Add close button handler
+                    const closeBtn = alertEl.querySelector('.alert-close');
+                    if (closeBtn) {
+                        closeBtn.onclick = function () {
+                            dismissAlert(alertEl);
+                        };
+                    }
 
                     // Add to container
                     container.appendChild(alertEl);
@@ -305,15 +336,65 @@
                 }
 
                 function dismissAlert(alertEl) {
-                    const alertDiv = alertEl.querySelector('.alert');
-                    alertDiv.classList.add('fade-out');
+                    if (!alertEl || !alertEl.parentNode) return;
+
+                    alertEl.classList.add('fade-out');
+
                     setTimeout(() => {
                         if (alertEl.parentNode) {
                             alertEl.parentNode.removeChild(alertEl);
                         }
+
+                        // Hide container if empty
+                        const container = document.getElementById('alertContainer');
+                        if (container && container.children.length === 0) {
+                            container.style.display = 'none';
+                        }
                     }, 300);
                 }
 
+                // Enhanced URL parameter handling
+                document.addEventListener('DOMContentLoaded', function () {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const container = document.getElementById('alertContainer');
+
+                    // Function to safely show alert from URL
+                    function showAlertFromUrl(param, type) {
+                        const value = urlParams.get(param);
+                        if (value && value.trim() !== '' && value !== 'undefined' && value !== 'null') {
+                            showAlert(type, value.trim());
+
+                            // Clean URL without reloading
+                            const url = new URL(window.location);
+                            url.searchParams.delete(param);
+
+                            // Clean up any other empty params
+                            for (const [key, val] of url.searchParams.entries()) {
+                                if (!val || val.trim() === '' || val === 'undefined' || val === 'null') {
+                                    url.searchParams.delete(key);
+                                }
+                            }
+
+                            let newSearch = url.search;
+                            if (newSearch === '?') newSearch = '';
+
+                            window.history.replaceState({}, document.title, url.pathname + newSearch + url.hash);
+                        }
+                    }
+
+                    // Check for alert parameters
+                    showAlertFromUrl('success', 'success');
+                    showAlertFromUrl('error', 'error');
+                    showAlertFromUrl('warning', 'warning');
+                    showAlertFromUrl('info', 'info');
+                });
+
+                // Global functions
+                window.showSuccess = (message, title) => showAlert('success', message, title);
+                window.showError = (message, title) => showAlert('error', message, title);
+                window.showWarning = (message, title) => showAlert('warning', message, title);
+                window.showInfo = (message, title) => showAlert('info', message, title);
+                
                 // Updated Quick Update Modal Functions
                 function openQuickUpdateModal(taskId, projectId, currentStatus, currentPriority) {
                     currentTaskData = { taskId, projectId };

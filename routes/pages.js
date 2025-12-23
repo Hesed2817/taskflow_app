@@ -215,6 +215,7 @@ router.get('/projects', protect, async function (request, response) {
 router.get('/projects/new', protect, function (request, response) {
     response.render('projects/create', {
         title: 'Create Project',
+        cssFile:'projects',
         user: request.user, 
         error: request.query.error || null,
         success: request.query.success || null
