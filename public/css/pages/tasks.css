@@ -156,6 +156,7 @@
 
 .user-avatar-primary {
     background: linear-gradient(135deg, var(--color-primary), #8b5cf6);
+    color: var(--color-bg);
 }
 
 .user-avatar-success {
