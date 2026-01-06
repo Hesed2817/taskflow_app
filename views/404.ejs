@@ -1,0 +1,24 @@
+<%- include('./layouts/main.ejs') -%>
+
+    <div class="error-container">
+        <div class="error-content">
+            <i class="fas fa-ghost fa-6x error-icon"></i>
+
+            <h1 class="error-code">404</h1>
+            <h2 class="error-title">Page Not Found</h2>
+
+            <p class="error-message">
+                Whoops! It looks like you've ventured into the unknown. The page you're looking for doesn't exist or has
+                been moved.
+            </p>
+
+            <div class="error-actions">
+                <a href="javascript:history.back()" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Go Back
+                </a>
+                <a href="/dashboard" class="btn btn-primary">
+                    <i class="fas fa-house"></i> Dashboard
+                </a>
+            </div>
+        </div>
+    </div>

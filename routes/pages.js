@@ -10,7 +10,7 @@ const { homePage, login, register, dashboard, search, getProjects, createProject
     profile,
     editProfile,
     changePassword,
-    logout} = require('../controllers/pageController');
+    logout } = require('../controllers/pageController');
 const router = express.Router();
 
 
@@ -24,6 +24,15 @@ router.get('/login', login);
 
 // Register page
 router.get('/register', register);
+
+// Forgot Password page
+router.get('/forgot-password', (req, res) => {
+    res.render('auth/forgot-password', {
+        title: 'Forgot Password',
+        user: null, // Auth pages don't have user context usually
+        cssFile: 'auth' // Assuming 'auth' css exists or reusing main/form styles
+    });
+});
 
 // ========== PROTECTED ROUTES ==========
 

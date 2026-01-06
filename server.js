@@ -41,5 +41,9 @@ app.use('/api/tasks', require('./routes/globalTasks'));
 app.use('/api/users', require('./routes/users'));
 
 app.use((request, response) => {
-    response.send("Error 404 - Path not found. Try contacting the genius :)");
+    response.status(404).render('404', {
+        title: 'Page Not Found',
+        user: request.user || null,
+        cssFile: '404'
+    });
 });
