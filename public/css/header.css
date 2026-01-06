@@ -121,7 +121,7 @@
     right: 0;
     top: calc(100% + 0.5rem);
     background-color: var(--color-surface);
-    color: var(--color-text);
+    color: var(--color-primary-light);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xl), 0 0 0 1px var(--color-border);
     min-width: 200px;
@@ -163,14 +163,11 @@
 .theme-toggle {
     background: transparent;
     border: 1px solid var(--color-border);
-    color: var(--color-text-secondary);
+    color: var(--color-text);
     cursor: pointer;
     padding: var(--space-sm);
-    /* Added padding */
     width: auto;
-    /* Remove fixed width */
     height: auto;
-    /* Remove fixed height */
     aspect-ratio: 1;
     border-radius: var(--radius-md);
     display: flex;
