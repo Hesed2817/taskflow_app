@@ -178,6 +178,14 @@ const userSearchValidator = [
     }
 ];
 
+const deleteUserValidator = [
+    body('password')
+        .trim()
+        .notEmpty().withMessage('Password is required')
+        .isLength({ min: 6 }).withMessage('Password must be atleast 6 characters')
+        .matches(/\d/).withMessage('Password must contain at least one number')
+]
+
 // task filter validators
 const taskFilterValidator = [
     query('status')
@@ -214,6 +222,7 @@ module.exports = {
     taskUpdateValidator,
     taskIdValidator,
     userSearchValidator,
+    deleteUserValidator,
     taskFilterValidator,
     validate
 }

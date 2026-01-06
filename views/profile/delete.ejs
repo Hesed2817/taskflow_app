@@ -1,0 +1,269 @@
+<%- include('../layouts/main.ejs') -%>
+
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <%= user.username.charAt(0).toUpperCase() %>
+                </div>
+                <div class="profile-info">
+                    <h1 class="profile-name">Delete Account</h1>
+                    <p class="profile-email">Permanently delete your account and all associated data</p>
+                    <div class="profile-actions">
+                        <a href="/profile" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning Card -->
+        <div class="profile-card profile-card-danger">
+            <div class="profile-header">
+                <div class="profile-warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <h2 class="profile-warning-title">Warning: Irreversible Action
+                    </h2>
+                    <p class="profile-warning-text">
+                        Deleting your account is permanent and cannot be undone. Please read what will be deleted:
+                    </p>
+                </div>
+            </div>
+
+            <div class="profile-warning-box">
+                <h3 class="profile-warning-subtitle">What will be deleted:</h3>
+
+                <div class="profile-delete-list">
+                    <div class="profile-delete-item">
+                        <i class="fas fa-user-slash profile-delete-icon"></i>
+                        <div>
+                            <strong>Your Profile</strong> - All your personal information (username, email)
+                        </div>
+                    </div>
+
+                    <div class="profile-delete-item">
+                        <i class="fas fa-project-diagram profile-delete-icon"></i>
+                        <div>
+                            <strong>Projects You Own</strong> - All projects you created will be permanently deleted
+                        </div>
+                    </div>
+
+                    <div class="profile-delete-item">
+                        <i class="fas fa-tasks profile-delete-icon"></i>
+                        <div>
+                            <strong>Task Assignments</strong> - You will be unassigned from all tasks
+                        </div>
+                    </div>
+
+                    <div class="profile-delete-item">
+                        <i class="fas fa-users profile-delete-icon"></i>
+                        <div>
+                            <strong>Team Memberships</strong> - You will be removed from all project teams
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation Form -->
+        <div class="profile-card">
+            <h2 class="profile-section-title">Confirm Account Deletion</h2>
+
+            <div id="deleteMessage" class="profile-message" style="display: none;"></div>
+
+            <form id="deleteAccountForm" class="profile-form">
+                <div class="form-group">
+                    <label class="form-label" for="password">
+                        <i class="fas fa-key"></i> Enter your password to confirm
+                    </label>
+                    <input type="password" id="password" name="password" class="form-control"
+                        placeholder="Enter your current password" required autocomplete="current-password">
+                    <div class="password-requirements">
+                        This action requires your current password for verification
+                    </div>
+                </div>
+
+                <div class="profile-form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/profile'">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-danger" id="deleteBtn" disabled>
+                        <i class="fas fa-trash-alt"></i> Delete My Account
+                    </button>
+                </div>
+            </form>
+
+            <!-- Loading indicator -->
+            <div id="deleteLoading" class="profile-loading" style="display: none;">
+                <div class="profile-loader-container">
+                    <div class="loading-spinner"></div>
+                    <p class="profile-loader-text">Deleting account and cleaning up data...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="finalConfirmationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-exclamation-circle text-danger"></i>
+                    Final Confirmation
+                </h2>
+                <button type="button" class="modal-close" onclick="closeFinalModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p class="mb-md">
+                    <strong>Are you absolutely sure?</strong> This action cannot be undone.
+                </p>
+
+                <div class="profile-modal-warning-box">
+                    <p class="profile-modal-warning-text">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        All your data will be permanently deleted.
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirmText">
+                        Type <strong>DELETE MY ACCOUNT</strong> to confirm:
+                    </label>
+                    <input type="text" id="confirmText" class="form-control" placeholder="Type DELETE MY ACCOUNT"
+                        oninput="checkConfirmationText(this.value)">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeFinalModal()">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="finalDeleteBtn" disabled
+                    onclick="submitDeleteAccount()">
+                    <i class="fas fa-trash-alt"></i> Yes, Delete My Account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Password validation
+        const passwordInput = document.getElementById('password');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const deleteMessage = document.getElementById('deleteMessage');
+        const deleteForm = document.getElementById('deleteAccountForm');
+
+        passwordInput.addEventListener('input', function () {
+            deleteBtn.disabled = this.value.trim() === '';
+        });
+
+        // Handle form submission
+        deleteForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const password = passwordInput.value.trim();
+
+            if (!password) {
+                showMessage('error', 'Please enter your password');
+                return;
+            }
+
+            // Show final confirmation modal
+            document.getElementById('finalConfirmationModal').classList.add('show');
+            document.getElementById('confirmText').value = '';
+            document.getElementById('finalDeleteBtn').disabled = true;
+        });
+
+        // Final confirmation logic
+        function checkConfirmationText(text) {
+            const finalDeleteBtn = document.getElementById('finalDeleteBtn');
+            finalDeleteBtn.disabled = text.toUpperCase() !== 'DELETE MY ACCOUNT';
+        }
+
+        function closeFinalModal() {
+            document.getElementById('finalConfirmationModal').classList.remove('show');
+        }
+
+        // Show alert message
+        function showMessage(type, message) {
+            deleteMessage.textContent = message;
+            deleteMessage.className = 'profile-message show';
+            deleteMessage.classList.add(`profile-message-${type}`);
+
+            setTimeout(() => {
+                deleteMessage.classList.remove('show');
+            }, 5000);
+        }
+
+        // Submit delete request
+        async function submitDeleteAccount() {
+            closeFinalModal();
+            const password = passwordInput.value.trim();
+
+            // Show loading
+            document.getElementById('deleteLoading').style.display = 'block';
+            document.getElementById('deleteAccountForm').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/users/delete-profile', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show success message
+                    showAlert('success', 'Account deleted successfully');
+
+                    // Redirect to login after delay
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+
+                } else {
+                    // Show error message
+                    showAlert('error', data.message || 'Failed to delete account');
+
+                    // Reset form
+                    document.getElementById('deleteLoading').style.display = 'none';
+                    document.getElementById('deleteAccountForm').style.display = 'block';
+                    passwordInput.value = '';
+                    deleteBtn.disabled = true;
+                }
+
+            } catch (error) {
+                console.error('Delete error:', error);
+                showAlert('error', 'Network error. Please try again.');
+
+                document.getElementById('deleteLoading').style.display = 'none';
+                document.getElementById('deleteAccountForm').style.display = 'block';
+            }
+        }
+
+        // Close modal on outside click
+        window.onclick = function (event) {
+            const modal = document.getElementById('finalConfirmationModal');
+            if (event.target === modal) {
+                closeFinalModal();
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeFinalModal();
+            }
+        });
+    </script>

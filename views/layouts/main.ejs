@@ -5,12 +5,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <%= title || 'TaskFlow' %>
-    </title>
-
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts: Reddit Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Reddit+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="/css/main.css">
@@ -36,15 +38,17 @@
                     <i class="fas fa-bars"></i>
                 </button>
 
-                <nav class="nav" id="mainNav">                    
+                <div class="menu-backdrop" id="menuBackdrop" onclick="toggleMobileMenu()"></div>
+
+                <nav class="nav" id="mainNav">
                     <a href="/dashboard" class="nav-link">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
-                    </a>                    
+                        <i class="fas fa-house"></i> Dashboard
+                    </a>
                     <a href="/projects" class="nav-link">
-                        <i class="fas fa-project-diagram"></i> Projects
+                        <i class="fas fa-folder-open"></i> Projects
                     </a>
                     <a href="/tasks" class="nav-link">
-                        <i class="fas fa-tasks"></i> Tasks
+                        <i class="fas fa-clipboard-check"></i> Tasks
                     </a>
 
                     <button class="theme-toggle" onclick="toggleTheme()">
@@ -196,19 +200,23 @@
                     // Mobile menu toggle
                     window.toggleMobileMenu = function () {
                         const nav = document.getElementById('mainNav');
+                        const backdrop = document.getElementById('menuBackdrop');
                         nav.classList.toggle('show');
+                        backdrop.classList.toggle('show');
                     };
 
                     // Close mobile menu when clicking outside
                     document.addEventListener('click', function (event) {
                         const nav = document.getElementById('mainNav');
                         const menuToggle = document.querySelector('.menu-toggle');
+                        const backdrop = document.getElementById('menuBackdrop');
 
                         if (nav && menuToggle &&
                             !nav.contains(event.target) &&
                             !menuToggle.contains(event.target) &&
                             nav.classList.contains('show')) {
                             nav.classList.remove('show');
+                            backdrop.classList.remove('show');
                         }
                     });
                 });
@@ -220,15 +228,7 @@
                     }
 
                     const menu = document.getElementById('userMenu');
-                    const isMobile = window.innerWidth <= 768;
-
-                    if (isMobile) {
-                        // For mobile, show from bottom
-                        menu.classList.toggle('show');
-                    } else {
-                        // For desktop, toggle normally
-                        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-                    }
+                    menu.classList.toggle('show');
                 }
 
                 // Close menu when clicking outside (updated for new structure)
@@ -237,11 +237,7 @@
                     const button = document.querySelector('.user-menu-btn');
 
                     if (menu && button && !menu.contains(event.target) && !button.contains(event.target)) {
-                        if (window.innerWidth <= 768) {
-                            menu.classList.remove('show');
-                        } else {
-                            menu.style.display = 'none';
-                        }
+                        menu.classList.remove('show');
                     }
                 });
 
@@ -394,7 +390,7 @@
                 window.showError = (message, title) => showAlert('error', message, title);
                 window.showWarning = (message, title) => showAlert('warning', message, title);
                 window.showInfo = (message, title) => showAlert('info', message, title);
-                
+
                 // Updated Quick Update Modal Functions
                 function openQuickUpdateModal(taskId, projectId, currentStatus, currentPriority) {
                     currentTaskData = { taskId, projectId };

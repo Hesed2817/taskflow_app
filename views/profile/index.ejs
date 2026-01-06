@@ -1,137 +1,129 @@
 <%- include('../layouts/main.ejs') -%>
 
-<div class="profile-container">
-    <!-- Profile Header -->
-    <div class="profile-card">
-        <div class="profile-header">
-            <div class="profile-avatar">
-                <%= user.username.charAt(0).toUpperCase() %>
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <%= user.username.charAt(0).toUpperCase() %>
+                </div>
+                <div class="profile-info">
+                    <h1 class="profile-name">
+                        <%= user.username %>
+                    </h1>
+                    <p class="profile-email">
+                        <%= user.email %>
+                    </p>
+                    <div class="profile-actions">
+                        <a href="/profile/edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </a>
+                        <a href="/profile/change-password" class="btn btn-secondary">
+                            <i class="fas fa-key"></i> Change Password
+                        </a>
+                        <a href="/profile/delete" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> Delete Account
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="profile-info">
-                <h1 class="profile-name"><%= user.username %></h1>
-                <p class="profile-email"><%= user.email %></p>
-                <div class="profile-actions">
-                    <a href="/profile/edit" class="btn btn-primary">
-                        <i class="fas fa-edit"></i> Edit Profile
-                    </a>
-                    <a href="/profile/change-password" class="btn btn-secondary">
-                        <i class="fas fa-key"></i> Change Password
-                    </a>
+
+            <div class="profile-stats">
+                <div class="profile-stat profile-stat-projects">
+                    <div class="profile-stat-number">
+                        <%= projectsCount %>
+                    </div>
+                    <div class="profile-stat-label">Projects</div>
+                </div>
+
+                <div class="profile-stat profile-stat-tasks">
+                    <div class="profile-stat-number">
+                        <%= tasksCount %>
+                    </div>
+                    <div class="profile-stat-label">Total Tasks</div>
+                </div>
+
+                <div class="profile-stat profile-stat-assigned">
+                    <div class="profile-stat-number">
+                        <%= tasksAssignedCount %>
+                    </div>
+                    <div class="profile-stat-label">Tasks Assigned</div>
                 </div>
             </div>
         </div>
-        
-        <div class="profile-stats">
-            <div class="profile-stat profile-stat-projects">
-                <div class="profile-stat-number"><%= projectsCount %></div>
-                <div class="profile-stat-label">Projects</div>
+
+        <!-- Account Details -->
+        <div class="profile-card">
+            <h2 style="margin: 0 0 var(--space-lg) 0;">Account Information</h2>
+
+            <div class="account-details">
+                <div class="account-detail">
+                    <div class="account-detail-label">Username</div>
+                    <div class="account-detail-value">
+                        <%= user.username %>
+                    </div>
+                </div>
+
+                <div class="account-detail">
+                    <div class="account-detail-label">Email Address</div>
+                    <div class="account-detail-value">
+                        <%= user.email %>
+                    </div>
+                </div>
+
+                <div class="account-detail">
+                    <div class="account-detail-label">Member Since</div>
+                    <div class="account-detail-value">
+                        <%= new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric' , month: 'long' ,
+                            day: 'numeric' }) %>
+                    </div>
+                </div>
             </div>
-            
-            <div class="profile-stat profile-stat-tasks">
-                <div class="profile-stat-number"><%= tasksCount %></div>
-                <div class="profile-stat-label">Total Tasks</div>
-            </div>
-            
-            <div class="profile-stat profile-stat-assigned">
-                <div class="profile-stat-number"><%= tasksAssignedCount %></div>
-                <div class="profile-stat-label">Tasks Assigned</div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="profile-card">
+            <h2 style="margin: 0 0 var(--space-lg) 0;">Quick Actions</h2>
+
+            <div class="quick-links">
+                <a href="/dashboard" class="quick-link quick-link-dashboard">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <div class="quick-link-title">Dashboard</div>
+                    <div class="quick-link-desc">Go to your dashboard</div>
+                </a>
+
+                <a href="/projects" class="quick-link quick-link-projects">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="quick-link-title">Projects</div>
+                    <div class="quick-link-desc">View all projects</div>
+                </a>
+
+                <a href="/tasks" class="quick-link quick-link-tasks">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="quick-link-title">Tasks</div>
+                    <div class="quick-link-desc">View all tasks</div>
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Account Details -->
-    <div class="profile-card">
-        <h2 style="margin: 0 0 var(--space-lg) 0;">Account Information</h2>
-        
-        <div class="account-details">
-            <div class="account-detail">
-                <div class="account-detail-label">Username</div>
-                <div class="account-detail-value"><%= user.username %></div>
-            </div>
-            
-            <div class="account-detail">
-                <div class="account-detail-label">Email Address</div>
-                <div class="account-detail-value"><%= user.email %></div>
-            </div>
-            
-            <div class="account-detail">
-                <div class="account-detail-label">Member Since</div>
-                <div class="account-detail-value">
-                    <%= new Date(user.createdAt).toLocaleDateString('en-US', { 
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    }) %>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Success message handling -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const successMsg = urlParams.get('success');
 
-    <!-- Quick Links -->
-    <div class="profile-card">
-        <h2 style="margin: 0 0 var(--space-lg) 0;">Quick Actions</h2>
-        
-        <div class="quick-links">
-            <a href="/dashboard" class="quick-link quick-link-dashboard">
-                <div class="quick-link-icon">
-                    <i class="fas fa-tachometer-alt"></i>
-                </div>
-                <div class="quick-link-title">Dashboard</div>
-                <div class="quick-link-desc">Go to your dashboard</div>
-            </a>
-            
-            <a href="/projects" class="quick-link quick-link-projects">
-                <div class="quick-link-icon">
-                    <i class="fas fa-project-diagram"></i>
-                </div>
-                <div class="quick-link-title">Projects</div>
-                <div class="quick-link-desc">View all projects</div>
-            </a>
-            
-            <a href="/tasks" class="quick-link quick-link-tasks">
-                <div class="quick-link-icon">
-                    <i class="fas fa-tasks"></i>
-                </div>
-                <div class="quick-link-title">Tasks</div>
-                <div class="quick-link-desc">View all tasks</div>
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- Success message handling -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const successMsg = urlParams.get('success');
-    
-    if (successMsg) {
-        showAlert('success', successMsg);
-        // Clean URL without reloading
-        const newUrl = window.location.pathname + window.location.search.replace(/[?&]success=[^&]+/, '').replace(/^&/, '?');
-        window.history.replaceState({}, document.title, newUrl);
-    }
-    
-    // Add real-time stats update if you want live updates   
-    updateProfileStats();
-});
-
-// Optional: Function to update stats without page reload
-async function updateProfileStats() {
-    try {
-        const response = await fetch('/api/users/me/stats', {
-            credentials: 'include'
+            if (successMsg) {
+                showAlert('success', successMsg);
+                // Clean URL without reloading
+                const newUrl = window.location.pathname + window.location.search.replace(/[?&]success=[^&]+/, '').replace(/^&/, '?');
+                window.history.replaceState({}, document.title, newUrl);
+            }
         });
-        const data = await response.json();
-        
-        if (data.success) {
-            // Update stats on the page
-            document.querySelectorAll('.profile-stat-number')[0].textContent = data.projectsCount;
-            document.querySelectorAll('.profile-stat-number')[1].textContent = data.tasksCount;
-            document.querySelectorAll('.profile-stat-number')[2].textContent = data.tasksAssignedCount;
-        }
-    } catch (error) {
-        console.error('Failed to update stats:', error);
-    }
-}
-</script>
+    </script>

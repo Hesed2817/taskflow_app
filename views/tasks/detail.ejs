@@ -2,7 +2,7 @@
 
 <div class="tasks-container">
     <div class="task-header">
-        <a href="/tasks" class="task-back-link">
+        <a href="/tasks" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to All Tasks
         </a>
         <h1 class="task-title"><%= task.title %></h1>
@@ -32,7 +32,7 @@
             </div>
 
             <% if (isOwner) { %>
-                <a href="/tasks/<%= task._id %>/edit" class="btn btn-warning">
+                <a href="/tasks/<%= task._id %>/edit" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Edit Task
                 </a>
             <% } %>

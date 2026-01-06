@@ -1,105 +1,120 @@
 <%- include('../layouts/main.ejs') -%>
 
-<div class="projects-container project-form-container">
-    <div class="project-header">
-        <a href="/projects" class="project-back-link">
-            <i class="fas fa-arrow-left"></i> Back to Projects
-        </a>
-        <h1 class="project-title">Create New Project</h1>
-        <p class="project-subtitle">Start organizing your work with a new project</p>
+    <div class="projects-container project-form-container">
+        <div class="project-header">
+            <a href="/projects" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Projects
+            </a>
+            <h1 class="project-title">Create New Project</h1>
+            <p class="project-subtitle">Start organizing your work with a new project</p>
+        </div>
+
+        <div class="project-form-card">
+            <form id="createProjectForm" class="project-form">
+                <div class="project-form-group">
+                    <label class="project-form-label">
+                        Project Name *
+                    </label>
+                    <input type="text" name="name" required placeholder="e.g., Website Redesign, Marketing Campaign"
+                        class="project-form-input" autocomplete="off">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                    <div class="project-form-group">
+                        <label class="project-form-label">Start Date</label>
+                        <input type="date" name="startDate" class="project-form-input">
+                    </div>
+                    <div class="project-form-group">
+                        <label class="project-form-label">End Date</label>
+                        <input type="date" name="endDate" class="project-form-input">
+                    </div>
+                </div>
+
+                <div class="project-form-group">
+                    <label class="project-form-label">
+                        Description
+                    </label>
+                    <textarea name="description" rows="4"
+                        placeholder="Describe the project goals, objectives, and scope..."
+                        class="project-form-textarea"></textarea>
+                </div>
+
+                <div class="project-form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Project
+                    </button>
+                    <a href="/projects" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div class="project-form-card">
-        <form id="createProjectForm" class="project-form">
-            <div class="project-form-group">
-                <label class="project-form-label">
-                    Project Name *
-                </label>
-                <input 
-                    type="text" 
-                    name="name" 
-                    required 
-                    placeholder="e.g., Website Redesign, Marketing Campaign"
-                    class="project-form-input"
-                    autocomplete="off"
-                >
-            </div>
+    <script>
+        document.getElementById('createProjectForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-            <div class="project-form-group">
-                <label class="project-form-label">
-                    Description
-                </label>
-                <textarea 
-                    name="description" 
-                    rows="4"
-                    placeholder="Describe the project goals, objectives, and scope..."
-                    class="project-form-textarea"
-                ></textarea>
-            </div>
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
 
-            <div class="project-form-actions">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Create Project
-                </button>
-                <a href="/projects" class="btn btn-secondary">
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
+            // Show loading state
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Project...';
+            submitBtn.disabled = true;
 
-<script>
-document.getElementById('createProjectForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
+            try {
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
 
-    const form = e.target;
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
+                // Remove empty strings for dates
+                if (data.startDate === '') delete data.startDate;
+                if (data.endDate === '') delete data.endDate;
 
-    // Show loading state
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Project...';
-    submitBtn.disabled = true;
+                console.log('Creating project with data:', data);
 
-    try {
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
+                const response = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data),
+                    credentials: 'include'
+                });
 
-        console.log('Creating project with data:', data);
+                console.log('Response status:', response.status);
 
-        // ✅ CRITICAL: Use credentials: 'include' for cookies
-        const response = await fetch('/api/projects', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-                // NO Authorization header - cookie will be sent automatically
-            },
-            body: JSON.stringify(data),
-            credentials: 'include' // ← THIS SENDS THE COOKIE
+                const result = await response.json();
+                console.log('API Response:', result);
+
+                if (result.success) {
+                    showAlert('success', 'Project created successfully!');
+                    setTimeout(() => {
+                        window.location.href = '/projects/' + result.data._id;
+                    }, 1000);
+                } else {
+                    showAlert('error', result.message || 'Failed to create project');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Create project error:', error);
+                showAlert('error', 'Network error: ' + error.message);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         });
 
-        console.log('Response status:', response.status);
+        // Date validation: End date cannot be before start date
+        const startInput = document.querySelector('input[name="startDate"]');
+        const endInput = document.querySelector('input[name="endDate"]');
 
-        const result = await response.json();
-        console.log('API Response:', result);
-
-        if (result.success) {
-            // Redirect to the new project
-            showAlert('success', 'Project created successfully!');
-            setTimeout(() => {
-                window.location.href = '/projects/' + result.data._id;
-            }, 1500);
-        } else {
-            // Show error message
-            showAlert('error', result.message || 'Failed to create project');
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+        if (startInput && endInput) {
+            startInput.addEventListener('change', function () {
+                endInput.min = this.value;
+                if (endInput.value && endInput.value < this.value) {
+                    endInput.value = this.value;
+                }
+            });
         }
-    } catch (error) {
-        console.error('Create project error:', error);
-        showAlert('error', 'Network error: ' + error.message);
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }
-});
-</script>
+    </script>

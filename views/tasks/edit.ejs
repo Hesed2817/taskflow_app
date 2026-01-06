@@ -3,7 +3,7 @@
 <div class="tasks-container task-form-container">
     <!-- Header -->
     <div class="task-header">
-        <a href="/tasks/<%= task._id %>" class="task-back-link">
+        <a href="/tasks/<%= task._id %>" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Task
         </a>
         <h1 class="task-title">Edit Task: <%= task.title %></h1>
@@ -108,7 +108,7 @@
             </div>
             
             <div class="task-form-actions">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-success">
                     <i class="fas fa-save"></i> Save Changes
                 </button>
                 <a href="/tasks/<%= task._id %>" class="btn btn-secondary">

@@ -7,14 +7,15 @@
 
 /* Welcome Section */
 .dashboard-hero {
-    background: linear-gradient(135deg, var(--color-primary) 0%, #667eea 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-bg-secondary) 100%);
+    color: var(--color-text);
     padding: var(--space-xl) var(--space-2xl);
     border-radius: var(--radius-xl);
     margin-bottom: var(--space-2xl);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-sm);
     position: relative;
     overflow: hidden;
+    border: 1px solid var(--color-border);
 }
 
 .dashboard-hero::before {
@@ -24,7 +25,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 60%);
+    background: radial-gradient(circle at top right, var(--color-primary-fade), transparent 40%);
 }
 
 .dashboard-hero-content {
@@ -36,10 +37,8 @@
     font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: var(--space-xs);
-    background: linear-gradient(to right, #ffffff, #e0e7ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--color-text);
+    /* Removed custom gradient text for cleaner minimalist look */
 }
 
 .dashboard-hero p {
@@ -486,41 +485,41 @@
     .dashboard-container {
         padding: var(--space-lg) var(--space-sm);
     }
-    
+
     .dashboard-hero {
         padding: var(--space-lg) var(--space-md);
         text-align: center;
     }
-    
+
     .dashboard-hero h1 {
         font-size: 2rem;
     }
-    
+
     .dashboard-hero-stats {
         justify-content: center;
         gap: var(--space-xl);
     }
-    
+
     .quick-actions-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .dashboard-stats {
         grid-template-columns: 1fr;
     }
-    
+
     .dashboard-recent {
         grid-template-columns: 1fr;
     }
-    
+
     .recent-section {
         padding: var(--space-lg);
     }
-    
+
     .search-form {
         flex-direction: column;
     }
-    
+
     .search-btn {
         width: 100%;
         justify-content: center;
@@ -531,33 +530,33 @@
     .dashboard-hero {
         padding: var(--space-md);
     }
-    
+
     .dashboard-hero h1 {
         font-size: 1.5rem;
     }
-    
+
     .dashboard-hero-stats {
         gap: var(--space-lg);
     }
-    
+
     .hero-stat-value {
         font-size: 1.5rem;
     }
-    
+
     .stat-card-value {
         font-size: 2rem;
     }
-    
+
     .recent-item-header {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--space-xs);
     }
-    
+
     .recent-item-badge {
         align-self: flex-start;
     }
-    
+
     .recent-item-meta {
         flex-direction: column;
         align-items: flex-start;

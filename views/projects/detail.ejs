@@ -2,6 +2,9 @@
     <div class="projects-container project-detail-container">
         <!-- Project Header -->
         <div class="project-detail-header">
+            <a href="/projects" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to All Projects
+            </a>
             <div class="project-detail-header-content">
                 <div>
                     <h1 class="project-detail-title">
@@ -13,30 +16,69 @@
                         </p>
                         <% } %>
                 </div>
-
-                <% if (isOwner) { %>
-                    <a href="/projects/<%= project._id %>/edit" class="btn btn-warning">
-                        <i class="fas fa-edit"></i> Edit Project
-                    </a>
-                    <% } %>
             </div>
 
             <div class="project-detail-meta">
                 <div class="project-detail-meta-item">
-                    <strong>Created by:</strong>
+                    <strong><i class="fas fa-person"></i>Created by:</strong>
                     <%= project.createdBy.username %>
                 </div>
                 <div class="project-detail-meta-item">
-                    <strong>Created on:</strong>
+                    <strong><i class="fas fa-calendar-day"></i>Created on:</strong>
                     <%= new Date(project.createdAt).toLocaleDateString() %>
                 </div>
-                <div class="project-detail-meta-item">
-                    <strong>Team Members:</strong>
-                    <% const teamMembersCount=project.members.filter(member=>
-                        member._id.toString() !== project.createdBy._id.toString()).length; %>
-                        <%= teamMembersCount %>
-                </div>
+                <% if (project.startDate) { %>
+                    <div class="project-detail-meta-item">
+                        <strong><i class="fas fa-hourglass-start"></i>Start:</strong>
+                        <%= new Date(project.startDate).toLocaleDateString() %>
+                    </div>
+                    <% } %>
+                        <% if (project.endDate) { %>
+                            <div class="project-detail-meta-item">
+                                <strong><i class="fas fa-hourglass-end"></i>End:</strong>
+                                <%= new Date(project.endDate).toLocaleDateString() %>
+                            </div>
+                            <% } %>
+
+                                <% if (project.endDate) { %>
+                                    <% const today=new Date(); today.setHours(0, 0, 0, 0); const end=new
+                                        Date(project.endDate); end.setHours(0, 0, 0, 0); const diffTime=end - today;
+                                        const diffDays=Math.ceil(diffTime / (1000 * 60 * 60 * 24)); const
+                                        totalTasks=tasks.length; const completedTasks=tasks.filter(t=> t.status ===
+                                        'done').length;
+                                        const isProjectCompleted = totalTasks > 0 && totalTasks === completedTasks;
+                                        %>
+                                        <div class="project-detail-meta-item">
+                                            <% if (isProjectCompleted) { %>
+                                                <strong><i class="fas fa-check-circle text-success"></i>Status:</strong>
+                                                <span class="text-success">Completed</span>
+                                                <% } else if (diffDays>= 0) { %>
+                                                    <strong><i class="fas fa-clock"></i>Status:</strong>
+                                                    <span class="text-success">
+                                                        <%= diffDays %> day<%= diffDays !==1 ? 's' : '' %> remaining
+                                                    </span>
+                                                    <% } else { %>
+                                                        <strong><i
+                                                                class="fas fa-exclamation-circle text-danger"></i>Status:</strong>
+                                                        <span class="text-danger">Due <%= Math.abs(diffDays) %> day<%=
+                                                                    Math.abs(diffDays) !==1 ? 's' : '' %> ago</span>
+                                                        <% } %>
+                                        </div>
+                                        <% } %>
+                                            <div class="project-detail-meta-item">
+                                                <strong><i class="fas fa-users"></i>Team Members:</strong>
+                                                <% const teamMembersCount=project.members.filter(member=>
+                                                    member._id.toString() !==
+                                                    project.createdBy._id.toString()).length; %>
+                                                    <%= teamMembersCount %>
+                                            </div>
             </div>
+
+            <% if (isOwner) { %>
+                <a href="/projects/<%= project._id %>/edit" class="btn btn-primary">
+                    <i class="fas fa-pen"></i> Edit Project
+                </a>
+                <% } %>
         </div>
 
         <!-- Two Column Layout -->
@@ -432,6 +474,7 @@
         function showMemberForm() {
             document.getElementById('memberForm').classList.add('show');
             window.location.href = "#memberForm";
+            document.getElementById('searchEmail').focus;
         }
 
         function hideMemberForm() {

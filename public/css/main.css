@@ -1,5 +1,6 @@
 /* CSS RESET & GLOBAL STYLES */
 * {
+    font-family: 'Reddit Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     scroll-behavior: smooth;
     margin: 0;
     padding: 0;
@@ -7,46 +8,61 @@
 }
 
 :root {
-    /* Light Theme Variables */
-    --color-primary: #4f46e5;
+    /* Minimalist Palette (Zinc-inspired) */
+
+    --color-primary: #5b5bd6;
     --color-primary-dark: #4338ca;
-    --color-primary-light: #e0e7ff;
-    
-    --color-success: #10b981;
+    --color-primary-light: #eef2ff;
+    --color-primary-fade: rgba(91, 91, 214, 0.1);
+
+    /* Functional Colors - Dampened brightness */
+    --color-success: #059669;
     --color-success-light: #d1fae5;
-    
+    --color-success-bg: #effdf5;
+
     --color-danger: #dc2626;
     --color-danger-light: #fee2e2;
-    
-    --color-warning: #f59e0b;
+    --color-danger-bg: #fef2f2;
+
+    --color-warning: #d97706;
     --color-warning-light: #fef3c7;
-    
-    --color-info: #3b82f6;
+    --color-warning-bg: #fffbeb;
+
+    --color-info: #2563eb;
     --color-info-light: #dbeafe;
-    
-    /* Neutral Colors - Light Theme */
-    --color-bg: #ffffff;
-    --color-bg-secondary: #f9fafb;
+    --color-info-bg: #eff6ff;
+
+    /* Light Theme Neutrals */
+    --color-bg: #f4f4f5;
+    --color-bg-secondary: #ffffff;
+    --color-bg-tertiary: #d4d4d8;
+
     --color-surface: #ffffff;
-    
-    --color-text: #111827;
-    --color-text-secondary: #6b7280;
-    --color-text-muted: #9ca3af;
-    
-    --color-border: #e5e7eb;
-    --color-border-light: #f3f4f6;
-    
-    /* Shadows */
+    --color-surface-hover: #fafafa;
+
+    --color-text: #18181b;
+    --color-text-secondary: #52525b;
+    --color-text-muted: #a1a1aa;
+
+    --color-border: #d4d4d8;
+    --color-border-light: #e4e4e7;
+    --color-border-hover: #a1a1aa;
+
+
+    /* Shadows - Soft & Diffused */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+
     /* Border Radius */
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
     --radius-full: 9999px;
-    
+    --radius-circular: 100%;
+
     /* Spacing */
     --space-xs: 0.5rem;
     --space-sm: 0.75rem;
@@ -54,39 +70,68 @@
     --space-lg: 1.5rem;
     --space-xl: 2rem;
     --space-2xl: 3rem;
-    
+    --space-3xl: 4rem;
+
     /* Transitions */
-    --transition-fast: 150ms ease;
-    --transition-base: 300ms ease;
-    --transition-slow: 500ms ease;
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Dark Theme Variables */
 [data-theme="dark"] {
-    --color-primary-light:#233465;
-    --color-bg: #111827;
-    --color-bg-secondary: #1f2937;
-    --color-surface: #374151;
-    
-    --color-text: #f9fafb;
-    --color-text-secondary: #d1d5db;
-    --color-text-muted: #9ca3af;
-    
-    --color-border: #4b5563;
-    --color-border-light: #374151;
-    
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    --color-primary: #818cf8;
+    --color-primary-dark: #6366f1;
+    --color-primary-light: #1e1b4b;
+    --color-primary-fade: rgba(129, 140, 248, 0.15);
+
+    color-scheme: dark;
+
+    /* Dark Theme Neutrals (Zinc-based) */
+    --color-bg: #09090b;
+    --color-bg-secondary: #000000;
+    --color-bg-tertiary: #27272a;
+
+    --color-surface: #18181b;
+    --color-surface-hover: #27272a;
+
+    --color-text: #f4f4f5;
+    --color-text-secondary: #a1a1aa;
+    --color-text-muted: #52525b;
+
+    --color-border: #27272a;
+    --color-border-light: #18181b;
+    --color-border-hover: #3f3f46;
+
+    /* Adjusted shadows for dark mode */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
 }
 
-/* Base Typography */
+/* Base Typography & Reset */
 body {
-    font-family: "Reddit sans", -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: var(--color-bg);
     color: var(--color-text);
-    line-height: 1.5;
+    line-height: 1.6;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--color-text);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    /* Tight tracking for modern feel */
 }
 
 /* Selection */
@@ -96,24 +141,26 @@ body {
 }
 
 [data-theme="dark"] ::selection {
-    background-color: var(--color-primary);
-    color: white;
+    background-color: var(--color-primary-light);
+    /* Indigo 950 */
+    color: var(--color-primary);
+    /* Indigo 400 */
 }
 
-/* Focus Styles */
+/* Focus Styles - Accessible high contrast w/ offset */
 :focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
 }
 
-/* Scrollbar Styling */
+/* Scrollbar Styling - Thinner & cleaner */
 ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--color-bg-secondary);
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {

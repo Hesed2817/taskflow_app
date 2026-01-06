@@ -1,100 +1,126 @@
 <%- include('../layouts/main.ejs') -%>
 
-<div class="projects-container project-form-container">
-    <div class="project-header">
-        <a href="/projects/<%= project._id %>" class="project-back-link">
-            <i class="fas fa-arrow-left"></i> Back to Project
-        </a>
-        <h1 class="project-title">Edit Project: <%= project.name %></h1>
+    <div class="projects-container project-form-container">
+        <div class="project-header">
+            <a href="/projects/<%= project._id %>" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Project
+            </a>
+            <h1 class="project-title">Edit Project: <%= project.name %>
+            </h1>
+        </div>
+
+        <div class="project-form-card">
+            <form id="editProjectForm" class="project-form">
+                <div class="project-form-group">
+                    <label class="project-form-label">
+                        Project Name *
+                    </label>
+                    <input type="text" name="name" required value="<%= project.name %>" class="project-form-input">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                    <div class="project-form-group">
+                        <label class="project-form-label">Start Date</label>
+                        <input type="date" name="startDate" class="project-form-input"
+                            value="<%= project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '' %>">
+                    </div>
+                    <div class="project-form-group">
+                        <label class="project-form-label">End Date</label>
+                        <input type="date" name="endDate" class="project-form-input"
+                            value="<%= project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '' %>">
+                    </div>
+                </div>
+
+                <div class="project-form-group">
+                    <label class="project-form-label">
+                        Description
+                    </label>
+                    <textarea name="description" rows="4"
+                        class="project-form-textarea"><%= project.description || '' %></textarea>
+                </div>
+
+                <div class="project-form-actions">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Update Project
+                    </button>
+                    <a href="/projects/<%= project._id %>" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div class="project-form-card">
-        <form id="editProjectForm" class="project-form">
-            <div class="project-form-group">
-                <label class="project-form-label">
-                    Project Name *
-                </label>
-                <input 
-                    type="text" 
-                    name="name" 
-                    required 
-                    value="<%= project.name %>"
-                    class="project-form-input"
-                >
-            </div>
+    <script>
+        document.getElementById('editProjectForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-            <div class="project-form-group">
-                <label class="project-form-label">
-                    Description
-                </label>
-                <textarea 
-                    name="description" 
-                    rows="4"
-                    class="project-form-textarea"
-                ><%= project.description || '' %></textarea>
-            </div>
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
 
-            <div class="project-form-actions">
-                <button type="submit" class="btn btn-warning">
-                    <i class="fas fa-save"></i> Update Project
-                </button>
-                <a href="/projects/<%= project._id %>" class="btn btn-secondary">
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
+            // Show loading state
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            submitBtn.disabled = true;
 
-<script>
-document.getElementById('editProjectForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
+            try {
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
 
-    const form = e.target;
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
+                // Remove empty strings for dates to avoid database errors
+                if (data.startDate === '') delete data.startDate;
+                if (data.endDate === '') delete data.endDate;
 
-    // Show loading state
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    submitBtn.disabled = true;
+                console.log('Updating project with:', data);
 
-    try {
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
+                const response = await fetch('/api/projects/<%= project._id %>', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data),
+                    credentials: 'include'
+                });
 
-        console.log('Updating project with:', data);
+                console.log('Response status:', response.status);
 
-        // ✅ CRITICAL: Use credentials: 'include' for cookies
-        const response = await fetch('/api/projects/<%= project._id %>', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data),
-            credentials: 'include' // ← THIS SENDS THE COOKIE
+                const result = await response.json();
+                console.log('API Response:', result);
+
+                if (result.success) {
+                    // Redirect to the updated project
+                    setTimeout(() => {
+                        window.location.href = '/projects/<%= project._id %>?success=Project updated successfully';
+                    }, 1500);
+                } else {
+                    // Show error message
+                    showAlert('error', result.message || 'Failed to update project');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Update project error:', error);
+                showAlert('error', 'Network error: ' + error.message);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         });
 
-        console.log('Response status:', response.status);
+        // Date validation: End date cannot be before start date
+        const startInput = document.querySelector('input[name="startDate"]');
+        const endInput = document.querySelector('input[name="endDate"]');
 
-        const result = await response.json();
-        console.log('API Response:', result);
+        if (startInput && endInput) {
+            // Set initial min date if start date exists
+            if (startInput.value) {
+                endInput.min = startInput.value;
+            }
 
-        if (result.success) {
-            // Redirect to the updated project
-            setTimeout(() => {
-                window.location.href = '/projects/<%= project._id %>?success=Project updated successfully';
-            }, 1500);
-        } else {
-            // Show error message
-            showAlert('error', result.message || 'Failed to update project');
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+            startInput.addEventListener('change', function () {
+                endInput.min = this.value;
+                if (endInput.value && endInput.value < this.value) {
+                    endInput.value = this.value;
+                }
+            });
         }
-    } catch (error) {
-        console.error('Update project error:', error);
-        showAlert('error', 'Network error: ' + error.message);
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }
-});
-</script>
+    </script>

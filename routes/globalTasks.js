@@ -9,7 +9,6 @@ const router = express.Router({ mergeParams: true });
 
 // Protecting all routes
 router.use(protect);
-
 router.get('/', taskFilterValidator, validate, filterTasks);
 
 module.exports = router;

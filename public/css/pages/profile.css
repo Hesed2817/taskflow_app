@@ -53,11 +53,6 @@
     box-shadow: var(--shadow-lg);
 }
 
-/* Profile Form */
-.profile-form {
-    /* Form styles are inherited from components.css */
-}
-
 .profile-form-group {
     margin-bottom: var(--space-lg);
 }
@@ -300,57 +295,57 @@
     .profile-container {
         padding: var(--space-lg) var(--space-sm);
     }
-    
+
     .profile-header {
         gap: var(--space-lg);
         flex-direction: column;
         text-align: center;
     }
-    
+
     .profile-avatar {
         width: 80px;
         height: 80px;
         font-size: 2.5rem;
     }
-    
+
     .profile-name {
         font-size: 1.5rem;
     }
-    
+
     .profile-email {
         font-size: 1rem;
     }
-    
+
     .profile-actions {
         justify-content: center;
     }
-    
+
     .profile-stats {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .profile-stat {
         padding: var(--space-md);
     }
-    
+
     .profile-stat-number {
         font-size: 2rem;
     }
-    
+
     .profile-form-actions {
         flex-direction: column;
     }
-    
+
     .profile-form-actions .btn,
     .profile-form-actions a {
         width: 100%;
         text-align: center;
     }
-    
+
     .quick-links {
         grid-template-columns: 1fr;
     }
-    
+
     .profile-card {
         padding: var(--space-lg);
     }
@@ -360,26 +355,26 @@
     .profile-container {
         padding: var(--space-md) var(--space-xs);
     }
-    
+
     .profile-stats {
         grid-template-columns: 1fr;
     }
-    
+
     .profile-title {
         font-size: 1.5rem;
     }
-    
+
     .profile-actions {
         flex-direction: column;
         width: 100%;
     }
-    
+
     .profile-actions .btn,
     .profile-actions a {
         width: 100%;
         text-align: center;
     }
-    
+
     .profile-card {
         padding: var(--space-md);
     }
@@ -421,4 +416,118 @@
     background-color: var(--color-danger-light);
     color: var(--color-danger);
     border: 1px solid var(--color-danger);
+}
+
+/* Delete Account Page Styles */
+.profile-card-danger {
+    border-left: 4px solid var(--color-danger);
+}
+
+.profile-warning-icon {
+    color: var(--color-danger);
+    font-size: 2rem;
+    margin-right: var(--space-md);
+}
+
+.profile-warning-title {
+    margin: 0 0 var(--space-xs) 0;
+    color: var(--color-danger);
+}
+
+.profile-warning-text {
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.profile-warning-box {
+    margin-top: var(--space-lg);
+    padding: var(--space-lg);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-md);
+}
+
+.profile-warning-subtitle {
+    margin: 0 0 var(--space-md) 0;
+    color: var(--color-danger);
+}
+
+.profile-delete-list {
+    display: grid;
+    gap: var(--space-sm);
+}
+
+.profile-delete-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+}
+
+.profile-delete-icon {
+    color: var(--color-danger);
+    margin-top: 2px;
+}
+
+.profile-section-title {
+    margin: 0 0 var(--space-lg) 0;
+}
+
+.profile-loader-container {
+    text-align: center;
+}
+
+.profile-loader-text {
+    color: var(--color-text-secondary);
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-border);
+    border-top: 3px solid var(--color-danger);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto var(--space-md) auto;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal Specifics */
+.profile-modal-warning-box {
+    padding: var(--space-md);
+    background-color: var(--color-danger-light);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+}
+
+.profile-modal-warning-text {
+    margin: 0;
+    color: var(--color-danger);
+}
+
+.text-danger {
+    color: var(--color-danger);
+}
+
+.mb-md {
+    margin-bottom: var(--space-md);
 }
