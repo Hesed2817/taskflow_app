@@ -1,7 +1,5 @@
 # **TaskFlow - Professional Project Management**
 
-![TaskFlow Banner](https://via.placeholder.com/1200x300/2563eb/ffffff?text=TaskFlow+Project+Management)
-
 ## **🚀 Overview**
 TaskFlow is a robust, production-ready task management solution built with Node.js, Express, and EJS. It is designed to streamline team collaboration, providing intuitive tools for tracking projects, managing tasks, and monitoring progress.
 
