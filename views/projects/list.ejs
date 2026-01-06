@@ -1,64 +1,196 @@
 <%- include('../layouts/main.ejs') -%>
 
-    <div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h1>My Projects</h1>
-            <a href="/projects/new"
-                style="background: #4f46e5; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none;">
-                <i class="fas fa-plus"></i> New Project
-            </a>
+    <div class="projects-list-container">
+        <!-- Hero Header -->
+        <div class="projects-list-hero">
+            <div class="projects-list-hero-content">
+                <h1>My Projects</h1>
+                <p>Manage all your projects in one place. Track progress, collaborate with team members, and stay
+                    organized.</p>
+            </div>
         </div>
 
+        <!-- Action Bar -->
+        <div class="projects-action-bar">
+            <div class="projects-stats">
+                <div class="project-stat">
+                    <div class="project-stat-value">
+                        <%= projects.length %>
+                    </div>
+                    <div class="project-stat-label">Total Projects</div>
+                </div>
+                <div class="project-stat">
+                    <div class="project-stat-value">
+                        <%= projects.filter(p=> p.createdBy._id.toString() === user.id).length %>
+                    </div>
+                    <div class="project-stat-label">Owned by Me</div>
+                </div>
+                <div class="project-stat">
+                    <div class="project-stat-value">
+                        <%= projects.filter(p=> p.createdBy._id.toString() !== user.id).length %>
+                    </div>
+                    <div class="project-stat-label">Shared with Me</div>
+                </div>
+            </div>
+
+            <div class="projects-actions">
+                <a href="/projects/new" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Project
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="projects-filters">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <button class="filter-toggle" id="filterToggle">
+                    <i class="fas fa-filter"></i> Filter Projects
+                    <i class="fas fa-chevron-down" id="filterChevron"></i>
+                </button>
+
+                <div class="sort-controls">
+                    <span class="sort-label">Sort by:</span>
+                    <select class="sort-select" id="sortSelect">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="name">Project Name</option>
+                        <option value="members">Most Members</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-panel" id="filterPanel">
+                <form id="filterForm" class="filter-form">
+                    <div class="filter-group">
+                        <label class="filter-label">Show Projects</label>
+                        <select name="ownership" class="filter-select">
+                            <option value="">All Projects</option>
+                            <option value="owned">Owned by Me</option>
+                            <option value="shared">Shared with Me</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Sort By</label>
+                        <select name="sort" class="filter-select">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="name">Project Name</option>
+                            <option value="members">Most Members</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select name="status" class="filter-select">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check"></i> Apply Filters
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="clearFilters">
+                            <i class="fas fa-times"></i> Clear All
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Projects Grid -->
         <% if (projects.length> 0) { %>
-            <div style="display: grid; gap: 1rem;">
-                <% projects.forEach(project=> { %>
-                    <div
-                        style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                            <div>
-                                <h2 style="margin: 0 0 0.5rem 0;">
-                                    <a href="/projects/<%= project._id %>" style="color: #333; text-decoration: none;">
-                                        <%= project.name %>
-                                    </a>
-                                </h2>
-                                <% if (project.description) { %>
-                                    <p style="color: #666; margin: 0;">
-                                        <%= project.description %>
-                                    </p>
-                                    <% } %>
+            <div class="projects-grid-enhanced">
+                <% projects.forEach(project=> {
+                    const isOwner = project.createdBy._id.toString() === user.id;
+                    const teamMembersCount = project.members.filter(member =>
+                    member._id.toString() !== project.createdBy._id.toString()
+                    ).length;
+
+                    // Filter tasks for this project
+                    const projectTasks = tasks.filter(task => task.project.toString() === project._id.toString());
+                    const totalTasks = projectTasks.length;
+                    const completedTasks = projectTasks.filter(task => task.status === 'done').length;
+                    %>
+                    <div class="project-card-enhanced">
+                        <div class="project-card-header">
+                            <span
+                                class="project-card-badge <%= isOwner ? 'project-card-badge-owner' : 'project-card-badge-member' %>">
+                                <%= isOwner ? 'O' : 'M' %>
+                            </span>
+
+                            <h2 class="project-card-title">
+                                <a href="/projects/<%= project._id %>">
+                                    <%= project.name %>
+                                </a>
+                            </h2>
+
+                            <% if (project.description) { %>
+                                <p class="project-card-description">
+                                    <%= project.description %>
+                                </p>
+                                <% } %>
+                        </div>
+
+                        <div class="project-card-body">
+                            <div class="project-card-meta">
+                                <div class="project-card-meta-item">
+                                    <i class="fas fa-user"></i>
+                                    <%= project.createdBy.username %>
+                                </div>
+                                <div class="project-card-meta-item">
+                                    <i class="fas fa-users"></i>
+                                    <%= teamMembersCount %>
+                                        <%= teamMembersCount==1 ? "Team member" : "Team members" %>
+                                </div>
                             </div>
 
-                            <div style="text-align: right;">
-                                <span
-                                    style="background: #d1fae5; color: #059669; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem;">
-                                    <%= project.createdBy._id.toString()===user.id ? 'Owner' : 'Member' %>
-                                </span>
+                            <div class="project-card-stats">
+                                <div class="project-card-stat">
+                                    <div class="project-card-stat-value">
+                                        <%= totalTasks %>
+                                    </div>
+                                    <div class="project-card-stat-label">Total Tasks</div>
+                                </div>
+                                <div class="project-card-stat">
+                                    <div class="project-card-stat-value">
+                                        <%= completedTasks %>
+                                    </div>
+                                    <div class="project-card-stat-label">Completed</div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: auto;">
+                                <% if (project.tags && project.tags.length> 0) { %>
+                                    <div
+                                        style="display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-bottom: var(--space-md);">
+                                        <% project.tags.forEach(tag=> { %>
+                                            <span
+                                                style="background: var(--color-bg-secondary); color: var(--color-text-secondary); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-full); font-size: 0.75rem;">
+                                                <%= tag %>
+                                            </span>
+                                            <% }) %>
+                                    </div>
+                                    <% } %>
                             </div>
                         </div>
 
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
-                            <div style="color: #666; font-size: 0.875rem;">
-                                <i class="fas fa-users"></i>
-                                <% 
-                                const teamMembersCount=project.members.filter(member=>
-                                    member._id.toString() !== project.createdBy._id.toString()
-                                    ).length;
-                                    %>
-                                    <%= teamMembersCount %>
-                                        <%= teamMembersCount===1 ? "member" : "members" %>
-                                            • Created <%= new Date(project.createdAt).toLocaleDateString() %>
+                        <div class="project-card-footer">
+                            <div class="project-card-date">
+                                Created <%= new Date(project.createdAt).toLocaleDateString() %>
                             </div>
 
-                            <div>
+                            <div class="project-card-actions">
                                 <a href="/projects/<%= project._id %>"
-                                    style="color: #4f46e5; text-decoration: none; margin-right: 1rem;">
+                                    class="project-card-action project-card-action-view">
                                     <i class="fas fa-eye"></i> View
                                 </a>
-                                <% if (project.createdBy._id.toString()===user.id) { %>
+                                <% if (isOwner) { %>
                                     <a href="/projects/<%= project._id %>/edit"
-                                        style="color: #f59e0b; text-decoration: none;">
+                                        class="project-card-action project-card-action-edit">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
                                     <% } %>
@@ -68,18 +200,125 @@
                     <% }) %>
             </div>
             <% } else { %>
-                <div
-                    style="text-align: center; padding: 4rem; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                    <div style="font-size: 4rem; color: #d1d5db; margin-bottom: 1rem;">
+                <div class="projects-empty-state-enhanced">
+                    <div class="projects-empty-icon">
                         <i class="fas fa-project-diagram"></i>
                     </div>
-                    <h3 style="color: #333; margin-bottom: 0.5rem;">No projects yet</h3>
-                    <p style="color: #666; margin-bottom: 2rem;">Create your first project to start organizing your work
+                    <h2 class="projects-empty-title">No projects yet</h2>
+                    <p class="projects-empty-text">
+                        Projects help you organize your work, collaborate with team members, and track progress.
+                        Create your first project to get started!
                     </p>
-                    <a href="/projects/new"
-                        style="background: #4f46e5; color: white; padding: 0.75rem 2rem; border-radius: 4px; text-decoration: none; font-weight: bold;">
-                        <i class="fas fa-plus"></i> Create First Project
+                    <a href="/projects/new" class="btn btn-primary" style="margin-top: var(--space-lg);">
+                        <i class="fas fa-plus"></i> Create Your First Project
                     </a>
                 </div>
                 <% } %>
     </div>
+
+    <!-- JavaScript for Enhanced Features -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Filter Toggle
+            const filterToggle = document.getElementById('filterToggle');
+            const filterPanel = document.getElementById('filterPanel');
+            const filterChevron = document.getElementById('filterChevron');
+
+            if (filterToggle && filterPanel) {
+                filterToggle.addEventListener('click', function () {
+                    filterPanel.classList.toggle('show');
+                    filterChevron.classList.toggle('fa-chevron-down');
+                    filterChevron.classList.toggle('fa-chevron-up');
+                });
+            }
+
+            // Clear Filters
+            const clearFiltersBtn = document.getElementById('clearFilters');
+            if (clearFiltersBtn) {
+                clearFiltersBtn.addEventListener('click', function () {
+                    document.getElementById('filterForm').reset();
+                    window.location.href = '/projects'; // Reset to default view
+                });
+            }
+
+            // Sort Select
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', function () {
+                    // You can implement AJAX sorting or redirect with sort parameter
+                    const sortValue = this.value;
+                    window.location.href = `/projects?sort=${sortValue}`;
+                });
+            }
+
+            // Filter Form Submission
+            const filterForm = document.getElementById('filterForm');
+            if (filterForm) {
+                filterForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const formData = new FormData(this);
+                    const params = new URLSearchParams();
+
+                    for (const [key, value] of formData.entries()) {
+                        if (value) {
+                            params.append(key, value);
+                        }
+                    }
+
+                    // Navigate to filtered URL
+                    window.location.href = '/projects?' + params.toString();
+                });
+
+                // Initialize form values from URL params
+                const urlParams = new URLSearchParams(window.location.search);
+                ['ownership', 'sort', 'status'].forEach(param => {
+                    const value = urlParams.get(param);
+                    if (value) {
+                        const select = filterForm.querySelector(`[name="${param}"]`);
+                        if (select) select.value = value;
+                    }
+                });
+
+                // If any filters are active, show the filter panel
+                if (urlParams.toString()) {
+                    filterPanel.classList.add('show');
+                    filterChevron.classList.remove('fa-chevron-down');
+                    filterChevron.classList.add('fa-chevron-up');
+                }
+            }
+
+            // Initialize sort select from URL
+            if (sortSelect) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const sortParam = urlParams.get('sort');
+                if (sortParam) {
+                    sortSelect.value = sortParam;
+                }
+            }
+
+            // Add hover animations to project cards
+            const projectCards = document.querySelectorAll('.project-card-enhanced');
+            projectCards.forEach(card => {
+                card.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-8px)';
+                });
+
+                card.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Add loading animation for cards
+            projectCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease-out';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        });
+    </script>

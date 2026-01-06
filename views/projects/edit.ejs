@@ -1,41 +1,49 @@
-<!-- views/projects/edit.ejs -->
 <%- include('../layouts/main.ejs') -%>
 
-    <div style="max-width: 600px; margin: 0 auto; padding: 2rem;">
-        <div style="margin-bottom: 2rem;">
-            <a href="/projects/<%= project._id %>"
-                style="color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+    <div class="projects-container project-form-container">
+        <div class="project-header">
+            <a href="/projects/<%= project._id %>" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Project
             </a>
-            <h1 style="margin: 1rem 0;">Edit Project: <%= project.name %>
+            <h1 class="project-title">Edit Project: <%= project.name %>
             </h1>
         </div>
 
-        <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <form id="editProjectForm">
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333;">
+        <div class="project-form-card">
+            <form id="editProjectForm" class="project-form">
+                <div class="project-form-group">
+                    <label class="project-form-label">
                         Project Name *
                     </label>
-                    <input type="text" name="name" required value="<%= project.name %>"
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 1rem;">
+                    <input type="text" name="name" required value="<%= project.name %>" class="project-form-input">
                 </div>
 
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                    <div class="project-form-group">
+                        <label class="project-form-label">Start Date</label>
+                        <input type="date" name="startDate" class="project-form-input"
+                            value="<%= project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '' %>">
+                    </div>
+                    <div class="project-form-group">
+                        <label class="project-form-label">End Date</label>
+                        <input type="date" name="endDate" class="project-form-input"
+                            value="<%= project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '' %>">
+                    </div>
+                </div>
+
+                <div class="project-form-group">
+                    <label class="project-form-label">
                         Description
                     </label>
                     <textarea name="description" rows="4"
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 1rem; resize: vertical;"><%= project.description || '' %></textarea>
+                        class="project-form-textarea"><%= project.description || '' %></textarea>
                 </div>
 
-                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                    <button type="submit"
-                        style="background: #f59e0b; color: white; border: none; padding: 0.75rem 2rem; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem;">
+                <div class="project-form-actions">
+                    <button type="submit" class="btn btn-success">
                         <i class="fas fa-save"></i> Update Project
                     </button>
-                    <a href="/projects/<%= project._id %>"
-                        style="background: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; padding: 0.75rem 2rem; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 1rem;">
+                    <a href="/projects/<%= project._id %>" class="btn btn-secondary">
                         Cancel
                     </a>
                 </div>
@@ -59,16 +67,19 @@
                 const formData = new FormData(form);
                 const data = Object.fromEntries(formData.entries());
 
+                // Remove empty strings for dates to avoid database errors
+                if (data.startDate === '') delete data.startDate;
+                if (data.endDate === '') delete data.endDate;
+
                 console.log('Updating project with:', data);
 
-                // ✅ CRITICAL: Use credentials: 'include' for cookies
                 const response = await fetch('/api/projects/<%= project._id %>', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data),
-                    credentials: 'include' // ← THIS SENDS THE COOKIE
+                    credentials: 'include'
                 });
 
                 console.log('Response status:', response.status);
@@ -94,4 +105,22 @@
                 submitBtn.disabled = false;
             }
         });
+
+        // Date validation: End date cannot be before start date
+        const startInput = document.querySelector('input[name="startDate"]');
+        const endInput = document.querySelector('input[name="endDate"]');
+
+        if (startInput && endInput) {
+            // Set initial min date if start date exists
+            if (startInput.value) {
+                endInput.min = startInput.value;
+            }
+
+            startInput.addEventListener('change', function () {
+                endInput.min = this.value;
+                if (endInput.value && endInput.value < this.value) {
+                    endInput.value = this.value;
+                }
+            });
+        }
     </script>

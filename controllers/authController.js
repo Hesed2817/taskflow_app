@@ -70,26 +70,17 @@ const loginUser = async function (request, response) {
         // check for the user and include the password (since select: false)
         const user = await User.findOne({ email }).select('+password');
 
-        if (user && (await user.matchPassword(password))) {
-
-            console.log('✅ Password correct for:', email); // --1--
+        if (user && (await user.matchPassword(password))) {           
 
             // generate a jwt token
-            const token = generateToken(user._id);
-            
-            console.log('✅ Token generated:', token.substring(0, 20) + '...'); // --2--
+            const token = generateToken(user._id);                        
 
             // set cookie for web requests
-            if (!request.headers['content-type']?.includes('application/json')) {
-                
-                console.log('🍪 Setting cookie...'); // --3--
-                
+            if (!request.headers['content-type']?.includes('application/json')) {                                           
                 response.cookie('auth_token', token, {
                     httpOnly: true,
                     maxAge: 24 * 60 * 60 * 1000 // 24 hours
-                });
-                
-                console.log('✅ Cookie set'); // --4--
+                });                                
 
             }
 
@@ -105,16 +96,11 @@ const loginUser = async function (request, response) {
                     }
                 });
             } else {
-                // Page request 
-                
-                console.log('🔄 Redirecting to dashboard...'); // --5--
-                
+                // Page request                                              
                 response.redirect('/dashboard');
             }
 
-        } else {
-            
-            console.log('❌ Invalid credentials for:', email); //--6--
+        } else {                
             
             if (request.headers['content-type']?.includes('application/json')) {
                 response.status(401).json({
@@ -126,9 +112,7 @@ const loginUser = async function (request, response) {
             }
 
         }
-    } catch (error) {
-
-        console.error('❌ Login error:', error); //--7--
+    } catch (error) {        
 
         console.error('Failed to create user:', error);
         if (request.headers['content-type']?.includes('application/json')) {

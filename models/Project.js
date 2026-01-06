@@ -10,7 +10,13 @@ const projectSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        maxlength: [500, "Project name cannot be more than 500 characters"]
+        maxlength: [500, "Project description cannot be more than 500 characters"]
+    },
+    startDate: {
+        type: Date
+    },
+    endDate: {
+        type: Date
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -26,17 +32,17 @@ const projectSchema = new mongoose.Schema({
     collection: 'projects'
 });
 
-projectSchema.pre('deleteOne', { document: true, query: false}, async function (next){
-    try{
+projectSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+    try {
         const projectId = this._id;
 
         await Task.deleteMany({ project: projectId });
         console.log('successfully deleted associated tasks');
 
-    } catch (error){
+    } catch (error) {
         console.error('Error cascade deleting tasks', error);
         next();
     }
-})
+});
 
 module.exports = mongoose.model('Project', projectSchema);

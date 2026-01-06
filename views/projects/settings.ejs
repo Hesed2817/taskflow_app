@@ -1,290 +1,262 @@
 <%- include('../layouts/main.ejs') -%>
 
-    <div style="max-width: 800px; margin: 0 auto; padding: 2rem;">
-        <!-- Page Header -->
-        <div style="margin-bottom: 2rem;">
-            <a href="/projects/<%= project._id %>"
-                style="color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
-                <i class="fas fa-arrow-left"></i> Back to Project
-            </a>
-            <h1 style="margin: 1rem 0;">Project Settings: <%= project.name %>
-            </h1>
-            <p style="color: #666;">Manage project configuration and ownership</p>
-        </div>
+<div class="projects-container project-settings-container">
+    <!-- Page Header -->
+    <div class="project-header">
+        <a href="/projects/<%= project._id %>" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Project
+        </a>
+        <h1 class="project-title">Project Settings: <%= project.name %></h1>
+        <p class="project-subtitle">Manage project configuration and ownership</p>
+    </div>
 
+    <!-- Project Information -->
+    <div class="project-settings-section">
+        <h2 class="project-settings-title">Project Information</h2>
 
-        <!-- Project Information -->
-        <div
-            style="background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="margin: 0 0 1.5rem 0; color: #333;">Project Information</h2>
-
-            <div style="display: grid; gap: 1.5rem;">
-                <div>
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #666;">Project
-                        Name</label>
-                    <div style="font-size: 1.125rem;">
-                        <%= project.name %>
-                    </div>
-                </div>
-
-                <div>
-                    <label
-                        style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #666;">Description</label>
-                    <div style="font-size: 1.125rem; color: #666;">
-                        <%= project.description || 'No description provided' %>
-                    </div>
-                </div>
-
-                <div>
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #666;">Current
-                        Owner</label>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <div
-                            style="width: 40px; height: 40px; background: #4f46e5; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                            <%= project.createdBy.username.charAt(0).toUpperCase() %>
-                        </div>
-                        <div>
-                            <div style="font-weight: bold;">
-                                <%= project.createdBy.username %>
-                            </div>
-                            <div style="color: #666; font-size: 0.875rem;">
-                                <%= project.createdBy.email %>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #666;">Created
-                        Date</label>
-                    <div style="font-size: 1.125rem;">
-                        <%= new Date(project.createdAt).toLocaleDateString('en-US', { year: 'numeric' , month: 'long' ,
-                            day: 'numeric' }) %>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Editing settings -->
-        <div
-            style="background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="margin: 0 0 1.5rem 0; color: #333;">Edit Project Details</h2>
-            <p style="color: #666; margin-bottom: 1rem;">Update project name, description, or other details.</p>
-            <a href="/projects/<%= project._id %>/edit"
-                style="background: #4f46e5; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none; display: inline-block;">
-                <i class="fas fa-edit"></i> Edit Project
-            </a>
-        </div>
-
-        <!-- Project Members -->
-        <div
-            style="background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 2rem;margin-bottom: 2rem;">
-            <h2 style="margin: 0 0 1.5rem 0; color: #333;">Project Members</h2>
-
-            <div style="margin-bottom: 1.5rem;">
-                <div
-                    style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #f9fafb; border-radius: 4px; margin-bottom: 0.5rem;">
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <div
-                            style="width: 40px; height: 40px; background: #4f46e5; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                            <%= project.createdBy.username.charAt(0).toUpperCase() %>
-                        </div>
-                        <div>
-                            <div style="font-weight: bold;">
-                                <%= project.createdBy.username %>
-                            </div>
-                            <div style="color: #666; font-size: 0.875rem;">Owner • <%= project.createdBy.email %>
-                            </div>
-                        </div>
-                    </div>
-                    <span style="color: #4f46e5; font-weight: bold;">You</span>
-                </div>
-
-                <% project.members.forEach(member=> { %>
-                    <div
-                        style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #f9fafb; border-radius: 4px; margin-bottom: 0.5rem;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div
-                                style="width: 40px; height: 40px; background: #10b981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                                <%= member.username.charAt(0).toUpperCase() %>
-                            </div>
-                            <div>
-                                <div style="font-weight: bold;">
-                                    <%= member.username %>
-                                </div>
-                                <div style="color: #666; font-size: 0.875rem;">Member • <%= member.email %>
-                                </div>
-                            </div>
-                        </div>
-                        <button onclick="removeMember('<%= member._id %>', '<%= member.username %>')"
-                            style="background: none; border: none; color: #dc2626; cursor: pointer; padding: 0.5rem; border-radius: 4px;"
-                            title="Remove member">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <% }) %>
+        <div class="project-info-grid">
+            <div class="project-info-item">
+                <span class="project-info-label">Project Name</span>
+                <div class="project-info-value"><%= project.name %></div>
             </div>
 
-            <div style="text-align: center; color: #666; font-style: italic;">
-                <% const teamMembers=project.members.filter(member=>
-                    member._id.toString() !== project.createdBy._id.toString()
-                    );
-                    %>
-
-                    <%= teamMembers.length %> member(s) total
-            </div>
-        </div>
-
-        <!-- Danger Zone -->
-        <div
-            style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: #dc2626; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fas fa-exclamation-triangle"></i> Danger Zone
-            </h2>
-            <p style="color: #7f1d1d; margin-bottom: 1.5rem;">
-                These actions are irreversible. Please proceed with caution.
-            </p>
-
-            <!-- Transfer Ownership -->
-            <div style="margin-bottom: 1.5rem; padding: 1.5rem; background: white; border-radius: 4px;">
-                <h3 style="margin: 0 0 1rem 0; color: #333;">Transfer Project Ownership</h3>
-                <p style="color: #666; margin-bottom: 1rem;">
-                    Transfer ownership to another project member. You will become a regular member after transfer.
-                </p>
-
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <select id="newOwnerSelect"
-                        style="flex: 1; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px;">
-                        <option value="">Select a member...</option>
-                        <% project.members.forEach(member=> { %>
-                            <option value="<%= member._id %>">
-                                <%= member.username %> (<%= member.email %>)
-                            </option>
-                            <% }) %>
-                    </select>
-                    <button onclick="transferOwnership()"
-                        style="background: #dc2626; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                        Transfer Ownership
-                    </button>
+            <div class="project-info-item">
+                <span class="project-info-label">Description</span>
+                <div class="project-info-value">
+                    <%= project.description || 'No description provided' %>
                 </div>
             </div>
 
-            <!-- Delete Project -->
-            <div style="padding: 1.5rem; background: white; border-radius: 4px;">
-                <h3 style="margin: 0 0 1rem 0; color: #333;">Delete Project</h3>
-                <p style="color: #666; margin-bottom: 1rem;">
-                    Permanently delete this project and all associated tasks. This action cannot be undone.
-                </p>
-                <button onclick="deleteProject()"
-                    style="background: #dc2626; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                    <i class="fas fa-trash"></i> Delete Project
-                </button>
+            <div class="project-info-item">
+                <span class="project-info-label">Current Owner</span>
+                <div class="settings-member-info">
+                    <div class="settings-member-avatar settings-member-avatar-owner">
+                        <%= project.createdBy.username.charAt(0).toUpperCase() %>
+                    </div>
+                    <div class="settings-member-details">
+                        <div class="settings-member-name"><%= project.createdBy.username %></div>
+                        <div class="settings-member-role"><%= project.createdBy.email %></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-info-item">
+                <span class="project-info-label">Created Date</span>
+                <div class="project-info-value">
+                    <%= new Date(project.createdAt).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    }) %>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // Transfer Ownership Function
-        async function transferOwnership() {
-            const newOwnerId = document.getElementById('newOwnerSelect').value;
+    <!-- Editing settings -->
+    <div class="project-settings-section">
+        <h2 class="project-settings-title">Edit Project Details</h2>
+        <p class="project-subtitle" style="margin-bottom: var(--space-md);">Update project name, description, or other details.</p>
+        <a href="/projects/<%= project._id %>/edit" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit Project
+        </a>
+    </div>
 
-            if (!newOwnerId) {
-                alert('Please select a member to transfer ownership to');
-                return;
-            }
+    <!-- Project Members -->
+    <div class="project-settings-section">
+        <h2 class="project-settings-title">Project Members</h2>
 
-            const newOwnerName = document.getElementById('newOwnerSelect').options[document.getElementById('newOwnerSelect').selectedIndex].text;
+        <div class="settings-member-list">
+            <!-- Owner -->
+            <div class="settings-member-item">
+                <div class="settings-member-info">
+                    <div class="settings-member-avatar settings-member-avatar-owner">
+                        <%= project.createdBy.username.charAt(0).toUpperCase() %>
+                    </div>
+                    <div class="settings-member-details">
+                        <div class="settings-member-name"><%= project.createdBy.username %></div>
+                        <div class="settings-member-role">Owner • <%= project.createdBy.email %></div>
+                    </div>
+                </div>
+                <span style="color: var(--color-primary); font-weight: bold;">You</span>
+            </div>
 
-            if (!confirm(`Transfer project ownership to ${newOwnerName}?\n\nYou will become a regular member after transfer. This action cannot be undone.`)) {
-                return;
-            }
+            <!-- Members -->
+            <% project.members.forEach(member => { %>
+                <div class="settings-member-item">
+                    <div class="settings-member-info">
+                        <div class="settings-member-avatar settings-member-avatar-member">
+                            <%= member.username.charAt(0).toUpperCase() %>
+                        </div>
+                        <div class="settings-member-details">
+                            <div class="settings-member-name"><%= member.username %></div>
+                            <div class="settings-member-role">Member • <%= member.email %></div>
+                        </div>
+                    </div>
+                    <button onclick="removeMember('<%= member._id %>', '<%= member.username %>')" 
+                            class="btn-icon btn-icon-delete"
+                            title="Remove member">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            <% }) %>
+        </div>
 
-            try {
-                const response = await fetch(`/api/projects/<%= project._id %>/transfer-ownership`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ newOwnerId }),
-                    credentials: 'include'
-                });
+        <div style="text-align: center; color: var(--color-text-secondary); font-style: italic;">
+            <% const teamMembers = project.members.filter(member =>
+                member._id.toString() !== project.createdBy._id.toString()
+            ); %>
+            <%= teamMembers.length %> member(s) total
+        </div>
+    </div>
 
-                const result = await response.json();
+    <!-- Danger Zone -->
+    <div class="danger-zone">
+        <h2 class="danger-zone-title">
+            <i class="fas fa-exclamation-triangle"></i> Danger Zone
+        </h2>
+        <p class="danger-zone-warning">
+            These actions are irreversible. Please proceed with caution.
+        </p>
 
-                if (result.success) {
-                    showAlert('success', 'Ownership transferred successfully! Redirecting...');
-                    setTimeout(() => {
-                        window.location.href = `/projects/<%= project._id %>?success=Project ownership transferred`;
-                    }, 1500);
-                } else {
-                    showAlert('error', result.message || 'Failed to transfer ownership');
-                }
-            } catch (error) {
-                console.error('Transfer ownership error:', error);
-                showAlert('error', 'Error: ' + error.message);
-            }
+        <!-- Transfer Ownership -->
+        <div class="danger-zone-section">
+            <h3 class="danger-zone-section-title">Transfer Project Ownership</h3>
+            <p class="danger-zone-section-text">
+                Transfer ownership to another project member. You will become a regular member after transfer.
+            </p>
+
+            <div class="transfer-ownership-form">
+                <select id="newOwnerSelect" class="form-control form-select">
+                    <option value="">Select a member...</option>
+                    <% project.members.forEach(member => { %>
+                        <option value="<%= member._id %>">
+                            <%= member.username %> (<%= member.email %>)
+                        </option>
+                    <% }) %>
+                </select>
+                <button onclick="transferOwnership()" class="btn btn-danger">
+                    Transfer Ownership
+                </button>
+            </div>
+        </div>
+
+        <!-- Delete Project -->
+        <div class="danger-zone-section">
+            <h3 class="danger-zone-section-title">Delete Project</h3>
+            <p class="danger-zone-section-text">
+                Permanently delete this project and all associated tasks. This action cannot be undone.
+            </p>
+            <button onclick="deleteProject()" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete Project
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Transfer Ownership Function
+    async function transferOwnership() {
+        const newOwnerId = document.getElementById('newOwnerSelect').value;
+
+        if (!newOwnerId) {
+            alert('Please select a member to transfer ownership to');
+            return;
         }
 
-        // Delete Project Function
-        async function deleteProject() {
-            if (!confirm('Are you sure you want to delete this project?\n\nThis will permanently delete:\n• All project data\n• All tasks in this project\n• All member associations\n\nThis action cannot be undone.')) {
-                return;
-            }
+        const newOwnerName = document.getElementById('newOwnerSelect').options[document.getElementById('newOwnerSelect').selectedIndex].text;
 
-            // Extra confirmation for deletion
-            const projectName = prompt(`Type the project name "${'<%= project.name %>'}" to confirm deletion:`);
-
-            if (projectName !== '<%= project.name %>') {
-                alert('Project name does not match. Deletion cancelled.');
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/projects/<%= project._id %>`, {
-                    method: 'DELETE',
-                    credentials: 'include'
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    showAlert('success', 'Project deleted successfully! Redirecting...');
-                    setTimeout(() => { window.location.href = '/projects?success=Project deleted successfully'; }, 1500);
-                } else {
-                    showAlert('error', result.message || 'Failed to delete project');
-                }
-            } catch (error) {
-                console.error('Delete project error:', error);
-                showAlert('error', 'Error: ' + error.message);
-            }
+        if (!confirm(`Transfer project ownership to ${newOwnerName}?\n\nYou will become a regular member after transfer. This action cannot be undone.`)) {
+            return;
         }
 
-        // Remove Member Function
-        async function removeMember(userId, userName) {
-            if (!confirm(`Remove ${userName} from this project?`)) {
-                return;
+        try {
+            const response = await fetch(`/api/projects/<%= project._id %>/transfer-ownership`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ newOwnerId }),
+                credentials: 'include'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showAlert('success', 'Ownership transferred successfully! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = `/projects/<%= project._id %>?success=Project ownership transferred`;
+                }, 1500);
+            } else {
+                showAlert('error', result.message || 'Failed to transfer ownership');
             }
-
-            try {
-                const response = await fetch(`/api/projects/<%= project._id %>/members/${userId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    credentials: 'include'
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    showAlert('success', 'Member removed successfully');
-                    setTimeout(()=>{window.location.reload();}, 1000);
-                } else {
-                    showAlert('error', result.message || 'Failed to remove member');
-                }
-            } catch (error) {
-                console.error('Remove member error:', error);
-                showAlert('error', 'Error: ' + error.message);
-            }
+        } catch (error) {
+            console.error('Transfer ownership error:', error);
+            showAlert('error', 'Error: ' + error.message);
         }
-    </script>
+    }
+
+    // Delete Project Function
+    async function deleteProject() {
+        if (!confirm('Are you sure you want to delete this project?\n\nThis will permanently delete:\n• All project data\n• All tasks in this project\n• All member associations\n\nThis action cannot be undone.')) {
+            return;
+        }
+
+        // Extra confirmation for deletion
+        const projectName = prompt(`Type the project name "${'<%= project.name %>'}" to confirm deletion:`);
+
+        if (projectName !== '<%= project.name %>') {
+            alert('Project name does not match. Deletion cancelled.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/projects/<%= project._id %>`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showAlert('success', 'Project deleted successfully! Redirecting...');
+                setTimeout(() => { window.location.href = '/projects?success=Project deleted successfully'; }, 1500);
+            } else {
+                showAlert('error', result.message || 'Failed to delete project');
+            }
+        } catch (error) {
+            console.error('Delete project error:', error);
+            showAlert('error', 'Error: ' + error.message);
+        }
+    }
+
+    // Remove Member Function
+    async function removeMember(userId, userName) {
+        if (!confirm(`Remove ${userName} from this project?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/projects/<%= project._id %>/members/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showAlert('success', 'Member removed successfully');
+                setTimeout(()=>{window.location.reload();}, 1000);
+            } else {
+                showAlert('error', result.message || 'Failed to remove member');
+            }
+        } catch (error) {
+            console.error('Remove member error:', error);
+            showAlert('error', 'Error: ' + error.message);
+        }
+    }
+</script>

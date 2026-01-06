@@ -1,12 +1,10 @@
-GET  http://localhost:3000/
-
 ### signing up a user
 POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-    "username": "stroz",
-    "email": "stroz@gmail.com",
+    "username": "john",
+    "email": "john@gmail.com",
     "password": "password1234"
 }
 
@@ -15,12 +13,12 @@ POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 { 
-       "email": "ITGUY@gmail.com",
+       "email": "john@gmail.com",
     "password": "password1234"
 }
 
 ### accessing a protected route without a token
-post http://localhost:3000/auth/login
+post http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 { 
@@ -29,12 +27,12 @@ Content-Type: application/json
 }
 
 ### accessing a protected route with a token
-post http://localhost:3000/api/projects/693735a2900253e8fb24c415/members
+delete http://localhost:3000/api/users/delete-profile
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MjhjNGVlOGQ4OThhN2Q1ODYxZDE4NyIsImlhdCI6MTc2NTEzOTQ0MywiZXhwIjoxNzY3NzMxNDQzfQ.9v4rGeKjfSlu-H8kDatXLvsLi6A58hE32hkDdM5arkw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NGM3ZmYzNjQ3N2M3ODBmOWZkNWI5NCIsImlhdCI6MTc2NjYyMTE3MSwiZXhwIjoxNzY5MjEzMTcxfQ.VtbEfwJSoMOW5zLgOyR8hXSnywtDOFAB11y68NevdJg
 
 {
-  "userId": "69349ab3cc3d7184c3bbd77d"
+  "password": "password1234"
 }
 
 

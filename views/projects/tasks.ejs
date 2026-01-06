@@ -1,309 +1,285 @@
 <%- include('../layouts/main.ejs') -%>
 
-    <div>
-        <!-- Page Header -->
-        <div
-            style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
-                <div>
-                    <a href="/projects/<%= project._id %>"
-                        style="color: #4f46e5; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                        <i class="fas fa-arrow-left"></i> Back to Project
-                    </a>
-                    <h1 style="margin: 0 0 0.5rem 0;">Tasks for: <%= project.name %>
-                    </h1>
-                    <% if (project.description) { %>
-                        <p style="color: #666; margin: 0;">
-                            <%= project.description %>
-                        </p>
-                        <% } %>
-                </div>
-
-                <div>
-                    <a href="/projects/<%= project._id %>"
-                        style="background: #4f46e5; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none; display: inline-block;">
-                        <i class="fas fa-plus"></i> Add Task
-                    </a>
-                </div>
+<div class="projects-container project-tasks-container">
+    <!-- Page Header -->
+    <div class="project-tasks-header">
+        <div class="project-tasks-header-content">
+            <div class="project-tasks-header-main">
+                <a href="/projects/<%= project._id %>" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Project
+                </a>
+                <h1 class="project-tasks-title">Tasks for: <%= project.name %></h1>
+                <% if (project.description) { %>
+                    <p class="project-tasks-description">
+                        <%= project.description %>
+                    </p>
+                <% } %>
             </div>
 
-            <!-- Stats -->
-            <div
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
-                <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                    <div style="font-size: 2rem; font-weight: bold; color: #4f46e5;">
-                        <%= totalTasks %>
-                    </div>
-                    <div style="color: #666; font-size: 0.875rem;">Total Tasks</div>
-                </div>
-
-                <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                    <div style="font-size: 2rem; font-weight: bold; color: #3b82f6;">
-                        <%= todoTasks %>
-                    </div>
-                    <div style="color: #666; font-size: 0.875rem;">To Do</div>
-                </div>
-
-                <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                    <div style="font-size: 2rem; font-weight: bold; color: #f59e0b;">
-                        <%= inProgressTasks %>
-                    </div>
-                    <div style="color: #666; font-size: 0.875rem;">In Progress</div>
-                </div>
-
-                <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                    <div style="font-size: 2rem; font-weight: bold; color: #10b981;">
-                        <%= doneTasks %>
-                    </div>
-                    <div style="color: #666; font-size: 0.875rem;">Completed</div>
-                </div>
+            <div class="project-tasks-header-actions">
+                <a href="/projects/<%= project._id %>" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Task
+                </a>
             </div>
         </div>
 
-        <!-- Filters -->
-        <div
-            style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-            <h3 style="margin: 0 0 1rem 0;">Filter Tasks</h3>
-            <form id="filterForm"
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                <div>
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Status</label>
-                    <select name="status"
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px;">
-                        <option value="">All Status</option>
-                        <option value="todo">To Do</option>
-                        <option value="in-progress">In Progress</option>
-                        <option value="done">Done</option>
-                    </select>
+        <!-- Stats -->
+        <div class="project-tasks-stats">
+            <div class="project-stat">
+                <div class="project-stat-value project-stat-total">
+                    <%= totalTasks %>
                 </div>
+                <div class="project-stat-label">Total Tasks</div>
+            </div>
 
-                <div>
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Priority</label>
-                    <select name="priority"
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px;">
-                        <option value="">All Priorities</option>
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
-                    </select>
+            <div class="project-stat">
+                <div class="project-stat-value project-stat-todo">
+                    <%= todoTasks %>
                 </div>
+                <div class="project-stat-label">To Do</div>
+            </div>
 
-                <div>
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Assigned To</label>
-                    <select name="assignedTo"
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px;">
-                        <option value="">Everyone</option>
-                        <option value="me">Assigned to Me</option>
-                        <option value="unassigned">Unassigned</option>
-                        <% allMembers.forEach(member=> { %>
-                            <option value="<%= member._id %>">
-                                <%= member.username %>
-                                    <% if (member.isOwner) { %> (Owner)<% } %>
-                            </option>
-                            <% }) %>
-                    </select>
+            <div class="project-stat">
+                <div class="project-stat-value project-stat-progress">
+                    <%= inProgressTasks %>
                 </div>
+                <div class="project-stat-label">In Progress</div>
+            </div>
 
-                <div style="display: flex; align-items: flex-end;">
-                    <div style="display: flex; gap: 0.5rem; width: 100%;">
-                        <button type="submit"
-                            style="background: #4f46e5; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer; flex: 1;">
-                            Apply Filters
-                        </button>
-                        <button type="button" onclick="clearFilters()"
-                            style="background: #f3f4f6; color: #333; border: 1px solid #d1d5db; padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer;">
-                            Clear
-                        </button>
-                    </div>
+            <div class="project-stat">
+                <div class="project-stat-value project-stat-done">
+                    <%= doneTasks %>
                 </div>
-            </form>
-        </div>
-
-        <!-- Tasks Table -->
-        <div style="background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden;">
-            <% if (tasks.length> 0) { %>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead style="background: #f9fafb;">
-                            <tr>
-                                <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Task</th>
-                                <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Status
-                                </th>
-                                <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Priority
-                                </th>
-                                <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Assigned
-                                    To</th>
-                                <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Due Date
-                                </th>
-                                <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% tasks.forEach(task=> { %>
-                                <tr style="border-bottom: 1px solid #e5e7eb;">
-                                    <td style="padding: 1rem;">
-                                        <div>
-                                            <strong style="display: block;">
-                                                <a href="/tasks/<%= task._id %>"
-                                                    style="color: #333; text-decoration: none;">
-                                                    <%= task.title %>
-                                                </a>
-                                            </strong>
-                                            <% if (task.description) { %>
-                                                <small style="color: #666;">
-                                                    <%= task.description.substring(0, 60) %>
-                                                        <%= task.description.length> 60 ? '...' : '' %>
-                                                </small>
-                                                <% } %>
-                                        </div>
-                                    </td>
-                                    <td style="padding: 1rem;">
-                                        <span
-                                            style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem; 
-                                          <% if (task.status === 'todo') { %>background: #dbeafe; color: #1e40af;<% } %>
-                                          <% if (task.status === 'in-progress') { %>background: #fef3c7; color: #92400e;<% } %>
-                                          <% if (task.status === 'done') { %>background: #d1fae5; color: #065f46;<% } %>">
-                                            <%= task.status %>
-                                        </span>
-                                    </td>
-                                    <td style="padding: 1rem;">
-                                        <% if (task.priority==='high' ) { %>
-                                            <span style="color: #dc2626;"><i class="fas fa-arrow-up"></i> High</span>
-                                            <% } else if (task.priority==='medium' ) { %>
-                                                <span style="color: #f59e0b;">Medium</span>
-                                                <% } else { %>
-                                                    <span style="color: #10b981;">Low</span>
-                                                    <% } %>
-                                    </td>
-                                    <td style="padding: 1rem;">
-                                        <% if (task.assignedTo) { %>
-                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                                <div
-                                                    style="width: 24px; height: 24px; background: #10b981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">
-                                                    <%= task.assignedTo.username.charAt(0).toUpperCase() %>
-                                                </div>
-                                                <%= task.assignedTo.username %>
-                                            </div>
-                                            <% } else { %>
-                                                <span style="color: #9ca3af;">Unassigned</span>
-                                                <% } %>
-                                    </td>
-                                    <td style="padding: 1rem;">
-                                        <% if (task.dueDate) { %>
-                                            <%= new Date(task.dueDate).toLocaleDateString() %>
-                                                <% } else { %>
-                                                    <span style="color: #9ca3af;">No due date</span>
-                                                    <% } %>
-                                    </td>
-                                    <td style="padding: 1rem;">
-                                        <div style="display: flex; gap: 0.5rem;">
-                                            <a href="/tasks/<%= task._id %>"
-                                                style="color: #4f46e5; text-decoration: none;" title="View">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <button
-                                                onclick="quickUpdateTask('<%= task._id %>', '<%= task.project._id %>', '<%= task.status %>', '<%= task.priority %>')"
-                                                style="background: none; border: none; color: #f59e0b; cursor: pointer;"
-                                                title="Update">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <% if (isOwner || task.createdBy._id.toString()===user.id) { %>
-                                                <button onclick="deleteTask('<%= task._id %>', '<%= project._id %>')"
-                                                    style="background: none; border: none; color: #dc2626; cursor: pointer;"
-                                                    title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                                <% } %>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <% }) %>
-                        </tbody>
-                    </table>
-                </div>
-                <% } else { %>
-                    <div style="text-align: center; padding: 3rem; color: #9ca3af;">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">
-                            <i class="fas fa-tasks"></i>
-                        </div>
-                        <h3>No tasks found</h3>
-                        <p>No tasks match your filters or project has no tasks yet</p>
-                        <a href="/projects/<%= project._id %>"
-                            style="display: inline-block; margin-top: 1rem; background: #4f46e5; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none;">
-                            <i class="fas fa-plus"></i> Add First Task
-                        </a>
-                    </div>
-                    <% } %>
+                <div class="project-stat-label">Completed</div>
+            </div>
         </div>
     </div>
 
-    <script>
-        // Filter handling
-        document.getElementById('filterForm').addEventListener('submit', function (e) {
-            e.preventDefault();
+    <!-- Filters -->
+    <div class="project-tasks-filters">
+        <h3 class="project-tasks-filters-title">Filter Tasks</h3>
+        <form id="filterForm" class="project-tasks-filters-form">
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-control form-select">
+                    <option value="">All Status</option>
+                    <option value="todo">To Do</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="done">Done</option>
+                </select>
+            </div>
 
-            const formData = new FormData(this);
-            const params = new URLSearchParams();
+            <div class="form-group">
+                <label class="form-label">Priority</label>
+                <select name="priority" class="form-control form-select">
+                    <option value="">All Priorities</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+            </div>
 
-            for (const [key, value] of formData.entries()) {
-                if (value) {
-                    params.append(key, value);
-                }
-            }
+            <div class="form-group">
+                <label class="form-label">Assigned To</label>
+                <select name="assignedTo" class="form-control form-select">
+                    <option value="">Everyone</option>
+                    <option value="me">Assigned to Me</option>
+                    <option value="unassigned">Unassigned</option>
+                    <% allMembers.forEach(member => { %>
+                        <option value="<%= member._id %>">
+                            <%= member.username %>
+                            <% if (member.isOwner) { %> (Owner)<% } %>
+                        </option>
+                    <% }) %>
+                </select>
+            </div>
 
-            window.location.href = window.location.pathname + '?' + params.toString();
+            <div class="project-tasks-filters-actions">
+                <button type="submit" class="btn btn-primary">
+                    Apply Filters
+                </button>
+                <button type="button" onclick="clearFilters()" class="btn btn-secondary">
+                    Clear
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tasks Table -->
+    <div class="project-tasks-table-container">
+        <% if (tasks.length > 0) { %>
+            <div style="overflow-x: auto;">
+                <table class="project-tasks-table">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Assigned To</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% tasks.forEach(task => { %>
+                            <tr>
+                                <td>
+                                    <div>
+                                        <strong class="project-task-cell-title">
+                                            <a href="/tasks/<%= task._id %>">
+                                                <%= task.title %>
+                                            </a>
+                                        </strong>
+                                        <% if (task.description) { %>
+                                            <small class="project-task-cell-description">
+                                                <%= task.description.substring(0, 60) %>
+                                                <%= task.description.length > 60 ? '...' : '' %>
+                                            </small>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="task-badge status-<%= task.status %>">
+                                        <%= task.status %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <% if (task.priority === 'high') { %>
+                                        <span class="task-detail-meta due-date-overdue">
+                                            <i class="fas fa-arrow-up"></i> High
+                                        </span>
+                                    <% } else if (task.priority === 'medium') { %>
+                                        <span class="task-detail-meta due-date-today">
+                                            Medium
+                                        </span>
+                                    <% } else { %>
+                                        <span class="task-detail-meta due-date-upcoming">
+                                            Low
+                                        </span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (task.assignedTo) { %>
+                                        <div class="user-display-small">
+                                            <div class="user-avatar-small">
+                                                <%= task.assignedTo.username.charAt(0).toUpperCase() %>
+                                            </div>
+                                            <span class="user-name-small">
+                                                <%= task.assignedTo.username %>
+                                            </span>
+                                        </div>
+                                    <% } else { %>
+                                        <span class="task-detail-meta due-date-none">Unassigned</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (task.dueDate) { %>
+                                        <%= new Date(task.dueDate).toLocaleDateString() %>
+                                    <% } else { %>
+                                        <span class="task-detail-meta due-date-none">No due date</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="project-task-cell-actions">
+                                        <a href="/tasks/<%= task._id %>" class="btn-icon btn-icon-view" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <button onclick="quickUpdateTask('<%= task._id %>', '<%= task.project._id %>', '<%= task.status %>', '<%= task.priority %>')" class="btn-icon btn-icon-edit" title="Update">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <% if (isOwner || task.createdBy._id.toString() === user.id) { %>
+                                            <button onclick="deleteTask('<%= task._id %>', '<%= project._id %>')" class="btn-icon btn-icon-delete" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        <% } else { %>
+            <div class="project-tasks-empty">
+                <div class="project-tasks-empty-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3 class="project-tasks-empty-title">No tasks found</h3>
+                <p class="project-tasks-empty-text">No tasks match your filters or project has no tasks yet</p>
+                <a href="/projects/<%= project._id %>" class="btn btn-primary" style="margin-top: var(--space-md);">
+                    <i class="fas fa-plus"></i> Add First Task
+                </a>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+// Filter handling
+document.getElementById('filterForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const params = new URLSearchParams();
+
+    for (const [key, value] of formData.entries()) {
+        if (value) {
+            params.append(key, value);
+        }
+    }
+
+    window.location.href = window.location.pathname + '?' + params.toString();
+});
+
+function clearFilters() {
+    window.location.href = window.location.pathname;
+}
+
+// Initialize filters from URL
+document.addEventListener('DOMContentLoaded', function () {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    ['status', 'priority', 'assignedTo'].forEach(param => {
+        const value = urlParams.get(param);
+        if (value) {
+            const select = document.querySelector(`[name="${param}"]`);
+            if (select) select.value = value;
+        }
+    });
+});
+
+// Task functions
+function quickUpdateTask(taskId, projectId, currentStatus = 'todo', currentPriority = 'medium') {
+    console.log('=== UPDATE TASK DEBUG ===');
+    console.log('Task ID:', taskId);
+    console.log('Project ID:', projectId);
+    console.log('Current Status:', currentStatus);
+    console.log('Current Priority:', currentPriority);
+    openQuickUpdateModal(taskId, projectId, currentStatus, currentPriority);
+}
+
+async function deleteTask(taskId, projectId) {
+    if (!confirm('Are you sure you want to delete this task?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/projects/${projectId}/tasks/${taskId}`, {
+            method: 'DELETE',
+            credentials: 'include'
         });
 
-        function clearFilters() {
-            window.location.href = window.location.pathname;
+        const result = await response.json();
+
+        if (result.success) {
+            showAlert('success', 'Task deleted successfully');
+            setTimeout(() => { window.location.reload(); }, 1000);
+        } else {
+            showAlert('error', result.message || 'Failed to delete task');
         }
-
-        // Initialize filters from URL
-        document.addEventListener('DOMContentLoaded', function () {
-            const urlParams = new URLSearchParams(window.location.search);
-
-            ['status', 'priority', 'assignedTo'].forEach(param => {
-                const value = urlParams.get(param);
-                if (value) {
-                    const select = document.querySelector(`[name="${param}"]`);
-                    if (select) select.value = value;
-                }
-            });
-        });
-
-        // Task functions
-        function quickUpdateTask(taskId, projectId, currentStatus = 'todo', currentPriority = 'medium') {
-            console.log('=== UPDATE TASK DEBUG ===');
-            console.log('Task ID:', taskId);
-            console.log('Project ID:', projectId);
-            console.log('Current Status:', currentStatus);
-            console.log('Current Priority:', currentPriority);
-            openQuickUpdateModal(taskId, projectId, currentStatus, currentPriority);
-        }
-
-        async function deleteTask(taskId, projectId) {
-            if (!confirm('Are you sure you want to delete this task?')) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/projects/${projectId}/tasks/${taskId}`, {
-                    method: 'DELETE',
-                    credentials: 'include'
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    showAlert('success', 'Task deleted successfully');
-                    setTimeout(()=>{window.location.reload();}, 1000);
-                } else {
-                    showAlert('error', result.message || 'Failed to delete task');
-                }
-            } catch (error) {
-                console.error('Delete task error:', error);
-                showAlert('error','Network error: ' + error.message);
-            }
-        }
-    </script>
+    } catch (error) {
+        console.error('Delete task error:', error);
+        showAlert('error', 'Network error: ' + error.message);
+    }
+}
+</script>

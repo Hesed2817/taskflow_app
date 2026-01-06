@@ -1,0 +1,217 @@
+<%- include('../layouts/main.ejs') -%>
+
+<div class="search-container">
+    <!-- Search Header -->
+    <div class="search-header">
+        <a href="/dashboard" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        
+        <h1 class="search-title">Search</h1>
+        
+        <!-- Search Form -->
+        <form action="/search" method="GET" class="search-form">
+            <div class="search-input-group">
+                <input 
+                    type="text" 
+                    name="q" 
+                    value="<%= searchQuery %>"
+                    placeholder="Search projects and tasks..."
+                    class="search-input"
+                    autofocus
+                >
+                <button type="submit" class="search-button">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </form>
+
+        <!-- Search Tips -->
+        <% if (!searchQuery) { %>
+            <div class="search-tips">
+                <i class="fas fa-search search-tips-icon"></i>
+                <h3 class="search-tips-title">What are you looking for?</h3>
+                <p class="search-tips-text">Search for projects by name or description, or tasks by title.</p>
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Search Results -->
+    <% if (searchQuery) { %>
+        <div>
+            <!-- Results Summary -->
+            <div class="results-summary">
+                <h2 class="results-title">
+                    <% if (hasResults) { %>
+                        Results for "<%= searchQuery %>"
+                    <% } else { %>
+                        No results found for "<%= searchQuery %>"
+                    <% } %>
+                </h2>
+                <p class="results-count">
+                    Found <%= projects.length %> project(s) and <%= tasks.length %> task(s)
+                </p>
+            </div>
+
+            <!-- Projects Results -->
+            <% if (projects.length > 0) { %>
+                <div class="results-section">
+                    <h3 class="section-title">Projects</h3>
+                    <div class="results-grid">
+                        <% projects.forEach(project => { %>
+                            <a 
+                                href="/projects/<%= project._id %>" 
+                                class="result-item"
+                            >
+                                <div class="result-item-header">
+                                    <h4 class="result-item-title"><%= project.name %></h4>
+                                    <span class="result-item-badge result-item-project-badge">
+                                        Project
+                                    </span>
+                                </div>
+                                
+                                <% if (project.description) { %>
+                                    <p class="result-item-description">
+                                        <%= project.description %>
+                                    </p>
+                                <% } %>
+                                
+                                <div class="result-item-meta">
+                                    <span class="result-item-user">
+                                        <i class="fas fa-user"></i> <%= project.createdBy.username %>
+                                    </span>
+                                    <span class="result-item-date">
+                                        <i class="fas fa-calendar"></i> Created <%= new Date(project.createdAt).toLocaleDateString() %>
+                                    </span>
+                                </div>
+                            </a>
+                        <% }) %>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Tasks Results -->
+            <% if (tasks.length > 0) { %>
+                <div class="results-section">
+                    <h3 class="section-title">Tasks</h3>
+                    <div class="results-grid">
+                        <% tasks.forEach(task => { %>
+                            <a 
+                                href="/tasks/<%= task._id %>" 
+                                class="result-item task-result-item"
+                            >
+                                <div class="result-item-header">
+                                    <h4 class="result-item-title"><%= task.title %></h4>
+                                    <span class="result-item-badge status-badge-<%= task.status %>">
+                                        <%= task.status %>
+                                    </span>
+                                </div>
+                                
+                                <div class="task-project-tag">
+                                    <i class="fas fa-project-diagram"></i> <%= task.project.name %>
+                                </div>
+                                
+                                <% if (task.description) { %>
+                                    <p class="task-description-preview">
+                                        <%= task.description.substring(0, 150) %>
+                                        <%= task.description.length > 150 ? '...' : '' %>
+                                    </p>
+                                <% } %>
+                                
+                                <div class="result-item-meta">
+                                    <span class="result-item-user">
+                                        <% if (task.assignedTo) { %>
+                                            <i class="fas fa-user"></i> <%= task.assignedTo.username %>
+                                        <% } else { %>
+                                            <i class="fas fa-user-slash"></i> Unassigned
+                                        <% } %>
+                                    </span>
+                                    <span class="result-item-date">
+                                        <i class="fas fa-calendar"></i> Created <%= new Date(task.createdAt).toLocaleDateString() %>
+                                    </span>
+                                </div>
+                            </a>
+                        <% }) %>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- No Results Message -->
+            <% if (!hasResults) { %>
+                <div class="no-results">
+                    <i class="fas fa-search no-results-icon"></i>
+                    <h3 class="no-results-title">No matches found</h3>
+                    <p class="no-results-text">Try different keywords or check your spelling</p>
+                    <div class="no-results-actions">
+                        <a href="/projects" class="btn btn-primary">
+                            <i class="fas fa-project-diagram"></i> Browse Projects
+                        </a>
+                        <a href="/tasks" class="btn btn-success">
+                            <i class="fas fa-tasks"></i> Browse Tasks
+                        </a>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+<!-- Loading Indicator (Optional - for AJAX search) -->
+<div class="search-loading" id="searchLoading">
+    <div class="search-loading-spinner"></div>
+    <p class="search-loading-text">Searching...</p>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('.search-input');
+    const searchForm = document.querySelector('.search-form');
+    const searchLoading = document.getElementById('searchLoading');
+    
+    // Focus search input and select text on page load if there's a query
+    if (searchInput && searchInput.value) {
+        searchInput.select();
+    }
+    
+    // Clear search with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && searchInput && searchInput.value) {
+            searchInput.value = '';
+            searchInput.focus();
+        }
+    });    
+    
+    // Optional: Search with Enter key (already handled by form)
+    searchInput?.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            // Prevent default if you're doing AJAX search
+            // e.preventDefault();
+            // searchForm.submit();
+        }
+    });
+    
+    // Optional: Highlight search terms in results
+    function highlightSearchTerms() {
+        const query = '<%= searchQuery %>';
+        if (!query) return;
+        
+        const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 2);
+        if (searchTerms.length === 0) return;
+        
+        // Highlight in titles and descriptions
+        document.querySelectorAll('.result-item-title, .result-item-description, .task-description-preview').forEach(element => {
+            let html = element.innerHTML;
+            searchTerms.forEach(term => {
+                const regex = new RegExp(`(${term})`, 'gi');
+                html = html.replace(regex, '<span class="search-highlight">$1</span>');
+            });
+            element.innerHTML = html;
+        });
+    }
+    
+    // Run highlighting if there are search terms
+    if (searchInput?.value) {
+        highlightSearchTerms();
+    }
+});
+</script>

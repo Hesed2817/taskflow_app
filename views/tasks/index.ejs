@@ -1,29 +1,68 @@
 <%- include('../layouts/main.ejs') -%>
 
-<div>
-    <!-- Header with Actions -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <div>
+<div class="tasks-list-container">
+    <!-- Hero Header -->
+    <div class="tasks-list-hero">
+        <div class="tasks-list-hero-content">
             <h1>All Tasks</h1>
-            <p style="color: #666;">View and manage tasks across all your projects</p>
+            <p>Track and manage tasks across all your projects in one centralized view.</p>
         </div>
-        <div style="display: flex; gap: 1rem;">
-            <button onclick="showFilters()" style="background: #f3f4f6; color: #333; border: 1px solid #d1d5db; padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer;">
+    </div>
+
+    <!-- Action Bar -->
+    <div class="tasks-action-bar">
+        <div class="tasks-stats">
+            <div class="task-stat">
+                <div class="task-stat-value task-stat-total"><%= tasks.length %></div>
+                <div class="task-stat-label">Total Tasks</div>
+            </div>
+            <div class="task-stat">
+                <div class="task-stat-value task-stat-todo">
+                    <%= tasks.filter(t => t.status === 'todo').length %>
+                </div>
+                <div class="task-stat-label">To Do</div>
+            </div>
+            <div class="task-stat">
+                <div class="task-stat-value task-stat-progress">
+                    <%= tasks.filter(t => t.status === 'in-progress').length %>
+                </div>
+                <div class="task-stat-label">In Progress</div>
+            </div>
+            <div class="task-stat">
+                <div class="task-stat-value task-stat-done">
+                    <%= tasks.filter(t => t.status === 'done').length %>
+                </div>
+                <div class="task-stat-label">Completed</div>
+            </div>
+        </div>
+
+        <div class="tasks-actions">
+            <button onclick="showFilters()" class="btn btn-secondary">
                 <i class="fas fa-filter"></i> Filter
             </button>
-            <a href="/projects" style="background: #4f46e5; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none;">
+            <a href="/projects" class="btn btn-primary">
                 <i class="fas fa-plus"></i> New Task
             </a>
         </div>
     </div>
 
-    <!-- Filters Panel (Initially Hidden) -->
-    <div id="filtersPanel" style="display: none; background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-        <h3 style="margin: 0 0 1rem 0;">Filter Tasks</h3>
-        <form id="filterForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-            <div>
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Status</label>
-                <select name="status" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+    <!-- Enhanced Filters Panel -->
+    <div class="tasks-filters-enhanced" id="filtersPanel" style="display: none;">
+        <div class="filter-header">
+            <h2 class="filter-title">
+                <i class="fas fa-sliders-h"></i> Filter Tasks
+            </h2>
+            <button class="filter-toggle-btn" onclick="hideFilters()">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+
+        <form id="filterForm" class="filter-panel-enhanced">
+            <div class="filter-group-enhanced">
+                <label class="filter-label-enhanced">
+                    <i class="fas fa-list"></i> Status
+                </label>
+                <select name="status" class="filter-select-enhanced">
                     <option value="">All Status</option>
                     <option value="todo">To Do</option>
                     <option value="in-progress">In Progress</option>
@@ -31,9 +70,11 @@
                 </select>
             </div>
             
-            <div>
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Priority</label>
-                <select name="priority" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+            <div class="filter-group-enhanced">
+                <label class="filter-label-enhanced">
+                    <i class="fas fa-flag"></i> Priority
+                </label>
+                <select name="priority" class="filter-select-enhanced">
                     <option value="">All Priorities</option>
                     <option value="high">High</option>
                     <option value="medium">Medium</option>
@@ -41,9 +82,11 @@
                 </select>
             </div>
             
-            <div>
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Project</label>
-                <select name="project" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+            <div class="filter-group-enhanced">
+                <label class="filter-label-enhanced">
+                    <i class="fas fa-project-diagram"></i> Project
+                </label>
+                <select name="project" class="filter-select-enhanced">
                     <option value="">All Projects</option>
                     <% projects.forEach(project => { %>
                         <option value="<%= project._id %>"><%= project.name %></option>
@@ -51,154 +94,191 @@
                 </select>
             </div>
             
-            <div>
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Assigned To</label>
-                <select name="assignedTo" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px;">
+            <div class="filter-group-enhanced">
+                <label class="filter-label-enhanced">
+                    <i class="fas fa-user"></i> Assigned To
+                </label>
+                <select name="assignedTo" class="filter-select-enhanced">
                     <option value="">Everyone</option>
                     <option value="me">Assigned to Me</option>
                     <option value="unassigned">Unassigned</option>
                 </select>
             </div>
             
-            <div style="grid-column: 1 / -1; display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                <button type="submit" style="background: #4f46e5; color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 4px; cursor: pointer;">
-                    Apply Filters
+            <div class="filter-actions-enhanced">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Apply Filters
                 </button>
-                <button type="button" onclick="clearFilters()" style="background: #f3f4f6; color: #333; border: 1px solid #d1d5db; padding: 0.5rem 1.5rem; border-radius: 4px; cursor: pointer;">
-                    Clear All
-                </button>
-                <button type="button" onclick="hideFilters()" style="background: #9ca3af; color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 4px; cursor: pointer;">
-                    Close
+                <button type="button" class="btn btn-secondary" onclick="clearFilters()">
+                    <i class="fas fa-times"></i> Clear All
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- Tasks Summary -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 4px solid #3b82f6;">
-            <h3 style="color: #3b82f6; margin-bottom: 0.5rem;">Total Tasks</h3>
-            <p style="font-size: 2rem; font-weight: bold;"><%= tasks.length %></p>
+    <!-- Enhanced Table Container -->
+    <div class="tasks-table-container-enhanced">
+        <div class="table-header">
+            <h2>
+                <i class="fas fa-tasks"></i> Task List                
+            </h2>
         </div>
-        
-        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 4px solid #10b981;">
-            <h3 style="color: #10b981; margin-bottom: 0.5rem;">To Do</h3>
-            <p style="font-size: 2rem; font-weight: bold;"><%= tasks.filter(t => t.status === 'todo').length %></p>
-        </div>
-        
-        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 4px solid #f59e0b;">
-            <h3 style="color: #f59e0b; margin-bottom: 0.5rem;">In Progress</h3>
-            <p style="font-size: 2rem; font-weight: bold;"><%= tasks.filter(t => t.status === 'in-progress').length %></p>
-        </div>
-        
-        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 4px solid #8b5cf6;">
-            <h3 style="color: #8b5cf6; margin-bottom: 0.5rem;">Completed</h3>
-            <p style="font-size: 2rem; font-weight: bold;"><%= tasks.filter(t => t.status === 'done').length %></p>
-        </div>
-    </div>
 
-    <!-- Tasks Table -->
-    <div style="background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden;">
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead style="background: #f9fafb;">
-                    <tr>
-                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Task</th>
-                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Project</th>
-                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Status</th>
-                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Priority</th>
-                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Assigned To</th>
-                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Due Date</th>
-                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (tasks.length > 0) { %>
-                        <% tasks.forEach(task => { %>
-                            <tr style="border-bottom: 1px solid #e5e7eb;">
-                                <td style="padding: 1rem;">
-                                    <div>
-                                        <strong style="display: block;"><%= task.title %></strong>
-                                        <% if (task.description) { %>
-                                            <small style="color: #666;"><%= task.description.substring(0, 50) %><%= task.description.length > 50 ? '...' : '' %></small>
-                                        <% } %>
-                                    </div>
+        <% if (tasks.length > 0) { %>
+            <div style="overflow-x: auto;">
+                <table class="tasks-table-enhanced">                    
+                    <tr class="thead">
+                        <th>Task</th>
+                        <th>Project</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Assigned To</th>
+                        <th>Due Date</th>
+                        <!-- <th>Actions</th> -->
+                    </tr>                    
+                    <tbody>
+                        <% tasks.forEach(task => { 
+                            // Calculate due date status
+                            let dueDateClass = 'due-date-none';
+                            let dueDateText = 'No due date';
+                            
+                            if (task.dueDate) {
+                                const dueInDays = Math.ceil((new Date(task.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+                                
+                                if (dueInDays < 0) {
+                                    dueDateClass = 'due-date-overdue';
+                                    dueDateText = `Overdue by ${Math.abs(dueInDays)} days`;
+                                } else if (dueInDays === 0) {
+                                    dueDateClass = 'due-date-today';
+                                    dueDateText = 'Today';
+                                } else if (dueInDays <= 3) {
+                                    dueDateClass = 'due-date-today';
+                                    dueDateText = `In ${dueInDays} days`;
+                                } else {
+                                    dueDateClass = 'due-date-upcoming';
+                                    dueDateText = new Date(task.dueDate).toLocaleDateString();
+                                }
+                            }
+                            
+                            // Determine if user can edit/delete
+                            const canEdit = task.createdBy._id.toString() === user.id || 
+                                          task.project.createdBy._id.toString() === user.id;
+                        %>
+                            <tr onclick="window.location.href='/tasks/<%= task._id %>'" 
+                                style="cursor: pointer;"
+                                onmouseover="this.style.backgroundColor='var(--color-bg-secondary)'"
+                                onmouseout="this.style.backgroundColor=''">
+                                <td>
+                                    <span class="task-cell-title"><%= task.title %></span>
+                                    <% if (task.description) { %>
+                                        <span style="color: var(--color-text-secondary); font-size: 0.875rem; display: block; margin-top: var(--space-xs);">
+                                            <%= task.description.substring(0, 60) %>
+                                            <%= task.description.length > 60 ? '...' : '' %>
+                                        </span>
+                                    <% } %>
                                 </td>
-                                <td style="padding: 1rem;">
-                                    <a href="/projects/<%= task.project._id %>" style="color: #4f46e5; text-decoration: none;">
-                                        <%= task.project.name %>
+                                <td>
+                                    <a href="/projects/<%= task.project._id %>" class="task-cell-project" onclick="event.stopPropagation()">
+                                        <i class="fas fa-project-diagram"></i> <%= task.project.name %>
                                     </a>
                                 </td>
-                                <td style="padding: 1rem;">
-                                    <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem; 
-                                          <% if (task.status === 'todo') { %>background: #dbeafe; color: #1e40af;<% } %>
-                                          <% if (task.status === 'in-progress') { %>background: #fef3c7; color: #92400e;<% } %>
-                                          <% if (task.status === 'done') { %>background: #d1fae5; color: #065f46;<% } %>">
-                                        <%= task.status %>
+                                <td>
+                                    <span class="task-status-badge status-<%= task.status %>">
+                                        <% if (task.status === 'todo') { %>
+                                            <i class="fas fa-circle"></i> To Do
+                                        <% } else if (task.status === 'in-progress') { %>
+                                            <i class="fas fa-spinner fa-spin"></i> In Progress
+                                        <% } else { %>
+                                            <i class="fas fa-check-circle"></i> Done
+                                        <% } %>
                                     </span>
                                 </td>
-                                <td style="padding: 1rem;">
-                                    <% if (task.priority === 'high') { %>
-                                        <span style="color: #dc2626;"><i class="fas fa-arrow-up"></i> High</span>
-                                    <% } else if (task.priority === 'medium') { %>
-                                        <span style="color: #f59e0b;">Medium</span>
-                                    <% } else { %>
-                                        <span style="color: #10b981;">Low</span>
-                                    <% } %>
+                                <td>
+                                    <span class="priority-indicator priority-<%= task.priority %>">
+                                        <% if (task.priority === 'high') { %>
+                                            <i class="fas fa-arrow-up"></i> High
+                                        <% } else if (task.priority === 'medium') { %>
+                                            <i class="fas fa-equals"></i> Medium
+                                        <% } else { %>
+                                            <i class="fas fa-arrow-down"></i> Low
+                                        <% } %>
+                                    </span>
                                 </td>
-                                <td style="padding: 1rem;">
-                                    <% if (task.assignedTo) { %>
-                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <div style="width: 24px; height: 24px; background: #10b981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">
+                                <td>
+                                    <div class="user-cell">
+                                        <% if (task.assignedTo) { %>
+                                            <div class="user-avatar-table user-avatar-table-success">
                                                 <%= task.assignedTo.username.charAt(0).toUpperCase() %>
                                             </div>
-                                            <%= task.assignedTo.username %>
-                                        </div>
-                                    <% } else { %>
-                                        <span style="color: #9ca3af;">Unassigned</span>
-                                    <% } %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <% if (task.dueDate) { %>
-                                        <%= new Date(task.dueDate).toLocaleDateString() %>
-                                    <% } else { %>
-                                        <span style="color: #9ca3af;">No due date</span>
-                                    <% } %>
-                                </td>
-                                <td style="padding: 1rem;">
-                                    <div style="display: flex; gap: 0.5rem;">
-                                        <a href="/tasks/<%= task._id %>" style="color: #4f46e5; text-decoration: none;" title="View">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="/projects/<%= task.project._id %>" style="color: #10b981; text-decoration: none;" title="Go to Project">
-                                            <i class="fas fa-project-diagram"></i>
-                                        </a>
-                                        <% if (task.createdBy._id.toString() === user.id || task.project.createdBy._id.toString() === user.id) { %>
-                                            <button onclick="quickUpdateTask('<%= task._id %>', '<%= task.project._id %>', '<%= task.status %>', '<%= task.priority %>')" style="background: none; border: none; color: #f59e0b; cursor: pointer;" title="Update Status">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
+                                            <span class="user-name-table"><%= task.assignedTo.username %></span>
+                                        <% } else { %>
+                                            <div class="user-avatar-table user-avatar-table-primary" style="background: var(--color-bg-secondary); color: var(--color-text-muted);">
+                                                <i class="fas fa-user-slash"></i>
+                                            </div>
+                                            <span class="user-name-table" style="color: var(--color-text-muted);">Unassigned</span>
                                         <% } %>
                                     </div>
                                 </td>
+                                <td>
+                                    <div class="due-date-cell">
+                                        <span class="due-date-text <%= dueDateClass %>">
+                                            <%= dueDateText %>
+                                        </span>
+                                    </div>
+                                </td>
+                                <!-- <td>
+                                    <div class="actions-cell">
+                                        <div class="table-actions" onclick="event.stopPropagation()">
+                                            <a href="/tasks/<%= task._id %>" 
+                                               class="table-action-btn table-action-btn-view"
+                                               title="View task">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="/projects/<%= task.project._id %>" 
+                                               class="table-action-btn"
+                                               title="Go to project">
+                                                <i class="fas fa-project-diagram"></i>
+                                            </a>
+                                            <% if (canEdit) { %>
+                                                <button onclick="quickUpdateTask('<%= task._id %>', '<%= task.project._id %>', '<%= task.status %>', '<%= task.priority %>')" 
+                                                        class="table-action-btn table-action-btn-edit"
+                                                        title="Update status">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </td> -->
                             </tr>
                         <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        <% } else { %>
+            <div class="tasks-empty-state-enhanced">
+                <div class="tasks-empty-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h2 class="tasks-empty-title">No tasks found</h2>
+                <p class="tasks-empty-text">
+                    <% if (Object.keys(filters).length > 0) { %>
+                        No tasks match your current filters. Try adjusting your filters or clear them to see all tasks.
                     <% } else { %>
-                        <tr>
-                            <td colspan="7" style="padding: 3rem; text-align: center; color: #9ca3af;">
-                                <div style="font-size: 3rem; margin-bottom: 1rem;">
-                                    <i class="fas fa-tasks"></i>
-                                </div>
-                                <h3>No tasks found</h3>
-                                <p>Create tasks in your projects to see them here</p>
-                                <a href="/projects" style="display: inline-block; margin-top: 1rem; background: #4f46e5; color: white; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none;">
-                                    Go to Projects
-                                </a>
-                            </td>
-                        </tr>
+                        Create tasks in your projects to see them here. Get started by creating a new project or adding tasks to existing projects.
                     <% } %>
-                </tbody>
-            </table>
-        </div>
+                </p>
+                <div style="display: flex; gap: var(--space-sm); justify-content: center; margin-top: var(--space-lg);">
+                    <% if (Object.keys(filters).length > 0) { %>
+                        <button onclick="clearFilters()" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </button>
+                    <% } %>
+                    <a href="/projects" class="btn btn-primary">
+                        <i class="fas fa-project-diagram"></i> Browse Projects
+                    </a>
+                </div>
+            </div>
+        <% } %>
     </div>
 </div>
 
@@ -213,9 +293,7 @@ function hideFilters() {
 }
 
 function clearFilters() {
-    document.getElementById('filterForm').reset();
-    // Apply cleared filters by submitting
-    document.getElementById('filterForm').submit();
+    window.location.href = '/tasks';
 }
 
 // Handle Filter Form Submission
@@ -237,6 +315,7 @@ document.getElementById('filterForm').addEventListener('submit', function(e) {
 
 // Quick Status Update
 function quickUpdateTask(taskId, projectId, currentStatus = 'todo', currentPriority = 'medium') {
+    event.stopPropagation();
     openQuickUpdateModal(taskId, projectId, currentStatus, currentPriority);
 }
 
@@ -259,5 +338,44 @@ document.addEventListener('DOMContentLoaded', function() {
     if (status || priority || project || assignedTo) {
         showFilters();
     }
+    
+    // Add row click handlers for better UX
+    const tableRows = document.querySelectorAll('.tasks-table-enhanced tbody tr');
+    tableRows.forEach(row => {
+        // Remove inline handlers and add proper ones
+        row.onmouseover = function() {
+            this.style.backgroundColor = 'var(--color-bg-secondary)';
+        };
+        
+        row.onmouseout = function() {
+            this.style.backgroundColor = '';
+        };
+        
+        // Make sure only clicks on the row itself navigate, not on buttons
+        row.addEventListener('click', function(e) {
+            // Only navigate if the click wasn't on a button or link
+            if (!e.target.closest('button') && !e.target.closest('a')) {
+                const taskId = this.getAttribute('data-task-id') || 
+                              this.querySelector('a[href^="/tasks/"]')?.href?.split('/tasks/')[1]?.split('/')[0];
+                if (taskId) {
+                    window.location.href = `/tasks/${taskId}`;
+                }
+            }
+        });
+    });
+    
+    // Add animation to table rows
+    setTimeout(() => {
+        tableRows.forEach((row, index) => {
+            row.style.animationDelay = `${index * 0.05}s`;
+        });
+    }, 100);
 });
+
+// Pagination function (if you implement pagination)
+function goToPage(page) {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('page', page);
+    window.location.href = '/tasks?' + urlParams.toString();
+}
 </script>
