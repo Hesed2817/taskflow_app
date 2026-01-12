@@ -164,14 +164,19 @@ const userSearchValidator = [
     query('username')
         .optional()
         .trim()
-        .isLength({ min: 3 }).withMessage('Username must be atleast 2 characters'),
+        .isLength({ min: 2 }).withMessage('Username must be atleast 2 characters'),
 
-    function (request, response, next) {
+    query('search')
+        .optional()
+        .trim()
+        .isLength({ min: 2 }).withMessage('Search term must be atleast 2 characters'),
 
-        if (!request.query.email && !request.query.username) {
+    function (request, response) {
+
+        if (!request.query.email && !request.query.username && !request.query.search) {
             return response.status(400).json({
                 success: false,
-                message: 'Please provide either email or username to search'
+                message: 'Please provide email, username, or search term'
             });
         }
         next();

@@ -14,6 +14,16 @@ mongoose.connect(dbURI)
         require('./models/User');
         require('./models/Project');
 
+        mongoose.connection.db.admin().command({
+            connectionStatus: 1
+        })
+            .then((result) => {
+                console.log('Connected to MongoDB');
+            })
+            .catch((error) => {
+                console.error('Failed to connect to MongoDB: ', error);
+            });
+
         app.listen(PORT, () => {
             console.log(`Listening on http://localhost:${PORT}`);
         });

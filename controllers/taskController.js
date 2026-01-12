@@ -1,7 +1,7 @@
 const Task = require('../models/Task');
 const Project = require('../models/Project');
 
-const getProjectTasks = async function (request, response, next) {
+const getProjectTasks = async function (request, response) {
     try {
         const project = await Project.findById(request.params.projectId);
 
@@ -28,10 +28,13 @@ const getProjectTasks = async function (request, response, next) {
 
     } catch (error) {
         console.error('Failed to get tasks:', error);
-        next();
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 }
-const createTask = async function (request, response, next) {
+const createTask = async function (request, response) {
     try {
         const { title, description, assignedTo, dueDate, status, priority } = request.body;
         const project = await Project.findById(request.params.projectId);
@@ -77,10 +80,13 @@ const createTask = async function (request, response, next) {
 
     } catch (error) {
         console.error('Failed to create task:', error);
-        next();
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
-} 
-const getTask = async function (request, response, next) {
+}
+const getTask = async function (request, response) {
     try {
         const task = await Task.findById(request.params.taskId)
             .populate('project', 'name')
@@ -104,11 +110,14 @@ const getTask = async function (request, response, next) {
 
     } catch (error) {
         console.error('Failed to get task.', error);
-        next();
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 }
 
-const updateTask = async function (request, response, next) {
+const updateTask = async function (request, response) {
     try {
         console.log('Update Task - Params:', request.params);
         console.log('Update Task - Body:', request.body);
@@ -116,7 +125,7 @@ const updateTask = async function (request, response, next) {
 
         // First find the task
         let task = await Task.findById(request.params.taskId);
-        
+
         if (!task) {
             return response.status(404).json({
                 success: false,
@@ -126,7 +135,7 @@ const updateTask = async function (request, response, next) {
 
         // Find the project
         const project = await Project.findById(task.project);
-        
+
         if (!project) {
             return response.status(404).json({
                 success: false,
@@ -138,7 +147,7 @@ const updateTask = async function (request, response, next) {
         const isProjectOwner = project.createdBy.equals(request.user.id);
         const isTaskCreator = task.createdBy.equals(request.user.id);
         const isAssignedUser = task.assignedTo && task.assignedTo.equals(request.user.id);
-        
+
         if (!isProjectOwner && !isTaskCreator && !isAssignedUser) {
             return response.status(403).json({
                 success: false,
@@ -148,8 +157,8 @@ const updateTask = async function (request, response, next) {
 
         // If assigning to someone, verify they're a project member
         if (request.body.assignedTo && request.body.assignedTo !== '') {
-            const isMember = project.members.some(memberId => 
-                memberId.equals(request.body.assignedTo) || 
+            const isMember = project.members.some(memberId =>
+                memberId.equals(request.body.assignedTo) ||
                 project.createdBy.equals(request.body.assignedTo)
             );
 
@@ -163,12 +172,12 @@ const updateTask = async function (request, response, next) {
 
         // Prepare update data
         const updateData = { ...request.body };
-        
+
         // Convert empty string to null for assignedTo
         if (updateData.assignedTo === '') {
             updateData.assignedTo = null;
         }
-        
+
         // Format dueDate if provided
         if (updateData.dueDate) {
             updateData.dueDate = new Date(updateData.dueDate);
@@ -185,9 +194,9 @@ const updateTask = async function (request, response, next) {
                 runValidators: true
             }
         )
-        .populate('project', 'name')
-        .populate('assignedTo', 'username email')
-        .populate('createdBy', 'username email');
+            .populate('project', 'name')
+            .populate('assignedTo', 'username email')
+            .populate('createdBy', 'username email');
 
         response.json({
             success: true,
@@ -198,7 +207,7 @@ const updateTask = async function (request, response, next) {
         console.error('Update task error details:', error);
         console.error('Error name:', error.name);
         console.error('Error message:', error.message);
-        
+
         if (error.name === 'ValidationError') {
             const messages = Object.values(error.errors).map(err => err.message);
             return response.status(400).json({
@@ -206,14 +215,14 @@ const updateTask = async function (request, response, next) {
                 message: 'Validation error: ' + messages.join(', ')
             });
         }
-        
+
         if (error.name === 'CastError') {
             return response.status(400).json({
                 success: false,
                 message: 'Invalid data format'
             });
         }
-        
+
         response.status(500).json({
             success: false,
             message: 'Server error: ' + error.message
@@ -221,7 +230,7 @@ const updateTask = async function (request, response, next) {
     }
 }
 
-const filterTasks = async function (request, response, next) {
+const filterTasks = async function (request, response) {
     try {
         const { title, status, priority, project, assignedTo, search } = request.query;
 
@@ -284,10 +293,13 @@ const filterTasks = async function (request, response, next) {
 
     } catch (error) {
         console.error(error);
-        next();
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 }
-const deleteTask = async function (request, response, next) {
+const deleteTask = async function (request, response) {
     try {
         const task = await Task.findById(request.params.taskId);
         const project = await Project.findById(task.project);
@@ -311,7 +323,10 @@ const deleteTask = async function (request, response, next) {
 
     } catch (error) {
         console.error('Failed to create task:', error.message);
-        next();
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 }
 

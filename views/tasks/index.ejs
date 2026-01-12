@@ -1,232 +1,234 @@
 <%- include('../layouts/main.ejs') -%>
 
-<div class="tasks-list-container">
-    <!-- Hero Header -->
-    <div class="tasks-list-hero">
-        <div class="tasks-list-hero-content">
-            <h1>All Tasks</h1>
-            <p>Track and manage tasks across all your projects in one centralized view.</p>
-        </div>
-    </div>
-
-    <!-- Action Bar -->
-    <div class="tasks-action-bar">
-        <div class="tasks-stats">
-            <div class="task-stat">
-                <div class="task-stat-value task-stat-total"><%= tasks.length %></div>
-                <div class="task-stat-label">Total Tasks</div>
+    <div class="tasks-list-container">
+        <!-- Hero Header -->
+        <div class="tasks-list-hero">
+            <div class="tasks-list-hero-content">
+                <h1>All Tasks</h1>
+                <p>Track and manage tasks across all your projects in one centralized view.</p>
             </div>
-            <div class="task-stat">
-                <div class="task-stat-value task-stat-todo">
-                    <%= tasks.filter(t => t.status === 'todo').length %>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="tasks-action-bar">
+            <div class="tasks-stats">
+                <div class="task-stat">
+                    <div class="task-stat-value task-stat-total">
+                        <%= tasks.length %>
+                    </div>
+                    <div class="task-stat-label">Total Tasks</div>
                 </div>
-                <div class="task-stat-label">To Do</div>
-            </div>
-            <div class="task-stat">
-                <div class="task-stat-value task-stat-progress">
-                    <%= tasks.filter(t => t.status === 'in-progress').length %>
+                <div class="task-stat">
+                    <div class="task-stat-value task-stat-todo">
+                        <%= tasks.filter(t=> t.status === 'todo').length %>
+                    </div>
+                    <div class="task-stat-label">To Do</div>
                 </div>
-                <div class="task-stat-label">In Progress</div>
-            </div>
-            <div class="task-stat">
-                <div class="task-stat-value task-stat-done">
-                    <%= tasks.filter(t => t.status === 'done').length %>
+                <div class="task-stat">
+                    <div class="task-stat-value task-stat-progress">
+                        <%= tasks.filter(t=> t.status === 'in-progress').length %>
+                    </div>
+                    <div class="task-stat-label">In Progress</div>
                 </div>
-                <div class="task-stat-label">Completed</div>
+                <div class="task-stat">
+                    <div class="task-stat-value task-stat-done">
+                        <%= tasks.filter(t=> t.status === 'done').length %>
+                    </div>
+                    <div class="task-stat-label">Completed</div>
+                </div>
             </div>
-        </div>
 
-        <div class="tasks-actions">
-            <button onclick="showFilters()" class="btn btn-secondary">
-                <i class="fas fa-filter"></i> Filter
-            </button>
-            <a href="/projects" class="btn btn-primary">
-                <i class="fas fa-plus"></i> New Task
-            </a>
-        </div>
-    </div>
-
-    <!-- Enhanced Filters Panel -->
-    <div class="tasks-filters-enhanced" id="filtersPanel" style="display: none;">
-        <div class="filter-header">
-            <h2 class="filter-title">
-                <i class="fas fa-sliders-h"></i> Filter Tasks
-            </h2>
-            <button class="filter-toggle-btn" onclick="hideFilters()">
-                <i class="fas fa-times"></i> Close
-            </button>
-        </div>
-
-        <form id="filterForm" class="filter-panel-enhanced">
-            <div class="filter-group-enhanced">
-                <label class="filter-label-enhanced">
-                    <i class="fas fa-list"></i> Status
-                </label>
-                <select name="status" class="filter-select-enhanced">
-                    <option value="">All Status</option>
-                    <option value="todo">To Do</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="done">Done</option>
-                </select>
-            </div>
-            
-            <div class="filter-group-enhanced">
-                <label class="filter-label-enhanced">
-                    <i class="fas fa-flag"></i> Priority
-                </label>
-                <select name="priority" class="filter-select-enhanced">
-                    <option value="">All Priorities</option>
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
-                </select>
-            </div>
-            
-            <div class="filter-group-enhanced">
-                <label class="filter-label-enhanced">
-                    <i class="fas fa-project-diagram"></i> Project
-                </label>
-                <select name="project" class="filter-select-enhanced">
-                    <option value="">All Projects</option>
-                    <% projects.forEach(project => { %>
-                        <option value="<%= project._id %>"><%= project.name %></option>
-                    <% }) %>
-                </select>
-            </div>
-            
-            <div class="filter-group-enhanced">
-                <label class="filter-label-enhanced">
-                    <i class="fas fa-user"></i> Assigned To
-                </label>
-                <select name="assignedTo" class="filter-select-enhanced">
-                    <option value="">Everyone</option>
-                    <option value="me">Assigned to Me</option>
-                    <option value="unassigned">Unassigned</option>
-                </select>
-            </div>
-            
-            <div class="filter-actions-enhanced">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-check"></i> Apply Filters
+            <div class="tasks-actions">
+                <button onclick="showFilters()" class="btn btn-secondary">
+                    <i class="fas fa-filter"></i> Filter
                 </button>
-                <button type="button" class="btn btn-secondary" onclick="clearFilters()">
-                    <i class="fas fa-times"></i> Clear All
+                <a href="/projects" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Task
+                </a>
+            </div>
+        </div>
+
+        <!-- Enhanced Filters Panel -->
+        <div class="tasks-filters-enhanced" id="filtersPanel" style="display: none;">
+            <div class="filter-header">
+                <h2 class="filter-title">
+                    <i class="fas fa-sliders-h"></i> Filter Tasks
+                </h2>
+                <button class="filter-toggle-btn" onclick="hideFilters()">
+                    <i class="fas fa-times"></i> Close
                 </button>
             </div>
-        </form>
-    </div>
 
-    <!-- Enhanced Table Container -->
-    <div class="tasks-table-container-enhanced">
-        <div class="table-header">
-            <h2>
-                <i class="fas fa-tasks"></i> Task List                
-            </h2>
+            <form id="filterForm" class="filter-panel-enhanced">
+                <div class="filter-group-enhanced">
+                    <label class="filter-label-enhanced">
+                        <i class="fas fa-list"></i> Status
+                    </label>
+                    <select name="status" class="filter-select-enhanced">
+                        <option value="">All Status</option>
+                        <option value="todo">To Do</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="done">Done</option>
+                    </select>
+                </div>
+
+                <div class="filter-group-enhanced">
+                    <label class="filter-label-enhanced">
+                        <i class="fas fa-flag"></i> Priority
+                    </label>
+                    <select name="priority" class="filter-select-enhanced">
+                        <option value="">All Priorities</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+
+                <div class="filter-group-enhanced">
+                    <label class="filter-label-enhanced">
+                        <i class="fas fa-project-diagram"></i> Project
+                    </label>
+                    <select name="project" class="filter-select-enhanced">
+                        <option value="">All Projects</option>
+                        <% projects.forEach(project=> { %>
+                            <option value="<%= project._id %>">
+                                <%= project.name %>
+                            </option>
+                            <% }) %>
+                    </select>
+                </div>
+
+                <div class="filter-group-enhanced">
+                    <label class="filter-label-enhanced">
+                        <i class="fas fa-user"></i> Assigned To
+                    </label>
+                    <select name="assignedTo" class="filter-select-enhanced">
+                        <option value="">Everyone</option>
+                        <option value="me">Assigned to Me</option>
+                        <option value="unassigned">Unassigned</option>
+                    </select>
+                </div>
+
+                <div class="filter-actions-enhanced">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Apply Filters
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="clearFilters()">
+                        <i class="fas fa-times"></i> Clear All
+                    </button>
+                </div>
+            </form>
         </div>
 
-        <% if (tasks.length > 0) { %>
-            <div style="overflow-x: auto;">
-                <table class="tasks-table-enhanced">                    
-                    <tr class="thead">
-                        <th>Task</th>
-                        <th>Project</th>
-                        <th>Status</th>
-                        <th>Priority</th>
-                        <th>Assigned To</th>
-                        <th>Due Date</th>
-                        <!-- <th>Actions</th> -->
-                    </tr>                    
-                    <tbody>
-                        <% tasks.forEach(task => { 
-                            // Calculate due date status
-                            let dueDateClass = 'due-date-none';
-                            let dueDateText = 'No due date';
-                            
-                            if (task.dueDate) {
-                                const dueInDays = Math.ceil((new Date(task.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
-                                
-                                if (dueInDays < 0) {
-                                    dueDateClass = 'due-date-overdue';
-                                    dueDateText = `Overdue by ${Math.abs(dueInDays)} days`;
-                                } else if (dueInDays === 0) {
-                                    dueDateClass = 'due-date-today';
-                                    dueDateText = 'Today';
-                                } else if (dueInDays <= 3) {
-                                    dueDateClass = 'due-date-today';
-                                    dueDateText = `In ${dueInDays} days`;
-                                } else {
-                                    dueDateClass = 'due-date-upcoming';
-                                    dueDateText = new Date(task.dueDate).toLocaleDateString();
-                                }
-                            }
-                            
-                            // Determine if user can edit/delete
-                            const canEdit = task.createdBy._id.toString() === user.id || 
-                                          task.project.createdBy._id.toString() === user.id;
-                        %>
-                            <tr onclick="window.location.href='/tasks/<%= task._id %>'" 
-                                style="cursor: pointer;"
-                                onmouseover="this.style.backgroundColor='var(--color-bg-secondary)'"
-                                onmouseout="this.style.backgroundColor=''">
-                                <td>
-                                    <span class="task-cell-title"><%= task.title %></span>
-                                    <% if (task.description) { %>
-                                        <span style="color: var(--color-text-secondary); font-size: 0.875rem; display: block; margin-top: var(--space-xs);">
-                                            <%= task.description.substring(0, 60) %>
-                                            <%= task.description.length > 60 ? '...' : '' %>
-                                        </span>
-                                    <% } %>
-                                </td>
-                                <td>
-                                    <a href="/projects/<%= task.project._id %>" class="task-cell-project" onclick="event.stopPropagation()">
-                                        <i class="fas fa-project-diagram"></i> <%= task.project.name %>
-                                    </a>
-                                </td>
-                                <td>
-                                    <span class="task-status-badge status-<%= task.status %>">
-                                        <% if (task.status === 'todo') { %>
-                                            <i class="fas fa-circle"></i> To Do
-                                        <% } else if (task.status === 'in-progress') { %>
-                                            <i class="fas fa-spinner fa-spin"></i> In Progress
-                                        <% } else { %>
-                                            <i class="fas fa-check-circle"></i> Done
-                                        <% } %>
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="priority-indicator priority-<%= task.priority %>">
-                                        <% if (task.priority === 'high') { %>
-                                            <i class="fas fa-arrow-up"></i> High
-                                        <% } else if (task.priority === 'medium') { %>
-                                            <i class="fas fa-equals"></i> Medium
-                                        <% } else { %>
-                                            <i class="fas fa-arrow-down"></i> Low
-                                        <% } %>
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="user-cell">
-                                        <% if (task.assignedTo) { %>
-                                            <div class="user-avatar-table user-avatar-table-success">
-                                                <%= task.assignedTo.username.charAt(0).toUpperCase() %>
+        <!-- Enhanced Table Container -->
+        <div class="tasks-table-container-enhanced">
+            <div class="table-header">
+                <h2>
+                    <i class="fas fa-tasks"></i> Task List
+                </h2>
+            </div>
+
+            <% if (tasks.length> 0) { %>
+                <div style="overflow-x: auto;">
+                    <table class="tasks-table-enhanced">
+                        <tr class="thead">
+                            <th>Task</th>
+                            <th>Project</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Assigned To</th>
+                            <th>Due Date</th>
+                            <!-- <th>Actions</th> -->
+                        </tr>
+                        <tbody>
+                            <% tasks.forEach(task=> {
+                                // Calculate due date status
+                                let dueDateClass = 'due-date-none';
+                                let dueDateText = 'No due date';
+
+                                if (task.dueDate) {
+                                const dueInDays = Math.ceil((new Date(task.dueDate) - new Date()) / (1000 * 60 * 60 *
+                                24));
+
+                                if (dueInDays < 0) { dueDateClass='due-date-overdue' ; dueDateText=`Overdue by
+                                    ${Math.abs(dueInDays)} days`; } else if (dueInDays===0) {
+                                    dueDateClass='due-date-today' ; dueDateText='Today' ; } else if (dueInDays <=3) {
+                                    dueDateClass='due-date-today' ; dueDateText=`In ${dueInDays} days`; } else {
+                                    dueDateClass='due-date-upcoming' ; dueDateText=new
+                                    Date(task.dueDate).toLocaleDateString(); } } // Determine if user can edit/delete
+                                    const canEdit=task.createdBy._id.toString()===user.id ||
+                                    task.project.createdBy._id.toString()===user.id; %>
+                                    <tr onclick="window.location.href='/tasks/<%= task._id %>'" style="cursor: pointer;"
+                                        onmouseover="this.style.backgroundColor='var(--color-bg-secondary)'"
+                                        onmouseout="this.style.backgroundColor=''">
+                                        <td>
+                                            <span class="task-cell-title">
+                                                <%= task.title %>
+                                            </span>
+                                            <% if (task.description) { %>
+                                                <span
+                                                    style="color: var(--color-text-secondary); font-size: 0.875rem; display: block; margin-top: var(--space-xs);">
+                                                    <%= task.description.substring(0, 60) %>
+                                                        <%= task.description.length> 60 ? '...' : '' %>
+                                                </span>
+                                                <% } %>
+                                        </td>
+                                        <td>
+                                            <a href="/projects/<%= task.project._id %>" class="task-cell-project"
+                                                onclick="event.stopPropagation()">
+                                                <i class="fas fa-project-diagram"></i>
+                                                <%= task.project.name %>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="task-status-badge status-<%= task.status %>">
+                                                <% if (task.status==='todo' ) { %>
+                                                    <i class="fas fa-circle"></i> To Do
+                                                    <% } else if (task.status==='in-progress' ) { %>
+                                                        <i class="fas fa-spinner fa-spin"></i> In Progress
+                                                        <% } else { %>
+                                                            <i class="fas fa-check-circle"></i> Done
+                                                            <% } %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="priority-indicator priority-<%= task.priority %>">
+                                                <% if (task.priority==='high' ) { %>
+                                                    <i class="fas fa-arrow-up"></i> High
+                                                    <% } else if (task.priority==='medium' ) { %>
+                                                        <i class="fas fa-equals"></i> Medium
+                                                        <% } else { %>
+                                                            <i class="fas fa-arrow-down"></i> Low
+                                                            <% } %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="user-cell">
+                                                <% if (task.assignedTo) { %>
+                                                    <div class="user-avatar-table user-avatar-table-success">
+                                                        <%= task.assignedTo.username.charAt(0).toUpperCase() %>
+                                                    </div>
+                                                    <span class="user-name-table">
+                                                        <%= task.assignedTo.username %>
+                                                    </span>
+                                                    <% } else { %>
+                                                        <div class="user-avatar-table user-avatar-table-primary"
+                                                            style="background: var(--color-bg-secondary); color: var(--color-text-muted);">
+                                                            <i class="fas fa-user-slash"></i>
+                                                        </div>
+                                                        <span class="user-name-table"
+                                                            style="color: var(--color-text-muted);">Unassigned</span>
+                                                        <% } %>
                                             </div>
-                                            <span class="user-name-table"><%= task.assignedTo.username %></span>
-                                        <% } else { %>
-                                            <div class="user-avatar-table user-avatar-table-primary" style="background: var(--color-bg-secondary); color: var(--color-text-muted);">
-                                                <i class="fas fa-user-slash"></i>
+                                        </td>
+                                        <td>
+                                            <div class="due-date-cell">
+                                                <span class="due-date-text <%= dueDateClass %>">
+                                                    <%= dueDateText %>
+                                                </span>
                                             </div>
-                                            <span class="user-name-table" style="color: var(--color-text-muted);">Unassigned</span>
-                                        <% } %>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="due-date-cell">
-                                        <span class="due-date-text <%= dueDateClass %>">
-                                            <%= dueDateText %>
-                                        </span>
-                                    </div>
-                                </td>
-                                <!-- <td>
+                                        </td>
+                                        <!-- <td>
                                     <div class="actions-cell">
                                         <div class="table-actions" onclick="event.stopPropagation()">
                                             <a href="/tasks/<%= task._id %>" 
@@ -249,133 +251,136 @@
                                         </div>
                                     </div>
                                 </td> -->
-                            </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-            </div>
-        <% } else { %>
-            <div class="tasks-empty-state-enhanced">
-                <div class="tasks-empty-icon">
-                    <i class="fas fa-tasks"></i>
+                                    </tr>
+                                    <% }) %>
+                        </tbody>
+                    </table>
                 </div>
-                <h2 class="tasks-empty-title">No tasks found</h2>
-                <p class="tasks-empty-text">
-                    <% if (Object.keys(filters).length > 0) { %>
-                        No tasks match your current filters. Try adjusting your filters or clear them to see all tasks.
-                    <% } else { %>
-                        Create tasks in your projects to see them here. Get started by creating a new project or adding tasks to existing projects.
+                <% } else { %>
+                    <div class="tasks-empty-state-enhanced">
+                        <div class="tasks-empty-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <h2 class="tasks-empty-title">No tasks found</h2>
+                        <p class="tasks-empty-text">
+                            <% if (Object.keys(filters).length> 0) { %>
+                                No tasks match your current filters. Try adjusting your filters or clear them to see all
+                                tasks.
+                                <% } else { %>
+                                    Create tasks in your projects to see them here. Get started by creating a new
+                                    project or adding tasks to existing projects.
+                                    <% } %>
+                        </p>
+                        <div
+                            style="display: flex; gap: var(--space-sm); justify-content: center; margin-top: var(--space-lg);">
+                            <% if (Object.keys(filters).length> 0) { %>
+                                <button onclick="clearFilters()" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Clear Filters
+                                </button>
+                                <% } %>
+                                    <a href="/projects" class="btn btn-primary">
+                                        <i class="fas fa-project-diagram"></i> Browse Projects
+                                    </a>
+                        </div>
+                    </div>
                     <% } %>
-                </p>
-                <div style="display: flex; gap: var(--space-sm); justify-content: center; margin-top: var(--space-lg);">
-                    <% if (Object.keys(filters).length > 0) { %>
-                        <button onclick="clearFilters()" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Clear Filters
-                        </button>
-                    <% } %>
-                    <a href="/projects" class="btn btn-primary">
-                        <i class="fas fa-project-diagram"></i> Browse Projects
-                    </a>
-                </div>
-            </div>
-        <% } %>
+        </div>
     </div>
-</div>
 
-<script>
-// Filter Functions
-function showFilters() {
-    document.getElementById('filtersPanel').style.display = 'block';
-}
-
-function hideFilters() {
-    document.getElementById('filtersPanel').style.display = 'none';
-}
-
-function clearFilters() {
-    window.location.href = '/tasks';
-}
-
-// Handle Filter Form Submission
-document.getElementById('filterForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    const params = new URLSearchParams();
-    
-    for (const [key, value] of formData.entries()) {
-        if (value) {
-            params.append(key, value);
+    <script>
+        // Filter Functions
+        function showFilters() {
+            document.getElementById('filtersPanel').style.display = 'block';
         }
-    }
-    
-    // Navigate to filtered URL
-    window.location.href = '/tasks?' + params.toString();
-});
 
-// Quick Status Update
-function quickUpdateTask(taskId, projectId, currentStatus = 'todo', currentPriority = 'medium') {
-    event.stopPropagation();
-    openQuickUpdateModal(taskId, projectId, currentStatus, currentPriority);
-}
+        function hideFilters() {
+            document.getElementById('filtersPanel').style.display = 'none';
+        }
 
-// Initialize filters from URL params
-document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    // Set filter values from URL
-    const status = urlParams.get('status');
-    const priority = urlParams.get('priority');
-    const project = urlParams.get('project');
-    const assignedTo = urlParams.get('assignedTo');
-    
-    if (status) document.querySelector('[name="status"]').value = status;
-    if (priority) document.querySelector('[name="priority"]').value = priority;
-    if (project) document.querySelector('[name="project"]').value = project;
-    if (assignedTo) document.querySelector('[name="assignedTo"]').value = assignedTo;
-    
-    // If any filters are active, show the filter panel
-    if (status || priority || project || assignedTo) {
-        showFilters();
-    }
-    
-    // Add row click handlers for better UX
-    const tableRows = document.querySelectorAll('.tasks-table-enhanced tbody tr');
-    tableRows.forEach(row => {
-        // Remove inline handlers and add proper ones
-        row.onmouseover = function() {
-            this.style.backgroundColor = 'var(--color-bg-secondary)';
-        };
-        
-        row.onmouseout = function() {
-            this.style.backgroundColor = '';
-        };
-        
-        // Make sure only clicks on the row itself navigate, not on buttons
-        row.addEventListener('click', function(e) {
-            // Only navigate if the click wasn't on a button or link
-            if (!e.target.closest('button') && !e.target.closest('a')) {
-                const taskId = this.getAttribute('data-task-id') || 
-                              this.querySelector('a[href^="/tasks/"]')?.href?.split('/tasks/')[1]?.split('/')[0];
-                if (taskId) {
-                    window.location.href = `/tasks/${taskId}`;
+        function clearFilters() {
+            window.location.href = '/tasks';
+        }
+
+        // Handle Filter Form Submission
+        document.getElementById('filterForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const params = new URLSearchParams();
+
+            for (const [key, value] of formData.entries()) {
+                if (value) {
+                    params.append(key, value);
                 }
             }
-        });
-    });
-    
-    // Add animation to table rows
-    setTimeout(() => {
-        tableRows.forEach((row, index) => {
-            row.style.animationDelay = `${index * 0.05}s`;
-        });
-    }, 100);
-});
 
-// Pagination function (if you implement pagination)
-function goToPage(page) {
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('page', page);
-    window.location.href = '/tasks?' + urlParams.toString();
-}
-</script>
+            // Navigate to filtered URL
+            window.location.href = '/tasks?' + params.toString();
+        });
+
+        // Quick Status Update
+        function quickUpdateTask(taskId, projectId, currentStatus = 'todo', currentPriority = 'medium') {
+            event.stopPropagation();
+            openQuickUpdateModal(taskId, projectId, currentStatus, currentPriority);
+        }
+
+        // Initialize filters from URL params
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Set filter values from URL
+            const status = urlParams.get('status');
+            const priority = urlParams.get('priority');
+            const project = urlParams.get('project');
+            const assignedTo = urlParams.get('assignedTo');
+
+            if (status) document.querySelector('[name="status"]').value = status;
+            if (priority) document.querySelector('[name="priority"]').value = priority;
+            if (project) document.querySelector('[name="project"]').value = project;
+            if (assignedTo) document.querySelector('[name="assignedTo"]').value = assignedTo;
+
+            // If any filters are active, show the filter panel
+            if (status || priority || project || assignedTo) {
+                showFilters();
+            }
+
+            // Add row click handlers for better UX
+            const tableRows = document.querySelectorAll('.tasks-table-enhanced tbody tr');
+            tableRows.forEach(row => {
+                // Remove inline handlers and add proper ones
+                row.onmouseover = function () {
+                    this.style.backgroundColor = 'var(--color-bg-secondary)';
+                };
+
+                row.onmouseout = function () {
+                    this.style.backgroundColor = '';
+                };
+
+                // Make sure only clicks on the row itself navigate, not on buttons
+                row.addEventListener('click', function (e) {
+                    // Only navigate if the click wasn't on a button or link
+                    if (!e.target.closest('button') && !e.target.closest('a')) {
+                        const taskId = this.getAttribute('data-task-id') ||
+                            this.querySelector('a[href^="/tasks/"]')?.href?.split('/tasks/')[1]?.split('/')[0];
+                        if (taskId) {
+                            window.location.href = `/tasks/${taskId}`;
+                        }
+                    }
+                });
+            });
+
+            // Add animation to table rows
+            setTimeout(() => {
+                tableRows.forEach((row, index) => {
+                    row.style.animationDelay = `${index * 0.05}s`;
+                });
+            }, 100);
+        });
+
+        // Pagination function (if you implement pagination)
+        function goToPage(page) {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('page', page);
+            window.location.href = '/tasks?' + urlParams.toString();
+        }
+    </script>

@@ -1,8 +1,9 @@
 const Project = require('../models/Project');
 const User = require('../models/User');
+const { withTransaction } = require('../utils/transactionHelper');
 
 // creating a new project
-const createProject = async function (request, response, next) {
+const createProject = async function (request, response) {
 
     try {
         const { name, description, startDate, endDate } = request.body;
@@ -17,29 +18,30 @@ const createProject = async function (request, response, next) {
 
         if (startDate) projectData.startDate = startDate;
         if (endDate) projectData.endDate = endDate;
+        const result = await withTransaction(async (session) => {
+            // create project
+            const projects = await Project.create([projectData], { session });
+            const project = projects[0];
 
-        // create project
-        const project = await Project.create(projectData);
+            // populate the createdBy field to return user details
+            await project.populate('createdBy', 'username email');
 
-        // populate the createdBy field to return user details
-        await project.populate('createdBy', 'username email');
-
-        response.status(201).json({
-            success: true,
-            data: project
+            return { success: true, data: project };
         });
-
-        next();
+        response.status(201).json(result);
 
     } catch (error) {
         console.error('Failed to create project:', error);
-        next();
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 }
 
 
 // get all projects for the logged in user
-const getProjects = async function (request, response, next) {
+const getProjects = async function (request, response) {
 
     try {
         // get projects where user is creator OR member
@@ -59,16 +61,19 @@ const getProjects = async function (request, response, next) {
             data: projects
         });
 
-        next();
+
 
     } catch (error) {
         console.error('Failed to get projects:', error);
-        next();
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 }
 
 // get a single project 
-const getProject = async function (request, response, next) {
+const getProject = async function (request, response) {
 
     try {
         const project = await Project.findById(request.params.projectId)
@@ -91,16 +96,19 @@ const getProject = async function (request, response, next) {
             data: project
         });
 
-        next();
+
 
     } catch (error) {
         console.error('Failed to get project:', error);
-        next();
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 }
 
 // update a project
-const updateProject = async function (request, response, next) {
+const updateProject = async function (request, response) {
 
     try {
         let project = await Project.findById(request.params.projectId);
@@ -134,15 +142,19 @@ const updateProject = async function (request, response, next) {
             data: project
         });
 
-        next();
+
 
     } catch (error) {
         console.error('Failed to update project:', error);
-        next();
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 }
+
 // adding a member to a project
-const addProjectMember = async function (request, response, next) {
+const addProjectMember = async function (request, response) {
 
     try {
         const { userId } = request.body;
@@ -155,44 +167,49 @@ const addProjectMember = async function (request, response, next) {
                 message: 'Only project creators can add members'
             });
         }
+        const result = await withTransaction(async function (session) {
+            const userToAdd = await User.findById(userId).session(session);
 
-        const userToAdd = await User.findById(userId);
+            if (!userToAdd) {
+                return response.status(404).json({
+                    success: false,
+                    message: 'User not found'
+                });
+            }
 
-        if (!userToAdd) {
-            return response.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
+            // checking if user is already a member
+            const isAlreadyMember = project.members.some(memberId => memberId.equals(userId)) || project.createdBy.equals(userId);
+            if (isAlreadyMember) {
+                return response.status(400).json({
+                    success: false,
+                    message: 'User is already a project member'
+                });
+            }
 
-        // checking if user is already a member
-        const isAlreadyMember = project.members.some(memberId => memberId.equals(userId)) || project.createdBy.equals(userId);
-        if (isAlreadyMember) {
-            return response.status(400).json({
-                success: false,
-                message: 'User is already a project member'
-            });
-        }
+            // Adding the user to the project
+            project.members.push(userId);
+            await project.populate('members', 'name email');
 
-        // Adding the user to the project
-        project.members.push(userId);
-        await project.save();
+            await project.save({ session });
 
-        await project.populate('members', 'name email');
-
-        response.json({
-            success: true,
-            message: 'Member added successfully',
-            data: project
+            return {
+                success: true,
+                message: 'Member added successfully',
+                data: project
+            }
         });
+        response.json(result);
 
     } catch (error) {
         console.error(error);
-        next();
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 }
 // get project members
-const getProjectMembers = async function (request, response, next) {
+const getProjectMembers = async function (request, response) {
     try {
         const project = await Project.findById(request.params.projectId)
             .populate('createdBy', 'username email')
@@ -222,7 +239,10 @@ const getProjectMembers = async function (request, response, next) {
 
     } catch (error) {
         console.error(error);
-        next();
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 }
 
@@ -234,77 +254,80 @@ const transferProjectOwnership = async function (request, response) {
 
         console.log('Transfer ownership:', { projectId, newOwnerId, currentOwnerId: request.user.id });
 
-        // Find the project with populated members
-        const project = await Project.findById(projectId)
-            .populate('members', '_id');
+        const result = await withTransaction(async (session) => {
+            // Find the project with populated members
+            const project = await Project.findById(projectId)
+                .populate('members', '_id').session(session);
 
-        if (!project) {
-            return response.status(404).json({
-                success: false,
-                message: 'Project not found'
-            });
-        }
+            if (!project) {
+                return response.status(404).json({
+                    success: false,
+                    message: 'Project not found'
+                });
+            }
 
-        // Verify current user is the owner
-        if (project.createdBy.toString() !== request.user.id) {
-            return response.status(403).json({
-                success: false,
-                message: 'Only project owner can transfer ownership'
-            });
-        }
+            // Verify current user is the owner
+            if (project.createdBy.toString() !== request.user.id) {
+                return response.status(403).json({
+                    success: false,
+                    message: 'Only project owner can transfer ownership'
+                });
+            }
 
-        // Check if new owner is a team member (not the current owner)
-        // Filter out owner first to get real team members
-        const teamMembers = project.members.filter(member =>
-            !member._id.equals(project.createdBy)
-        );
+            // Check if new owner is a team member (not the current owner)
+            // Filter out owner first to get real team members
+            const teamMembers = project.members.filter(member =>
+                !member._id.equals(project.createdBy)
+            );
 
-        const isTeamMember = teamMembers.some(member =>
-            member._id.toString() === newOwnerId
-        );
+            const isTeamMember = teamMembers.some(member =>
+                member._id.toString() === newOwnerId
+            );
 
-        if (!isTeamMember) {
-            return response.status(400).json({
-                success: false,
-                message: 'New owner must be a project team member'
-            });
-        }
+            if (!isTeamMember) {
+                return response.status(400).json({
+                    success: false,
+                    message: 'New owner must be a project team member'
+                });
+            }
 
-        // Check if new owner is the same as current owner
-        if (newOwnerId === request.user.id) {
-            return response.status(400).json({
-                success: false,
-                message: 'You already own this project'
-            });
-        }
+            // Check if new owner is the same as current owner
+            if (newOwnerId === request.user.id) {
+                return response.status(400).json({
+                    success: false,
+                    message: 'You already own this project'
+                });
+            }
 
-        // Store old owner ID
-        const oldOwnerId = project.createdBy;
+            // Store old owner ID
+            const oldOwnerId = project.createdBy;
 
-        // Set new owner
-        project.createdBy = newOwnerId;
+            // Set new owner
+            project.createdBy = newOwnerId;
 
-        // Remove new owner from members array (they're now the owner)
-        project.members = project.members.pull(newOwnerId);
+            // Remove new owner from members array (they're now the owner)
+            project.members = project.members.pull(newOwnerId);
 
-        // Add old owner to members array (they're now a regular member)
-        // First check if old owner is already in members (shouldn't be)
-        const isOldOwnerInMembers = project.members.some(memberId =>
-            memberId.equals(oldOwnerId)
-        );
+            // Add old owner to members array (they're now a regular member)
+            // First check if old owner is already in members (shouldn't be)
+            const isOldOwnerInMembers = project.members.some(memberId =>
+                memberId.equals(oldOwnerId)
+            );
 
-        if (!isOldOwnerInMembers) {
-            project.members.push(oldOwnerId);
-        }
+            if (!isOldOwnerInMembers) {
+                project.members.push(oldOwnerId);
+            }
 
-        await project.save();
+            await project.save({ session });
 
-        console.log('Ownership transferred successfully');
+            console.log('Ownership transferred successfully');
 
-        response.json({
-            success: true,
-            message: 'Project ownership transferred successfully'
+            return {
+                success: true,
+                message: 'Project ownership transferred successfully'
+            }
         });
+        response.json(result);
 
     } catch (error) {
         console.error('Transfer ownership error:', error);
@@ -320,61 +343,64 @@ const removeProjectMember = async function (request, response) {
     try {
         const { projectId, userId } = request.params;
 
-        // Find the project
-        const project = await Project.findById(projectId);
+        const result = await withTransaction(async (session) => {
+            // Find the project
+            const project = await Project.findById(projectId).session(session);
 
-        if (!project) {
-            return response.status(404).json({
-                success: false,
-                message: 'Project not found'
-            });
-        }
+            if (!project) {
+                return response.status(404).json({
+                    success: false,
+                    message: 'Project not found'
+                });
+            }
 
-        // Check if user is the project owner
-        if (project.createdBy.toString() === userId) {
-            return response.status(400).json({
-                success: false,
-                message: 'Cannot remove project owner. Transfer ownership first.'
-            });
-        }
+            // Check if user is the project owner
+            if (project.createdBy.toString() === userId) {
+                return response.status(400).json({
+                    success: false,
+                    message: 'Cannot remove project owner. Transfer ownership first.'
+                });
+            }
 
-        // Check if the user is even a member of the project
-        const isMember = project.members.some(memberId =>
-            memberId.toString() === userId
-        );
+            // Check if the user is even a member of the project
+            const isMember = project.members.some(memberId =>
+                memberId.toString() === userId
+            );
 
-        if (!isMember) {
-            return response.status(400).json({
-                success: false,
-                message: 'User is not a member of this project'
-            });
-        }
+            if (!isMember) {
+                return response.status(400).json({
+                    success: false,
+                    message: 'User is not a member of this project'
+                });
+            }
 
-        // ✅ Check if user is assigned to any tasks in this project
-        const Task = require('../models/Task');
-        const assignedTasksCount = await Task.countDocuments({
-            project: projectId,
-            assignedTo: userId
+            // Check if user is assigned to any tasks in this project
+            const Task = require('../models/Task');
+            const assignedTasksCount = await Task.countDocuments({
+                project: projectId,
+                assignedTo: userId
+            }).session(session);
+
+            if (assignedTasksCount > 0) {
+                return response.status(400).json({
+                    success: false,
+                    message: `Cannot remove member. ${assignedTasksCount} task(s) are assigned to this user. Please unassign or reassign the tasks first.`
+                });
+            }
+
+            // Remove the member from the project
+            project.members = project.members.filter(
+                memberId => memberId.toString() !== userId
+            );
+
+            await project.save({ session });
+
+            return {
+                success: true,
+                message: 'Member removed successfully'
+            }
         });
-
-        if (assignedTasksCount > 0) {
-            return response.status(400).json({
-                success: false,
-                message: `Cannot remove member. ${assignedTasksCount} task(s) are assigned to this user. Please unassign or reassign the tasks first.`
-            });
-        }
-
-        // Remove the member from the project
-        project.members = project.members.filter(
-            memberId => memberId.toString() !== userId
-        );
-
-        await project.save();
-
-        response.json({
-            success: true,
-            message: 'Member removed successfully'
-        });
+        response.json(result);
 
     } catch (error) {
         console.error('Remove member error:', error);
@@ -386,32 +412,44 @@ const removeProjectMember = async function (request, response) {
 };
 
 // delete project
-const deleteProject = async function (request, response, next) {
+const deleteProject = async function (request, response) {
 
     try {
-        const project = await Project.findById(request.params.projectId);
+        const result = await withTransaction(async (session) => {
+            const project = await Project.findById(request.params.projectId).session(session);
 
-        // check if user is the project creator
-        if (!project.createdBy.equals(request.user.id)) {
-            return response.status(403).json({
-                success: false,
-                message: "Not authorized to delete this project"
-            });
-        }
+            if (!project) {
+                return response.status(404).json({
+                    success: false,
+                    message: "Project not found"
+                });
+            }
 
-        // delete the project
-        await Project.findByIdAndDelete(request.params.projectId);
+            // check if user is the project creator
+            if (!project.createdBy.equals(request.user.id)) {
+                return response.status(403).json({
+                    success: false,
+                    message: "Not authorized to delete this project"
+                });
+            }
 
-        response.json({
-            success: true,
-            message: "Project deleted successfully"
+            // delete the project - using deleteOne() to trigger pre('deleteOne') hook
+            await project.deleteOne({ session });
+
+            return {
+                success: true,
+                message: "Project deleted successfully"
+            };
         });
 
-        next();
+        response.json(result);
 
     } catch (error) {
         console.error('Failed to delete project:', error);
-        next();
+        response.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 }
 

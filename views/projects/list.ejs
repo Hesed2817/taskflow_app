@@ -21,13 +21,15 @@
                 </div>
                 <div class="project-stat">
                     <div class="project-stat-value">
-                        <%= projects.filter(p=> p.createdBy._id.toString() === user.id).length %>
+                        <%= projects.filter(p=> p.createdBy && p.createdBy._id && p.createdBy._id.toString() ===
+                            user.id).length %>
                     </div>
                     <div class="project-stat-label">Owned by Me</div>
                 </div>
                 <div class="project-stat">
                     <div class="project-stat-value">
-                        <%= projects.filter(p=> p.createdBy._id.toString() !== user.id).length %>
+                        <%= projects.filter(p=> !p.createdBy || (p.createdBy._id && p.createdBy._id.toString() !==
+                            user.id)).length %>
                     </div>
                     <div class="project-stat-label">Shared with Me</div>
                 </div>
@@ -105,9 +107,11 @@
         <% if (projects.length> 0) { %>
             <div class="projects-grid-enhanced">
                 <% projects.forEach(project=> {
-                    const isOwner = project.createdBy._id.toString() === user.id;
+                    const isOwner = project.createdBy && project.createdBy._id && project.createdBy._id.toString() ===
+                    user.id;
                     const teamMembersCount = project.members.filter(member =>
-                    member._id.toString() !== project.createdBy._id.toString()
+                    !project.createdBy || (member._id && project.createdBy._id && member._id.toString() !==
+                    project.createdBy._id.toString())
                     ).length;
 
                     // Filter tasks for this project
@@ -139,7 +143,7 @@
                             <div class="project-card-meta">
                                 <div class="project-card-meta-item">
                                     <i class="fas fa-user"></i>
-                                    <%= project.createdBy.username %>
+                                    <%= project.createdBy ? project.createdBy.username : 'Unknown User' %>
                                 </div>
                                 <div class="project-card-meta-item">
                                     <i class="fas fa-users"></i>
