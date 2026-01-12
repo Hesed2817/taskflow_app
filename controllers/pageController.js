@@ -227,9 +227,9 @@ const getProject = async function (request, response) {
         }
 
         // Check if user has access
-        const isOwner = project.createdBy._id.toString() === request.user.id;
+        const isOwner = project.createdBy && project.createdBy._id && project.createdBy._id.toString() === request.user.id;
         const isMember = project.members.some(member =>
-            member._id.toString() === request.user.id
+            member._id && member._id.toString() === request.user.id
         );
 
         if (!isOwner && !isMember) {
@@ -384,6 +384,7 @@ const getTasks = async function (request, response) {
             user: request.user,
             tasks: tasks,
             projects: projects,
+            filters: request.query,
             error: request.query.error || null,
             success: request.query.success || null
         });
@@ -395,6 +396,7 @@ const getTasks = async function (request, response) {
             user: request.user,
             tasks: [],
             projects: [],
+            filters: request.query,
             error: 'Failed to load tasks: ' + error.message
         });
     }

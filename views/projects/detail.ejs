@@ -21,7 +21,7 @@
             <div class="project-detail-meta">
                 <div class="project-detail-meta-item">
                     <strong><i class="fas fa-person"></i>Created by:</strong>
-                    <%= project.createdBy.username %>
+                    <%= project.createdBy ? project.createdBy.username : 'Unknown User' %>
                 </div>
                 <div class="project-detail-meta-item">
                     <strong><i class="fas fa-calendar-day"></i>Created on:</strong>
@@ -68,8 +68,9 @@
                                             <div class="project-detail-meta-item">
                                                 <strong><i class="fas fa-users"></i>Team Members:</strong>
                                                 <% const teamMembersCount=project.members.filter(member=>
+                                                    !project.createdBy || (member._id && project.createdBy._id &&
                                                     member._id.toString() !==
-                                                    project.createdBy._id.toString()).length; %>
+                                                    project.createdBy._id.toString())).length; %>
                                                     <%= teamMembersCount %>
                                             </div>
             </div>
@@ -108,8 +109,8 @@
                             <div class="task-form-grid-2">
                                 <div class="form-group">
                                     <label class="form-label">Task Title *</label>
-                                    <input type="text" name="title" required placeholder="What needs to be done?"
-                                        class="form-control">
+                                    <input type="text" name="title" id="task-title" required
+                                        placeholder="What needs to be done?" class="form-control">
                                 </div>
 
                                 <div class="form-group">
@@ -145,7 +146,7 @@
                                         <option value="">Unassigned</option>
                                         <option value="<%= user.id %>">Me (<%= user.username %>)</option>
                                         <% project.members.forEach(member=> { %>
-                                            <% if (member._id.toString() !==user.id) { %>
+                                            <% if (member._id && member._id.toString() !==user.id) { %>
                                                 <option value="<%= member._id %>">
                                                     <%= member.username %>
                                                 </option>
@@ -252,20 +253,22 @@
                         <!-- Owner -->
                         <div class="member-item member-item-owner">
                             <div class="member-avatar member-avatar-owner">
-                                <%= project.createdBy.username.charAt(0).toUpperCase() %>
+                                <%= project.createdBy ? project.createdBy.username.charAt(0).toUpperCase() : '?' %>
                             </div>
                             <div class="member-info">
                                 <div class="member-name">
-                                    <%= project.createdBy.username %>
+                                    <%= project.createdBy ? project.createdBy.username : 'Unknown User' %>
                                 </div>
-                                <div class="member-role">Owner • <%= project.createdBy.email %>
+                                <div class="member-role">Owner • <%= project.createdBy ? project.createdBy.email
+                                        : 'No email' %>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Team Members -->
                         <% const teamMembers=project.members.filter(member=>
-                            member._id.toString() !== project.createdBy._id.toString()) %>
+                            !project.createdBy || (member._id && project.createdBy._id && member._id.toString() !==
+                            project.createdBy._id.toString())) %>
 
                             <% if (teamMembers.length> 0) { %>
                                 <% teamMembers.forEach(member=> { %>
@@ -318,7 +321,7 @@
                         <form id="addMemberForm">
                             <div class="form-group">
                                 <label class="form-label">User Email</label>
-                                <input type="email" id="searchEmail" placeholder="Enter user's email address"
+                                <input type="text" id="searchEmail" placeholder="Enter email or username"
                                     class="member-search-input">
                                 <div id="userSuggestions" class="user-suggestions"></div>
                             </div>
@@ -380,6 +383,7 @@
         function showTaskForm() {
             document.getElementById('taskForm').classList.add('show');
             window.location.href = "#taskForm";
+            document.getElementById('task-title').focus();
         }
 
         function hideTaskForm() {
@@ -474,7 +478,7 @@
         function showMemberForm() {
             document.getElementById('memberForm').classList.add('show');
             window.location.href = "#memberForm";
-            document.getElementById('searchEmail').focus;
+            document.getElementById('searchEmail').focus();
         }
 
         function hideMemberForm() {
@@ -484,6 +488,7 @@
 
         function clearSelectedUser() {
             document.getElementById('selectedUser').classList.remove('show');
+            document.getElementById('selectedUser').style.display = "none";
             document.getElementById('searchEmail').value = '';
             document.getElementById('userSuggestions').innerHTML = '';
             document.getElementById('selectedUserId').value = '';
@@ -491,22 +496,22 @@
         // ========== USER SEARCH ==========
         let searchTimeout;
         document.getElementById('searchEmail').addEventListener('input', function (e) {
-            const email = e.target.value.trim();
+            const searchTerm = e.target.value.trim();
 
             clearTimeout(searchTimeout);
 
-            if (email.length < 3) {
+            if (searchTerm.length < 3) {
                 document.getElementById('userSuggestions').innerHTML = '';
                 return;
             }
 
             searchTimeout = setTimeout(async () => {
                 try {
-                    console.log('Searching users with email:', email);
+                    console.log('Searching users with term:', searchTerm);
 
-                    // ✅ CRITICAL: Use credentials: 'include' for cookies
-                    const response = await fetch(`/api/users/search?email=${encodeURIComponent(email)}`, {
-                        credentials: 'include' // ← THIS SENDS THE COOKIE
+
+                    const response = await fetch(`/api/users/search?search=${encodeURIComponent(searchTerm)}`, {
+                        credentials: 'include'
                     });
 
                     console.log('Search response:', response.status);
@@ -527,7 +532,7 @@
                     } else {
                         document.getElementById('userSuggestions').innerHTML = `
                     <div style="padding: 0.5rem; color: #9ca3af;">
-                        No users found with that email
+                        No users found
                     </div>
                 `;
                     }
@@ -647,7 +652,7 @@
 
         // ========== DELETE TASK ==========
         async function deleteTask(taskId, projectId, event) {
-            if (event) event.stopPropagation();
+            // if (event) event.stopPropagation();
 
             if (!confirm('Are you sure you want to delete this task?')) {
                 return;
@@ -677,36 +682,35 @@
 
         // Delete Project Function
         async function deleteProject() {
-            if (!confirm('Are you sure? This will delete the project and all its tasks.')) {
+            if (!confirm('Are you sure you want to delete this project?\n\nThis will permanently delete:\n• All project data\n• All tasks in this project\n• All member associations\n\nThis action cannot be undone.')) {
+                return;
+            }
+
+            // Extra confirmation for deletion
+            const projectName = prompt(`Type the project name "${'<%= project.name %>'}" to confirm deletion:`);
+
+            if (projectName !== '<%= project.name %>') {
+                alert('Project name does not match. Deletion cancelled.');
                 return;
             }
 
             try {
-                console.log('Deleting project:', '<%= project._id %>');
-
-                const response = await fetch('/api/projects/<%= project._id %>', {
+                const response = await fetch(`/api/projects/<%= project._id %>`, {
                     method: 'DELETE',
                     credentials: 'include'
                 });
 
-                console.log('Delete response:', response.status);
-
-                if (response.redirected) {
-                    window.location.href = response.url;
-                    return;
-                }
-
                 const result = await response.json();
-                console.log('Delete result:', result);
 
                 if (result.success) {
-                    window.location.href = '/projects?success=Project deleted successfully';
+                    showAlert('success', 'Project deleted successfully! Redirecting...');
+                    setTimeout(() => { window.location.href = '/projects?success=Project deleted successfully'; }, 1500);
                 } else {
                     showAlert('error', result.message || 'Failed to delete project');
                 }
             } catch (error) {
                 console.error('Delete project error:', error);
-                showAlert('error', 'Network error: ' + error.message);
+                showAlert('error', 'Error: ' + error.message);
             }
         }
     </script>

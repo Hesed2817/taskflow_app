@@ -207,7 +207,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.906);
+    background-color: var(--color-bg-secondary);
     backdrop-filter: blur(1px);
     -webkit-backdrop-filter: blur(1px);
     z-index: 1500;

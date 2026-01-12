@@ -32,16 +32,17 @@ const projectSchema = new mongoose.Schema({
     collection: 'projects'
 });
 
-projectSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+projectSchema.pre('deleteOne', { document: true, query: false }, async function () {
     try {
         const projectId = this._id;
+        const session = this.$session();
 
-        await Task.deleteMany({ project: projectId });
+        await Task.deleteMany({ project: projectId }, { session });
         console.log('successfully deleted associated tasks');
 
     } catch (error) {
         console.error('Error cascade deleting tasks', error);
-        next();
+        throw error;
     }
 });
 
