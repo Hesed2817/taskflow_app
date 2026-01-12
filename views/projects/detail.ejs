@@ -474,7 +474,7 @@
         function showMemberForm() {
             document.getElementById('memberForm').classList.add('show');
             window.location.href = "#memberForm";
-            document.getElementById('searchEmail').focus;
+            document.getElementById('searchEmail').focus();
         }
 
         function hideMemberForm() {
@@ -647,7 +647,7 @@
 
         // ========== DELETE TASK ==========
         async function deleteTask(taskId, projectId, event) {
-            if (event) event.stopPropagation();
+            // if (event) event.stopPropagation();
 
             if (!confirm('Are you sure you want to delete this task?')) {
                 return;
