@@ -10,6 +10,15 @@ const validate = function (request, response, next) {
     const extractedErrors = [];
     errors.array().map(error => extractedErrors.push({ [error.path]: error.msg }));
 
+    // Check if it's a web request or API request
+    if (!request.headers['content-type']?.includes('application/json') && !request.headers['accept']?.includes('application/json')) {
+        const firstError = errors.array()[0].msg;
+        const referer = request.get('Referer') || '/';
+        const url = new URL(referer, `${request.protocol}://${request.get('host')}`);
+        url.searchParams.set('error', firstError);
+        return response.redirect(url.toString());
+    }
+    
     return response.status(422).json({
         success: false,
         message: 'Validation failed',
@@ -171,7 +180,7 @@ const userSearchValidator = [
         .trim()
         .isLength({ min: 2 }).withMessage('Search term must be atleast 2 characters'),
 
-    function (request, response) {
+    function (request, response, next) {
 
         if (!request.query.email && !request.query.username && !request.query.search) {
             return response.status(400).json({

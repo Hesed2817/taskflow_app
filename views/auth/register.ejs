@@ -1,97 +1,72 @@
 <%- include('../layouts/main.ejs') -%>
 
-<div class="auth-container">
-    <div class="auth-box">
-        <!-- Logo Header -->
-        <div class="auth-header">
-            <a href="/" class="auth-logo">TaskFlow</a>
-            <p class="auth-tagline">Join thousands managing their projects efficiently</p>
-        </div>
-        
-        <!-- Alert Container -->
-        <% if (error) { %>
-            <div class="auth-alert auth-alert-error show">
-                <i class="fas fa-exclamation-circle"></i> <%= error %>
+    <div class="auth-container">
+        <div class="auth-box">
+            <!-- Logo Header -->
+            <div class="auth-header">
+                <a href="/" class="auth-logo">TaskFlow</a>
+                <p class="auth-tagline">Join others by managing your projects efficiently</p>
             </div>
-        <% } %>
-        
-        <% if (success) { %>
-            <div class="auth-alert auth-alert-success show">
-                <i class="fas fa-check-circle"></i> <%= success %>
-            </div>
-        <% } %>
-        
-        <h2 class="auth-title">Create Account</h2>
-        
-        <!-- Traditional form -->
-        <form action="/api/auth/register" method="POST" class="auth-form">
-            <div class="auth-form-group">
-                <label for="username" class="auth-label">Username</label>
-                <input 
-                    type="text" 
-                    id="username"
-                    name="username" 
-                    required
-                    class="auth-input"
-                    placeholder="John Doe"
-                    autocomplete="username"
-                >
-            </div>
-            
-            <div class="auth-form-group">
-                <label for="email" class="auth-label">Email</label>
-                <input 
-                    type="email" 
-                    id="email"
-                    name="email" 
-                    required
-                    class="auth-input"
-                    placeholder="your@email.com"
-                    autocomplete="email"
-                >
-            </div>
-            
-            <div class="auth-form-group">
-                <label for="password" class="auth-label">Password</label>
-                <input 
-                    type="password" 
-                    id="password"
-                    name="password" 
-                    required
-                    minlength="6"
-                    class="auth-input"
-                    placeholder="At least 6 characters"
-                    autocomplete="new-password"
-                >
-                <div class="password-requirements">
-                    Must be at least 6 characters long
-                </div>
-            </div>
-            
-            <!-- Confirm Password (Optional - add if needed) -->
-            
-            <div class="auth-form-group">
-                <label for="confirmPassword" class="auth-label">Confirm Password</label>
-                <input 
-                    type="password" 
-                    id="confirmPassword"
-                    name="confirmPassword" 
-                    required
-                    minlength="6"
-                    class="auth-input"
-                    placeholder="Confirm your password"
-                    autocomplete="new-password"
-                >
-            </div>
-           
-            
-            <button type="submit" class="auth-btn auth-btn-register">
-                <i class="fas fa-user-plus"></i> Create Account
-            </button>
-        </form>
-        
-        <!-- Terms & Conditions (Optional) -->
-        <!-- 
+
+            <!-- Alert Container -->
+            <% if (error) { %>
+                <%= error %>
+                    <% } %>
+
+                        <% if (success) { %>
+                            <div class="auth-alert auth-alert-success show">
+                                <i class="fas fa-check-circle"></i>
+                                <%= success %>
+                            </div>
+                            <% } %>
+
+                                <h2 class="auth-title">Create Account</h2>
+
+                                <!-- Traditional form -->
+                                <form action="/api/auth/register" method="POST" class="auth-form">
+                                    <div class="auth-form-group">
+                                        <label for="username" class="auth-label">Username</label>
+                                        <input type="text" id="username" name="username" required class="auth-input"
+                                            placeholder="John Doe" autocomplete="username">
+                                    </div>
+
+                                    <div class="auth-form-group">
+                                        <label for="email" class="auth-label">Email</label>
+                                        <input type="email" id="email" name="email" required class="auth-input"
+                                            placeholder="your@email.com" autocomplete="email">
+                                    </div>
+
+                                    <div class="auth-form-group">
+                                        <label for="password" class="auth-label">Password</label>
+                                        <input type="password" id="password" name="password" required minlength="6"
+                                            class="auth-input" placeholder="At least 6 characters"
+                                            autocomplete="new-password">
+                                        <div class="password-requirements">
+                                            Must be at least 6 characters long
+                                        </div>
+                                    </div>
+
+                                    <!-- Confirm Password (Optional - add if needed) -->
+
+                                    <div class="auth-form-group">
+                                        <label for="confirmPassword" class="auth-label">Confirm Password</label>
+                                        <input type="password" id="confirmPassword" name="confirmPassword" required
+                                            minlength="6" class="auth-input" placeholder="Confirm your password"
+                                            autocomplete="new-password">
+                                        <div id="password-match-message" class="password-requirements"
+                                            style="display: none;">
+                                            Passwords do not match
+                                        </div>
+                                    </div>
+
+
+                                    <button type="submit" class="auth-btn auth-btn-register">
+                                        <i class="fas fa-user-plus"></i> Create Account
+                                    </button>
+                                </form>
+
+                                <!-- Terms & Conditions (Optional) -->
+                                <!-- 
         <div class="auth-terms">
             <div class="auth-checkbox">
                 <input type="checkbox" id="terms" name="terms" required>
@@ -102,74 +77,93 @@
             </div>
         </div>
         -->
-        
-        <div class="auth-footer">
-            Already have an account? 
-            <a href="/login" class="auth-link">Login here</a>
+
+                                <div class="auth-footer">
+                                    Already have an account?
+                                    <a href="/login" class="auth-link">Login here</a>
+                                </div>
         </div>
     </div>
-</div>
 
-<!-- Add loading state for form -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('.auth-form');
-        if (form) {
-            form.addEventListener('submit', function() {
-                const submitBtn = this.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
-                }
-            });
-        }
-        
-        // Password validation
-        const passwordInput = document.getElementById('password');
-        if (passwordInput) {
-            passwordInput.addEventListener('input', function() {
-                const requirements = this.parentElement.querySelector('.password-requirements');
-                if (this.value.length < 6) {
-                    requirements.style.color = 'var(--color-danger)';
-                } else {
-                    requirements.style.color = 'var(--color-success)';
-                }
-            });
-        }
-        
-        // Theme toggle for auth pages
-        if (!document.querySelector('.header')) {
-            // Check if theme toggle already exists
-            if (!document.querySelector('.auth-theme-toggle')) {
-                const themeToggle = document.createElement('button');
-                themeToggle.className = 'theme-toggle auth-theme-toggle';
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i><i class="fas fa-sun"></i>';
-                themeToggle.setAttribute('title', 'Toggle dark mode');
-                themeToggle.style.position = 'fixed';
-                themeToggle.style.top = '20px';
-                themeToggle.style.right = '20px';
-                themeToggle.style.zIndex = '100';
-                themeToggle.style.background = 'var(--color-primary)';
-                themeToggle.style.color = 'white';
-                themeToggle.style.border = 'none';
-                themeToggle.style.width = '40px';
-                themeToggle.style.height = '40px';
-                themeToggle.style.borderRadius = '50%';
-                themeToggle.style.cursor = 'pointer';
-                themeToggle.style.display = 'flex';
-                themeToggle.style.alignItems = 'center';
-                themeToggle.style.justifyContent = 'center';
-                themeToggle.style.fontSize = '1rem';
-                
-                themeToggle.onclick = function() {
-                    const currentTheme = localStorage.getItem('theme') || 'light';
-                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-                    localStorage.setItem('theme', newTheme);
-                    document.documentElement.setAttribute('data-theme', newTheme);
+    <!-- Add loading state for form -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('.auth-form');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    if (passwordInput && confirmPasswordInput) {
+                        if (passwordInput.value !== confirmPasswordInput.value) {
+                            e.preventDefault();
+                            alert('Passwords do not match!');
+                            confirmPasswordInput.focus();
+                            return;
+                        }
+                    }
+
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+                    }
+                });
+            }
+
+            // Password validation
+            if (passwordInput && confirmPasswordInput) {
+                const matchMessage = document.getElementById('password-match-message');
+
+                const validatePasswords = () => {
+                    if (confirmPasswordInput.value === '') {
+                        matchMessage.style.display = 'none';
+                        return;
+                    }
+
+                    matchMessage.style.display = 'block';
+                    if (passwordInput.value === confirmPasswordInput.value) {
+                        matchMessage.textContent = 'Passwords match';
+                        matchMessage.style.color = 'var(--color-success)';
+                    } else {
+                        matchMessage.textContent = 'Passwords do not match';
+                        matchMessage.style.color = 'var(--color-danger)';
+                    }
                 };
-                
+
+                passwordInput.addEventListener('input', function () {
+                    const requirements = this.parentElement.querySelector('.password-requirements');
+                    if (this.value.length < 6) {
+                        requirements.style.color = 'var(--color-danger)';
+                    } else {
+                        requirements.style.color = 'var(--color-success)';
+                    }
+                    validatePasswords();
+                });
+
+                confirmPasswordInput.addEventListener('input', validatePasswords);
+            }
+
+            // Theme toggle for auth pages
+            const themeToggle = document.createElement('button');
+            themeToggle.className = 'theme-toggle auth-theme-toggle';
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i><i class="fas fa-sun"></i>';
+            themeToggle.setAttribute('title', 'Toggle dark mode');
+            themeToggle.style.position = 'fixed';
+            themeToggle.style.backgroundColor = 'var(--color-primary)';
+            themeToggle.style.top = '20px';
+            themeToggle.style.right = '20px';
+            themeToggle.style.zIndex = '100';
+            themeToggle.onclick = function () {
+                const currentTheme = localStorage.getItem('theme') || 'light';
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                localStorage.setItem('theme', newTheme);
+                document.documentElement.setAttribute('data-theme', newTheme);
+            };
+
+            // Add theme toggle if not already in header
+            if (!document.querySelector('.header')) {
                 document.body.appendChild(themeToggle);
             }
-        }
-    });
-</script>
+        });
+    </script>

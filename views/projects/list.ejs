@@ -109,10 +109,11 @@
                 <% projects.forEach(project=> {
                     const isOwner = project.createdBy && project.createdBy._id && project.createdBy._id.toString() ===
                     user.id;
+                    <!-- The + 1 is to include the team owner in the total count of members -->
                     const teamMembersCount = project.members.filter(member =>
                     !project.createdBy || (member._id && project.createdBy._id && member._id.toString() !==
                     project.createdBy._id.toString())
-                    ).length;
+                    ).length + 1;
 
                     // Filter tasks for this project
                     const projectTasks = tasks.filter(task => task.project.toString() === project._id.toString());

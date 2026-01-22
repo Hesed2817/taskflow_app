@@ -1,62 +1,47 @@
 <%- include('../layouts/main.ejs') -%>
 
-<div class="auth-container">
-    <div class="auth-box">
-        <!-- Logo Header -->
-        <div class="auth-header">
-            <a href="/" class="auth-logo">TaskFlow</a>
-            <p class="auth-tagline">Manage your projects and tasks efficiently</p>
-        </div>
-               
-        <h2 class="auth-title">Login to TaskFlow</h2>
-        
-        <!-- Traditional form -->
-        <form action="/api/auth/login" method="POST" class="auth-form">
-            <div class="auth-form-group">
-                <label for="email" class="auth-label">Email</label>
-                <input 
-                    type="email" 
-                    id="email"
-                    name="email" 
-                    required
-                    class="auth-input"
-                    placeholder="your@email.com"
-                    autocomplete="email"
-                >
+    <div class="auth-container">
+        <div class="auth-box">
+            <!-- Logo Header -->
+            <div class="auth-header">
+                <a href="/" class="auth-logo">TaskFlow</a>
+                <p class="auth-tagline">Manage your projects and tasks efficiently</p>
             </div>
-            
-            <div class="auth-form-group">
-                <label for="password" class="auth-label">Password</label>
-                <input 
-                    type="password" 
-                    id="password"
-                    name="password" 
-                    required
-                    class="auth-input"
-                    placeholder="••••••••"
-                    autocomplete="current-password"
-                >
-            </div>
-            
-            <!-- Remember Me & Forgot Password -->
-            <div class="auth-options">
-                <div class="auth-checkbox">
-                    <input type="checkbox" id="remember" name="remember">
-                    <label for="remember">Remember me</label>
+
+            <h2 class="auth-title">Login to TaskFlow</h2>
+
+            <!-- Traditional form -->
+            <form action="/api/auth/login" method="POST" class="auth-form">
+                <div class="auth-form-group">
+                    <label for="email" class="auth-label">Email</label>
+                    <input type="email" id="email" name="email" required class="auth-input" placeholder="your@email.com"
+                        autocomplete="email">
                 </div>
-                <a href="/forgot-password" class="forgot-password">
-                    Forgot password?
-                </a>
-            </div>
-            
-            <button type="submit" class="auth-btn auth-btn-login">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </button>
-        </form>
-        
-        <!-- Social Login Divider (Optional - uncomment if needed) -->
-        <!-- 
-        <div class="auth-divider">
+
+                <div class="auth-form-group">
+                    <label for="password" class="auth-label">Password</label>
+                    <input type="password" id="password" name="password" required class="auth-input"
+                        placeholder="••••••••" autocomplete="current-password">
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="auth-options">
+                    <div class="auth-checkbox">
+                        <!-- <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Remember me</label> -->
+                    </div>
+                    <a href="/forgot-password" class="forgot-password">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <button type="submit" class="auth-btn auth-btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+
+            <!-- Social Login Divider (Optional) -->
+            <!-- <div class="auth-divider">
             <span>Or continue with</span>
         </div>
         
@@ -67,50 +52,50 @@
             <a href="/auth/github" class="social-btn social-btn-github">
                 <i class="fab fa-github"></i> GitHub
             </a>
-        </div>
-        -->
-        
-        <div class="auth-footer">
-            Don't have an account? 
-            <a href="/register" class="auth-link">Register here</a>
+        </div> -->
+
+
+            <div class="auth-footer">
+                Don't have an account?
+                <a href="/register" class="auth-link">Register here</a>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Add loading state for form -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('.auth-form');
-        if (form) {
-            form.addEventListener('submit', function() {
-                const submitBtn = this.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-                }
-            });
-        }
-        
-        // Theme toggle for auth pages (since no header)
-        const themeToggle = document.createElement('button');
-        themeToggle.className = 'theme-toggle auth-theme-toggle';
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i><i class="fas fa-sun"></i>';
-        themeToggle.setAttribute('title', 'Toggle dark mode');
-        themeToggle.style.position = 'fixed';
-        themeToggle.style.backgroundColor = 'var(--color-primary)';
-        themeToggle.style.top = '20px';
-        themeToggle.style.right = '20px';
-        themeToggle.style.zIndex = '100';
-        themeToggle.onclick = function() {
-            const currentTheme = localStorage.getItem('theme') || 'light';
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            localStorage.setItem('theme', newTheme);
-            document.documentElement.setAttribute('data-theme', newTheme);
-        };
-        
-        // Add theme toggle if not already in header
-        if (!document.querySelector('.header')) {
-            document.body.appendChild(themeToggle);
-        }
-    });
-</script>
+    <!-- Add loading state for form -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('.auth-form');
+            if (form) {
+                form.addEventListener('submit', function () {
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+                    }
+                });
+            }
+
+            // Theme toggle for auth pages (since no header)
+            const themeToggle = document.createElement('button');
+            themeToggle.className = 'theme-toggle auth-theme-toggle';
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i><i class="fas fa-sun"></i>';
+            themeToggle.setAttribute('title', 'Toggle dark mode');
+            themeToggle.style.position = 'fixed';
+            themeToggle.style.backgroundColor = 'var(--color-primary)';
+            themeToggle.style.top = '20px';
+            themeToggle.style.right = '20px';
+            themeToggle.style.zIndex = '100';
+            themeToggle.onclick = function () {
+                const currentTheme = localStorage.getItem('theme') || 'light';
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                localStorage.setItem('theme', newTheme);
+                document.documentElement.setAttribute('data-theme', newTheme);
+            };
+
+            // Add theme toggle if not already in header
+            if (!document.querySelector('.header')) {
+                document.body.appendChild(themeToggle);
+            }
+        });
+    </script>

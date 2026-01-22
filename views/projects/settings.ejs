@@ -82,7 +82,7 @@
             </div>
 
             <!-- Members -->
-            <% project.members.forEach(member => { %>
+            <% project.members.forEach(member => { if (member.email == project.createdBy.email) { return; }%>
                 <div class="settings-member-item">
                     <div class="settings-member-info">
                         <div class="settings-member-avatar settings-member-avatar-member">
@@ -106,7 +106,8 @@
             <% const teamMembers = project.members.filter(member =>
                 member._id.toString() !== project.createdBy._id.toString()
             ); %>
-            <%= teamMembers.length %> member(s) total
+            <!-- The plus one is to include the team owner -->
+            <%= teamMembers.length +1 %> member(s) total
         </div>
     </div>
 
@@ -187,7 +188,7 @@
                 showAlert('success', 'Ownership transferred successfully! Redirecting...');
                 setTimeout(() => {
                     window.location.href = `/projects/<%= project._id %>?success=Project ownership transferred`;
-                }, 1500);
+                }, 100);
             } else {
                 showAlert('error', result.message || 'Failed to transfer ownership');
             }
@@ -221,7 +222,7 @@
 
             if (result.success) {
                 showAlert('success', 'Project deleted successfully! Redirecting...');
-                setTimeout(() => { window.location.href = '/projects?success=Project deleted successfully'; }, 1500);
+                setTimeout(() => { window.location.href = '/projects?success=Project deleted successfully'; }, 100);
             } else {
                 showAlert('error', result.message || 'Failed to delete project');
             }
@@ -250,7 +251,7 @@
 
             if (result.success) {
                 showAlert('success', 'Member removed successfully');
-                setTimeout(()=>{window.location.reload();}, 1000);
+                setTimeout(()=>{window.location.reload();}, 100);
             } else {
                 showAlert('error', result.message || 'Failed to remove member');
             }
