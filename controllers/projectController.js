@@ -233,7 +233,7 @@ const getProjectMembers = async function (request, response) {
 
         response.json({
             success: true,
-            count: teamMembers.length,
+            count: teamMembers.length +1, // to add the owner in the total count for team members
             data: teamMembers
         });
 

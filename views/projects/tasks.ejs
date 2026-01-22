@@ -117,18 +117,16 @@
                             <th>Priority</th>
                             <th>Assigned To</th>
                             <th>Due Date</th>
-                            <th>Actions</th>
+                            <!-- <th>Actions</th> -->
                         </tr>
                     </thead>
                     <tbody>
                         <% tasks.forEach(task => { %>
-                            <tr>
+                            <tr onclick="window.location.href = '/tasks/<%= task._id %>'">
                                 <td>
                                     <div>
                                         <strong class="project-task-cell-title">
-                                            <a href="/tasks/<%= task._id %>">
-                                                <%= task.title %>
-                                            </a>
+                                            <%= task.title %>
                                         </strong>
                                         <% if (task.description) { %>
                                             <small class="project-task-cell-description">
@@ -179,7 +177,7 @@
                                         <span class="task-detail-meta due-date-none">No due date</span>
                                     <% } %>
                                 </td>
-                                <td>
+                                <!-- <td>
                                     <div class="project-task-cell-actions">
                                         <a href="/tasks/<%= task._id %>" class="btn-icon btn-icon-view" title="View">
                                             <i class="fas fa-eye"></i>
@@ -193,7 +191,7 @@
                                             </button>
                                         <% } %>
                                     </div>
-                                </td>
+                                </td> -->
                             </tr>
                         <% }) %>
                     </tbody>
@@ -273,7 +271,7 @@ async function deleteTask(taskId, projectId) {
 
         if (result.success) {
             showAlert('success', 'Task deleted successfully');
-            setTimeout(() => { window.location.reload(); }, 1000);
+            setTimeout(() => { window.location.reload(); }, 100);
         } else {
             showAlert('error', result.message || 'Failed to delete task');
         }

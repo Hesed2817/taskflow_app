@@ -479,7 +479,7 @@
                             showAlert('success', 'Task updated successfully');
                             setTimeout(() => {
                                 window.location.reload();
-                            }, 1500);
+                            }, 100);
                         } else {
                             showAlert('error', result.message || 'Failed to update task');
                             submitBtn.innerHTML = originalText;

@@ -67,10 +67,11 @@
                                         <% } %>
                                             <div class="project-detail-meta-item">
                                                 <strong><i class="fas fa-users"></i>Team Members:</strong>
+                                                <!-- The + 1 is to include the team owner in the total count of members -->
                                                 <% const teamMembersCount=project.members.filter(member=>
                                                     !project.createdBy || (member._id && project.createdBy._id &&
                                                     member._id.toString() !==
-                                                    project.createdBy._id.toString())).length; %>
+                                                    project.createdBy._id.toString())).length + 1; %>
                                                     <%= teamMembersCount %>
                                             </div>
             </div>
@@ -304,7 +305,8 @@
                     </div>
 
                     <div class="member-summary">
-                        <%= teamMembers.length %> team member(s)
+                        <!-- The + 1 is to include the team owner in the total count of members -->
+                        <%= teamMembers.length + 1 %> team member(s)
                     </div>
 
                     <% if (isOwner) { %>
@@ -453,7 +455,7 @@
                     showAlert('success', 'Task created successfully!');
                     setTimeout(() => {
                         window.location.reload();
-                    }, 500);
+                    }, 100);
                 } else {
                     let errorMessage = result.message || 'Failed to create task';
                     if (result.errors) {
@@ -501,7 +503,7 @@
             clearTimeout(searchTimeout);
 
             if (searchTerm.length < 3) {
-                document.getElementById('userSuggestions').innerHTML = '';
+                document.getElementById('userSuggestions').innerHTML = "<div style='padding: 0.5rem; color: #9ca3af;'>Search term must be atleast 3 characters</div>";
                 return;
             }
 
@@ -589,7 +591,7 @@
                     showAlert('success', 'Member added successfully!');
                     setTimeout(() => {
                         window.location.reload();
-                    }, 1000);
+                    }, 100);
                 } else {
                     alert(result.message || 'Failed to add member');
                     submitBtn.innerHTML = originalText;
@@ -626,7 +628,7 @@
                     showAlert('success', 'Member removed successfully!');
                     setTimeout(() => {
                         window.location.reload();
-                    }, 1000);
+                    }, 100);
                 } else {
                     // Show error message with task count info
                     let errorMessage = result.message || 'Failed to remove member';
@@ -670,7 +672,7 @@
                     showAlert('success', 'Task deleted successfully!');
                     setTimeout(() => {
                         window.location.reload();
-                    }, 1000);
+                    }, 100);
                 } else {
                     showAlert('error', result.message);
                 }
@@ -704,7 +706,7 @@
 
                 if (result.success) {
                     showAlert('success', 'Project deleted successfully! Redirecting...');
-                    setTimeout(() => { window.location.href = '/projects?success=Project deleted successfully'; }, 1500);
+                    setTimeout(() => { window.location.href = '/projects?success=Project deleted successfully'; }, 100);
                 } else {
                     showAlert('error', result.message || 'Failed to delete project');
                 }

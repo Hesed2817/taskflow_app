@@ -91,7 +91,7 @@
                     showAlert('success', 'Project created successfully!');
                     setTimeout(() => {
                         window.location.href = '/projects/' + result.data._id;
-                    }, 1000);
+                    }, 100);
                 } else {
                     showAlert('error', result.message || 'Failed to create project');
                     submitBtn.innerHTML = originalText;

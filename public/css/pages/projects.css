@@ -879,6 +879,7 @@
 .project-tasks-table td {
     padding: var(--space-md);
     vertical-align: top;
+    cursor: pointer;
 }
 
 /* Table Cells */

@@ -29,8 +29,8 @@ router.get('/register', register);
 router.get('/forgot-password', (req, res) => {
     res.render('auth/forgot-password', {
         title: 'Forgot Password',
-        user: null, // Auth pages don't have user context usually
-        cssFile: 'auth' // Assuming 'auth' css exists or reusing main/form styles
+        user: null,
+        cssFile: 'auth'
     });
 });
 
