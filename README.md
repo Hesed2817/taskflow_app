@@ -78,12 +78,24 @@ Follow these instructions to get a copy of the project up and running on your lo
     
     Then open `.env` and fill in your details:
     ```env
-    NODE_ENV=development
     PORT=3000
     MONGODB_URI=mongodb://localhost:27017/taskflow
-    JWT_SECRET=your_secure_jwt_secret
-    SESSION_SECRET=your_secure_session_secret
-    JWT_EXPIRE=30d
+    
+    # Session & JWT
+    SESSION_SECRET=your_super_secret_session_key
+    JWT_ACCESS_SECRET=your_super_secret_access_key
+    JWT_ACCESS_EXPIRE=30d
+    JWT_REFRESH_SECRET=your_super_secret_refresh_key
+    
+    # SMTP Configuration
+    SMTP_HOST=smtp.sendgrid.net
+    SMTP_PORT=587
+    SMTP_EMAIL=apikey
+    SMTP_PASSWORD=your_sendgrid_api_key
+    
+    # Sender Information
+    FROM_EMAIL=your_email@example.com
+    FROM_NAME=TaskFlow
     ```
 
 4.  **Run the Application**
