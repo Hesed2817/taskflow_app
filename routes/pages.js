@@ -34,6 +34,16 @@ router.get('/forgot-password', (req, res) => {
     });
 });
 
+// Reset Password page
+router.get('/reset-password/:resetToken', (req, res) => {
+    res.render('auth/reset-password', {
+        title: 'Reset Password',
+        user: null,
+        cssFile: 'auth',
+        resetToken: req.params.resetToken
+    });
+});
+
 // ========== PROTECTED ROUTES ==========
 
 // Dashboard
