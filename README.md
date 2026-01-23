@@ -16,6 +16,8 @@ TaskFlow is a robust, production-ready task management solution built with Node.
 - **Dark/Light Mode:** Seamless theme switching with persistent user preference.
 - **Responsive Design:** Fully optimized for desktop, tablet, and mobile devices.
 - **Dynamic Animations:** Engaging UI elements for a premium feel.
+- **Password Visibility Toggle:** Built-in eye icon to securely preview passwords before submission.
+- **Enhanced Form Validation:** Real-time frontend alerts for invalid inputs (e.g., weak passwords, non-existent users).
 - **Custom Error Pages:** Friendly 404 and "Work in Progress" pages.
 
 ### **📊 Smart Project Management**
@@ -35,16 +37,18 @@ TaskFlow is a robust, production-ready task management solution built with Node.
 - **Secure Access:** JWT-based authentication with cookie management.
 - **Password Protection:** Robust hashing using bcrypt.
 - **Session Handling:** Secure session management for authenticated users.
+- **Password Recovery:** Integrated "Forgot Password" flow with secure email links via SendGrid.
+- **Access/Refresh Tokens:** Dual-token system for enhanced security and session persistence.
 
 ---
 
 ## **🛠️ Technology Stack**
 
-- **Backend:** Node.js, Express.js
+- **Backend:** Node.js, Express.js (v5+)
 - **Database:** MongoDB, Mongoose ODM
 - **Frontend:** EJS Templating, Vanilla CSS (Variables-based theming), Vanilla JavaScript
-- **Auth:** JWT (JSON Web Tokens), bcrypt, cookie-parser
-- **Utilities:** Moment.js (optional), Dotenv
+- **Auth:** JWT (JSON Web Tokens), bcrypt, cookie-parser, express-session
+- **Utilities:** SendGrid (@sendgrid/mail), Nodemailer, express-validator, Dotenv
 
 ---
 
@@ -135,6 +139,8 @@ While mostly a server-side rendered app, TaskFlow exposes internal APIs for dyna
 | :--- | :--- | :--- |
 | `POST` | `/api/auth/register` | Register a new user |
 | `POST` | `/api/auth/login` | Authenticate user |
+| `POST` | `/api/auth/forgot-password` | Request password reset email |
+| `PUT` | `/api/auth/reset-password/:token` | Reset password using token |
 | `GET` | `/api/projects` | Fetch all projects |
 | `POST` | `/api/projects` | Create a new project |
 | `PUT` | `/api/projects/:id` | Update project details |
