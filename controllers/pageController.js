@@ -13,7 +13,7 @@ const login = function (request, response) {
 
     response.render('auth/login', {
         title: 'Login',
-        user: null,  // Always pass user, even if null
+        user: null,
         error: request.query.error || null,
         success: request.query.success || null,
         cssFile: 'auth'
